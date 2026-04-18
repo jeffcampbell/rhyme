@@ -28,7 +28,7 @@ import os
 import sys
 import urllib.request
 
-from parse_utils import extract_json_array, extract_letter, normalize_matches
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); from parse_utils import extract_json_array, extract_letter, normalize_matches
 
 API_KEY = os.environ.get("OPENAI_API_KEY", "")
 BASE_URL = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
