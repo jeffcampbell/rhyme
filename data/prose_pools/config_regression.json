@@ -1,0 +1,119 @@
+{
+  "cause_class": "config_regression",
+  "summaries": [
+    "1:47 PM UTC We are investigating elevated {error_type} errors for {service} in the us-east-1 Region. The degradation began at {config_time}. No deployment event has been identified in the relevant window. We will provide an update within 30 minutes.",
+    "Between {config_time} and the time of mitigation, customers using {service} may have experienced {error_type} on the {endpoint} path. Investigation confirmed that a write to {configmap_name} in the {namespace} namespace, specifically modifying {config_key} from {old_value} to {new_value}, was the root cause. Code rollback had no effect; reverting the configuration resolved the incident.",
+    "PIR – {service} – {error_type} Spike Caused by Runtime Parameter Change – Tracking ID {config_key}. At {config_time} an automated pipeline job updated {config_key} to {new_value} inside {configmap_name}. Within minutes, {service} began emitting {error_type} at scale. The last code deployment was {last_deploy_ago}. Restoring {old_value} resolved the issue within seconds of propagation.",
+    "{service} health checks began failing at {config_time}. The image digest is identical to the prior {last_deploy_ago}. Engineers ruled out hardware and code causes and traced the incident to a ConfigMap write that set {config_key}={new_value}, overriding the expected {old_value}.",
+    "9:03 AM PST We are investigating a sudden increase in errors for {service}. The service image and rollout history show no changes in the past {last_deploy_ago}. Investigation is focused on runtime parameters modified around {config_time}. 9:34 AM PST We have confirmed the root cause: {config_key} inside {configmap_name} was updated to {new_value}. The configuration has been reverted and the service is recovering.",
+    "Post-Incident Review – {service} – {namespace} Namespace – Feature Flag Rollout Failure. Feature flag {feature_flag} was enabled for the {segment} cohort at {config_time}. Within two minutes, {service} began emitting {error_type} at {error_pct}%. Disabling the flag immediately restored normal behavior. No code change accompanied the flag activation.",
+    "A subset of customers experienced {error_type} when calling {endpoint} between {config_time} and mitigation. Deployment records confirmed no image push in the prior {last_deploy_ago}. A LaunchDarkly audit log revealed {feature_flag} was toggled from {old_value} to {new_value}, activating a code path incompatible with the current data schema.",
+    "Dashboards showed {service} request success rate dropping sharply at {config_time} with no deployment marker in the timeline. A diff of {configmap_name} revealed {config_key} had been changed from {old_value} to {new_value} moments earlier. Rolling back the configuration — not the container image — resolved the incident.",
+    "2:22 AM CET We can confirm degraded availability for {service} in the eu-west-1 Region. All pods are running the same image as before the incident. Preliminary investigation points to a runtime environment change around {config_time}. Engineering is actively working to restore service. 2:51 AM CET The issue has been identified as an incorrect value for {config_key} in {configmap_name}. The prior value {old_value} has been restored and the service is operating normally.",
+    "The issue with {service} elevated {error_type} has been resolved for all affected customers. Root cause: a scheduled pipeline job updated {config_key} to {new_value} in {configmap_name} at {config_time}. The service is sensitive to this parameter and cannot function with the new value. The artifact version was unchanged throughout.",
+    "Oncall was paged at {config_time} for a sudden {error_type} storm across all {service} replicas. The simultaneous onset on every pod — rather than a gradual rollout pattern — pointed immediately away from a code deploy and toward a shared runtime parameter. {config_key} was confirmed as {new_value} in {configmap_name}; restoring {old_value} resolved the incident.",
+    "Synthetic monitors for {endpoint} recorded a sharp {error_type} uptick at {config_time}. The service image had not changed in {last_deploy_ago}. Tracing the timeline, engineers found {config_key} inside {configmap_name} had been patched by an ops automation job seconds before the first alert fired.",
+    "PIR – {service} – East US – Environment Variable Regression. A routine audit updated {config_key} to {new_value} in the {namespace} namespace at {config_time}. The value was incompatible with {service}'s connection pool logic, producing {error_type} for {affected_pct}% of requests. Reverting {configmap_name} resolved the issue; the code was never touched.",
+    "Between {config_time} and mitigation, {affected_pct}% of {service} users in the {segment} cohort encountered {error_type}. No GitOps merge or image push appeared in the audit trail. A Kubernetes ConfigMap diff for {configmap_name} showed {changed_keys} had drifted from the approved baseline, confirming a runtime configuration regression as root cause.",
+    "Engineers spent approximately forty minutes investigating a suspected memory leak in {service} before noticing the anomaly onset at {config_time} coincided with a scheduled flag rotation job. {feature_flag} had been flipped to {new_value}, enabling a code branch incompatible with the deployed schema. Toggling it back resolved the issue.",
+    "4:15 PM SGT We are investigating elevated error rates for {service} in the ap-southeast-1 Region beginning at {config_time}. No deployment has occurred in the past {last_deploy_ago}. We are examining recent changes to runtime configuration. 4:44 PM SGT We have identified that {config_key} was set to {new_value} in {configmap_name}, inconsistent with service requirements. Revert is complete and the service is healthy.",
+    "Multiple services downstream of {service} began receiving malformed responses after {config_time}. Upstream tracing revealed {config_key} had been set to {new_value}, altering the serialization format expected by consumers. The container image was unchanged. Restoring {old_value} in {configmap_name} corrected the behavior immediately.",
+    "Alertmanager fired a P1 at {config_time} against {service} in the {namespace} namespace. Pod logs showed {error_type} flooding all replicas simultaneously — a pattern inconsistent with a rolling deployment. The uniform onset across all pods indicated a shared configuration layer change rather than a newly introduced code defect.",
+    "A Grafana annotation audit showed zero deploy events near the {config_time} incident window, but a feature flag audit log confirmed {feature_flag} was toggled from {old_value} to {new_value} by an automated system. That single change drove {affected_pct}% of the {segment} user base into an error state on {endpoint}.",
+    "Post-incident review confirmed that {service} degradation starting at {config_time} was caused entirely by a runtime parameter update. The code path is correct and functions normally when {config_key} is set to {old_value}. The service cannot operate with {config_key}={new_value}. Restoring the prior value in {configmap_name} resolved the incident within seconds."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL [{service}] Error rate {error_pct}% on {endpoint} — onset {config_time}; no deploy in past {last_deploy_ago}; {configmap_name} modified {changed_keys} immediately prior; image unchanged",
+        "P1 FIRING: {service} in {namespace} returning {error_type} for {affected_pct}% of {segment} requests since {config_time}; container digest unchanged; {config_key} recently set to {new_value}",
+        "CRITICAL [{service}] SLO breach — {error_pct}% errors over 10-minute window starting {config_time}; no deployment event; {config_key} changed from {old_value} to {new_value} in {configmap_name}",
+        "[PagerDuty] {service}/{namespace}: {error_type} storm since {config_time}. Feature flag {feature_flag}={new_value} is leading hypothesis. Image rollback had no effect. Revert flag immediately.",
+        "CRITICAL [{service}] Health check failure rate >50% at {config_time}. Last code push {last_deploy_ago}. ConfigMap {configmap_name} modified {changed_keys}. Rollback of container tag had no effect.",
+        "Datadog monitor '{service} availability' ALERT: success rate below 90% since {config_time}. Container digest unchanged. {changed_keys} in {configmap_name} updated seconds before incident onset.",
+        "[OpsGenie] {service} CRITICAL: {endpoint} latency p99 >30s since {config_time}. Artifact unchanged. {config_key}={new_value} inconsistent with service expectations. Revert {configmap_name}.",
+        "PAGERDUTY CRITICAL: {segment} cohort experiencing complete {error_type} failure on {service} — began {config_time}, {last_deploy_ago} after last code deploy; revert {feature_flag} immediately",
+        "FIRING [severity=critical] probe_success{{job=\"{service}\"}} == 0 for 5m — incident opens at {config_time}; no pod restarts; no deploy; {configmap_name} propagation suspected",
+        "CRITICAL [{service}/{namespace}] {error_pct}% traffic hitting {error_type} — Datadog APM shows uniform failure across all pods from {config_time}; consistent with config-layer change, not rolling deploy"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING [{service}] Error rate rising: {error_pct}% over last 5 minutes as of {config_time}. No deploy in {last_deploy_ago}. Check {configmap_name} for recent edits to {config_key}.",
+        "Splunk alert: {service} logging elevated {error_type} since {config_time}. Pattern suggests misconfigured {config_key}. Current value {new_value} may not match expected {old_value}.",
+        "[warn] {service}/{namespace} latency degradation at {config_time}. No rollout in progress. {changed_keys} flagged as recently modified in config audit log.",
+        "Prometheus: {service} 5xx rate 2x baseline beginning {config_time}. Image tag unchanged for {last_deploy_ago}. Possible runtime regression — validate {config_key} in {configmap_name}.",
+        "WARNING: Feature flag {feature_flag} toggled to {new_value} at {config_time}. {service} error anomaly detected shortly after. Recommend validation before broader rollout to {segment}.",
+        "New Relic anomaly: {service} throughput drop on {endpoint} since {config_time}. No deployment. {configmap_name} diff shows {config_key} modified — potential regression.",
+        "[CloudWatch] {service} in {namespace}: {affected_pct}% of requests returning {error_type}. Began {config_time}. Code version identical to last {last_deploy_ago}. Investigate environment variable changes.",
+        "warn: {service} pods showing repeated {error_type} since {config_time}. All pods affected simultaneously — excludes rolling deploy. Check {configmap_name} in {namespace}.",
+        "Grafana alert '{service} request errors' WARNING: error budget burn elevated since {config_time}. {config_key}={new_value} may be incompatible with downstream expectations.",
+        "[warn] SLI degradation for {service} {endpoint}: error ratio {error_pct}% over 15m window. No GitOps merge detected. {feature_flag} state recently changed — monitor closely."
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO: {configmap_name} in {namespace} updated at {config_time}. Changed keys: {changed_keys}. {service} pods will receive new values on next reload cycle.",
+        "Audit log: {feature_flag} toggled from {old_value} to {new_value} at {config_time} for segment {segment}. No associated deployment. Monitor {service} error metrics.",
+        "Config propagation complete for {configmap_name} ({namespace}) at {config_time}. Key {config_key} now {new_value}. Previous value: {old_value}. Affected service: {service}.",
+        "Notice: {service} metrics show minor uptick in {error_type} beginning {config_time}. Last deploy was {last_deploy_ago}. Tracking potential correlation with recent {config_key} update.",
+        "INFO [{service}]: Environment variable {config_key} updated to {new_value} via {configmap_name}. Watching {endpoint} for behavioral changes over next 30 minutes."
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "time={config_time} service={service} msg=\"request failed\" error=\"{error_type}\" config_key={config_key} config_value={new_value} endpoint={endpoint} — value rejected by validation layer, expected format matching {old_value}",
+        "[{config_time}] ERROR {service}: runtime flag {feature_flag} enabled code path incompatible with current data schema; flag value={new_value}; {error_type} on all requests to {endpoint}",
+        "ERROR [{service}] {config_time} — NullPointerException in config binding: {config_key} resolved to '{new_value}', cannot be cast to expected type; check {configmap_name} in {namespace}",
+        "{config_time} {service} [ERROR] downstream call to {endpoint} rejected: auth scope derived from {config_key}={new_value} does not match required scope; reverting to {old_value} resolves issue",
+        "[ERROR] {service} namespace={namespace} — feature flag {feature_flag} is {new_value}, activating experimental serializer; {error_type} thrown for {affected_pct}% of {segment} payloads",
+        "{config_time} level=error logger={service} msg=\"config value out of range\" key={config_key} got={new_value} allowed_range=\"[{old_value}]\" impact=\"{error_type} on all writes\"",
+        "ERROR {service}: connection pool exhausted — max_pool_size read from {configmap_name} as {new_value} instead of expected {old_value}; causing {error_type} under normal load since {config_time}",
+        "[{config_time}] {service} ERROR — route matching failed on {endpoint}: routing table built from {config_key}={new_value} produced zero valid backends; {error_pct}% of requests dropped",
+        "ERROR {service} {namespace}: TLS handshake rejected — cert path configured via {config_key} points to {new_value} which does not exist in this image; last deploy was {last_deploy_ago}",
+        "{config_time} {service} [ERROR] rate-limit policy loaded from {configmap_name} key={config_key} value={new_value} is stricter than intended; blocking {affected_pct}% of {segment} requests with {error_type}",
+        "[ERROR] {service}: feature flag {feature_flag}={new_value} enabled A/B path calling deprecated {endpoint}; downstream returns {error_type}; flag was {old_value} during last stable window",
+        "{config_time} ERROR {service} — database DSN assembled from {config_key}={new_value} fails parse; all DB operations returning {error_type}; no code change since {last_deploy_ago}",
+        "ERROR [{service}] env={namespace} — config-driven timeout {config_key}={new_value}ms is below p99 upstream latency; cascading {error_type} across {affected_pct}% of calls to {endpoint}",
+        "[{config_time}] {service} [ERROR] JSON schema validation failed: field required by {config_key}={new_value} contract absent in request; {error_pct}% rejection rate on {endpoint}",
+        "{config_time} {service} ERROR — queue concurrency set via {configmap_name}/{config_key} to {new_value} (was {old_value}); worker starvation causing {error_type} for {segment} consumers"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "WARN [{service}] {config_time} — {config_key} changed from {old_value} to {new_value} in {configmap_name}; service will use new value on next request cycle; monitor {endpoint} closely",
+        "[{config_time}] {service} WARN: feature flag {feature_flag} is now {new_value}; {segment} cohort will receive alternate code path; {error_type} risk elevated until validation completes",
+        "warn {service} namespace={namespace} — config reload detected for {configmap_name}; changed keys: {changed_keys}; validate downstream behavior within SLO window",
+        "{config_time} {service} [WARN] fallback triggered: {config_key}={new_value} failed validation, using hardcoded default; behavior may diverge from intent in {configmap_name}",
+        "WARN {service}: {config_key} value {new_value} is deprecated; expected {old_value}; compatibility shim active but {error_pct}% of edge cases may still fail on {endpoint}",
+        "[{config_time}] {service} WARN — retry budget for {endpoint} set to {new_value} via {config_key}; lower than recommended minimum {old_value}; elevated {error_type} possible under load",
+        "warn level={service} — {feature_flag} enabled for {segment}; this flag previously caused {error_type} in staging when set to {new_value}; proceed with caution",
+        "{config_time} WARN {service}/{namespace}: config propagation lag detected; {configmap_name} reports {config_key}={new_value} but 2 of 6 pods still serving {old_value}; split-brain possible",
+        "[WARN] {service} {config_time} — {config_key} boundary crossed: new value {new_value} exceeds soft limit; {affected_pct}% of {segment} requests routed to fallback handler on {endpoint}",
+        "WARN {service}: environment variable {config_key} is now {new_value}; this value was set previously {last_deploy_ago} and caused elevated {error_type} at that time",
+        "{config_time} {service} [WARN] config-driven feature {feature_flag} toggled mid-traffic; in-flight requests may see inconsistent behavior during propagation window across {namespace} pods",
+        "[{config_time}] WARN {service} — {configmap_name} checksum mismatch versus approved baseline; {changed_keys} appear modified outside normal change-management process"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "{config_time} {service} [INFO] ConfigMap {configmap_name} reloaded in namespace {namespace}; applied {changed_keys}; new value for {config_key} is {new_value} (was {old_value})",
+        "info service={service} — feature flag {feature_flag} evaluated as {new_value} for user segment {segment}; routing to alternate {endpoint} handler",
+        "[{config_time}] {service} INFO: environment bootstrap complete; {config_key}={new_value} sourced from {configmap_name}/{namespace}; last container build was {last_deploy_ago}",
+        "INFO {service} {namespace} — config-driven rollout for {feature_flag} reached {affected_pct}% of {segment} at {config_time}; no rollback criteria met yet",
+        "{config_time} {service} [INFO] runtime parameter update accepted: {config_key} set to {new_value}; change logged for audit; watchdog will alert if error rate exceeds threshold on {endpoint}",
+        "info {service}: {configmap_name} diff applied at {config_time}; {changed_keys} updated; image digest unchanged confirming this is a configuration-only change since last deploy {last_deploy_ago}",
+        "[INFO] {service} — periodic config snapshot recorded at {config_time}; {config_key}={new_value}; snapshot stored for rollback reference",
+        "{config_time} INFO {service}/{namespace}: feature flag {feature_flag} state persisted to cache as {new_value}; affects {segment} traffic on {endpoint}"
+      ]
+    }
+  ]
+}

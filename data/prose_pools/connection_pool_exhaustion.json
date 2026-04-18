@@ -1,0 +1,119 @@
+{
+  "cause_class": "connection_pool_exhaustion",
+  "summaries": [
+    "2:30 PM UTC We are investigating elevated latency on {service} in us-east-1. All {conn_max} connections in the pool to {downstream} are active with {idle} idle. New requests are waiting up to {pool_wait}ms to acquire a slot. {downstream} itself is healthy and completing queries at normal speed. The latency is entirely in the wait phase before a connection is obtained.",
+    "Between 10:15 and 12:40 UTC on 09 Apr 2026, customers using {service} in eu-west-1 experienced elevated end-to-end latency. The root cause was connection pool saturation against {downstream}: all {conn_max} connections were occupied and incoming requests queued for a median of {pool_wait}ms before being serviced. {downstream} query times were normal throughout.",
+    "Post Incident Review – Connection Pool Exhaustion, us-east-1. Tracking ID: CP-5581. What happened? A recent deployment to {service} introduced a code path that held connections to {db} open longer than expected. Over {hours} hours, idle connections dropped from a healthy level to zero, and pool wait times climbed from under 5ms to {pool_wait}ms. {downstream} showed no degradation for connections it did receive.",
+    "The latency issue affecting {service} in us-central1 has been resolved as of 3:00 PM US/Pacific. A connection pool saturation event against {downstream} has been cleared by restarting the affected {service} instances and increasing the pool maximum from {conn_max} to {conn_count}. {downstream} was healthy throughout the incident.",
+    "9:00 AM PST We are investigating slow response times on {service} in us-west-2. The connection pool to {downstream} is fully saturated: {active} active, {idle} idle, {waiting} waiting. Requests are queueing for {pool_wait}ms before a connection is available. No errors are visible on {downstream}. We are investigating whether a connection leak is present.",
+    "Between 06:30 and 08:45 UTC, customers in ap-southeast-1 experienced elevated latency on {endpoint}. Distributed traces showed the majority of added latency — up to {pool_wait}ms — occurring before the first byte was sent to {downstream}. {downstream} response times were within normal bounds. Pool diagnostics confirmed zero idle connections for the duration.",
+    "11:22 AM CET {service} in eu-central-1 is experiencing latency due to a saturated connection pool against {downstream}. Current pool state: {active} active, {idle} idle, {waiting} requests waiting. {downstream} is healthy and processing existing connections normally. A pool size increase is being applied as an immediate mitigation.",
+    "PIR – {service} Latency Degradation, eu-west-2. Tracking ID: CP-7743. On 03 Mar 2026 between 14:00 and 16:20 UTC, {service} p99 latency reached {p99}ms. Traces showed requests waiting {pool_wait}ms in queue before touching {downstream}. Pool maximum was {conn_max}; all connections active with zero idle. The {downstream} database showed no performance issues. Root cause was a missing connection release in a new exception handling branch.",
+    "10:45 PM UTC We have confirmed that {service} latency in us-east-1 is caused by a saturated connection pool to {downstream}. Pool state: {active}/{conn_max} active, zero idle, {waiting} requests queued. {downstream} is healthy. An emergency pool size increase has been applied and pool wait times are declining.",
+    "The connection pool issue affecting {service} in ap-northeast-1 has been resolved as of 07:15 US/Pacific. Pool wait times have returned to under 5ms following a deployment that fixed a connection leak in the {service} error handling path. {downstream} was healthy throughout. {conn_max} pool connections remain configured.",
+    "Between 17:45 and 19:30 UTC, {service} in West Europe recorded {error_pct}% of requests timing out at the {timeout}ms deadline. All timeouts were caused by wait time in the connection pool queue, not by slow {downstream} responses. The {downstream} database was operating normally throughout. Pool saturation occurred after a traffic spike doubled {rps} without a corresponding pool size increase.",
+    "3:00 PM PST We are monitoring elevated latency on {service} in us-west-2. Connection pool to {db} via {downstream} is at capacity: {active} active connections, {idle} idle, {waiting} requests pending pool acquisition. End-to-end latency is {latency}ms versus a {baseline}ms baseline. {downstream} query latency is normal. We are investigating connection lifetime and leak patterns.",
+    "Tracking ID: CP-2204. On 18 Jan 2026 between 08:00 and 10:45 UTC, {service} in us-east-1 served degraded latency to {affected_count} customers. Pool diagnostics recorded zero idle connections for the entire window. {downstream} received a steady {rps} RPS at normal query times. P99 latency of {p99}ms was driven almost entirely by {pool_wait}ms of pool wait time.",
+    "4:20 AM UTC RESOLVED – Connection pool saturation on {service} -> {downstream} in eu-west-1 has cleared. Idle connections: {idle}. Wait time returned to under 5ms. A fix for the connection leak will be deployed during the next maintenance window.",
+    "We are aware of elevated end-to-end latency on {service} in us-east-2. Traces confirm requests are spending {pool_wait}ms waiting to acquire a connection to {downstream} before any query is issued. {downstream} is healthy. Pool is at {active}/{conn_max} with {idle} idle. We are applying a temporary pool size increase while investigating the root cause.",
+    "8:45 AM JST {service} in ap-northeast-1 is experiencing latency consistent with resource queue saturation. Pool metrics confirm all {conn_max} connections to {downstream} are occupied with zero idle. {downstream} is operating within normal parameters. New requests are waiting {pool_wait}ms. A connection leak introduced in last night's deployment is suspected.",
+    "Post Incident Summary – Pool Exhaustion from Unreleased Connections. On 25 Feb 2026, a new feature in {service} acquired connections to {db} but did not release them on a specific error path. Over {hours} hours, idle connections drained to zero and pool wait times escalated to {pool_wait}ms. {downstream} showed no issues. The leak was fixed and connections now use a guaranteed-release context manager.",
+    "1:10 PM EST Customers in us-east-1 may notice slow responses on {endpoint}. {service} connection pool to {downstream} is saturated: {active} active, {idle} idle, {waiting} queued. The added latency is purely in the acquisition phase — {downstream} is completing queries normally in {p50}ms. We are applying a pool limit increase as an immediate relief measure.",
+    "Between 21:00 and 22:50 UTC, {service} in eu-west-2 experienced p99 latency of {p99}ms. All traces showed a flat {pool_wait}ms pre-send wait phase followed by normal {p50}ms {downstream} query times. Pool diagnostics confirmed zero idle connections throughout. The event followed a sustained traffic increase to {rps} RPS that exceeded the pool's {conn_max} connection ceiling.",
+    "RESOLVED 14:35 UTC – Connection pool wait times on {service} -> {downstream} in us-east-1 have normalized. Pool state: {active} active, {idle} idle, zero waiting. The connection leak has been patched and deployed. End-to-end latency has returned to {baseline}ms. Customers who experienced slow responses between 11:00 and 14:35 UTC do not need to take any action."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL: {service} connection pool to {downstream} exhausted in us-east-1. Active: {active}/{conn_max}, idle: {idle}, waiting: {waiting}. Pool wait time {pool_wait}ms.",
+        "CRITICAL: Zero idle connections in {service} -> {downstream} pool. {waiting} requests queued. Pool wait driving p99 latency to {p99}ms. {downstream} healthy.",
+        "CRITICAL: {service} pool exhaustion: all {conn_max} connections to {db} active. Requests queuing {pool_wait}ms before first byte sent. SLO breach imminent.",
+        "CRITICAL: Connection pool to {downstream}:{port} saturated. {active} active, {idle} idle. {waiting} threads blocked on pool acquisition. {downstream} reporting no issues.",
+        "CRITICAL: {service} latency {p99}ms p99 caused entirely by pool wait. {downstream} query time is {p50}ms (normal). Pool: {active}/{conn_max}, idle={idle}.",
+        "CRITICAL: {service} pool exhaustion in {namespace}. Connection wait timeout {pool_wait}ms exceeded for {error_pct}% of requests. No {downstream} errors observed.",
+        "CRITICAL: Pool size {conn_max} insufficient for current load {rps} RPS on {service}. Idle connections: {idle}. Wait queue depth: {waiting}. Downstream {db} healthy.",
+        "CRITICAL: {service} -> {downstream} pool: 0 idle connections for last {duration}ms. Connection leak suspected. Active: {active}, waiting: {waiting}. Restart may be required.",
+        "CRITICAL: {service} SLO breach: {slo}% availability. All failures are pool-wait timeouts — requests exceeding {timeout}ms budget while waiting for connection to {downstream}.",
+        "CRITICAL: Pool exhaustion event confirmed on {service} in eu-west-1. Connections not being released. Idle count: {idle}. All {conn_max} connections held open. Immediate investigation required."
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING: {service} connection pool to {downstream} at {active}/{conn_max} ({cpu_pct}% utilization). Idle connections: {idle}. Monitor for exhaustion under load.",
+        "WARNING: Pool wait time on {service} -> {downstream} increasing: {pool_wait}ms (normal under 5ms). Pool approaching saturation. Active: {active}/{conn_max}.",
+        "WARNING: {service} idle connections to {db} have dropped from normal {conn_count} to {idle} over the last {hours} hours. Possible connection leak.",
+        "WARNING: {service} -> {downstream} pool utilization {cpu_pct}%. At current growth rate, pool will be exhausted in approximately {hours} hours.",
+        "WARNING: Connection acquisition wait time for {service} -> {downstream} rose to {pool_wait}ms. {downstream} query time is normal at {p50}ms. Pool is the bottleneck.",
+        "WARNING: {waiting} requests currently queued for {service} connection pool to {downstream}. Normal queue depth is zero. Monitor for timeout escalation.",
+        "WARNING: {service} connection pool to {downstream}:{port} — idle connections trending down: {idle} remaining of {conn_max} max. Check for unclosed connections.",
+        "WARNING: Traffic spike to {rps} RPS on {service} may exhaust connection pool to {downstream} (max: {conn_max}). Current idle: {idle}. Consider temporary pool increase.",
+        "WARNING: {service} p99 latency rising: {p99}ms. Trace analysis shows latency in pre-send wait phase, not in {downstream} execution. Pool capacity check recommended.",
+        "WARNING: Connection lifetime on {service} -> {db} longer than expected. Mean connection age {duration}ms vs normal {baseline}ms. Possible leak in {namespace}."
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO: {service} connection pool to {downstream} recovering. Idle connections: {idle}. Wait time returning to under 5ms. {waiting} requests still queued.",
+        "INFO: Pool exhaustion event resolved on {service}. Pool state normalized: {active} active, {idle} idle, {waiting} waiting. Root cause: connection leak patched.",
+        "INFO: Emergency pool size increase applied: {service} -> {downstream} max connections raised from {conn_max} to {conn_count}. Wait times declining.",
+        "INFO: {service} connection pool metrics normal. Active: {active}/{conn_max}, idle: {idle}, wait time under 5ms. {downstream} healthy throughout incident.",
+        "INFO: Post-incident: connection lifecycle audit completed for {service}. All code paths verified to release connections. Pool monitoring thresholds updated."
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "[ERROR] {trace_id} ConnectionPoolTimeoutError: Timed out waiting for connection from pool to {downstream}:{port} after {pool_wait}ms. Pool state: {active}/{conn_max} active, {idle} idle.",
+        "[ERROR] {trace_id} PoolExhausted: Unable to acquire connection to {db} after {pool_wait}ms. All {conn_max} connections in use. {waiting} requests ahead in queue.",
+        "[ERROR] {trace_id} HikariPool-1 — Connection is not available, request timed out after {pool_wait}ms. Pool: active={active}, idle={idle}, waiting={waiting}, max={conn_max}.",
+        "[ERROR] {trace_id} pgbouncer: no more connections allowed (max_client_conn={conn_max}) for pool to {downstream}:{port}. Client must wait or fail.",
+        "[ERROR] {trace_id} {service} request to {endpoint} timed out after {timeout}ms. Trace shows {pool_wait}ms in pool acquisition phase, {p50}ms in {downstream} query. Pool is bottleneck.",
+        "[ERROR] {trace_id} SQLAlchemy QueuePool limit of size={conn_max} overflow=0 reached, connection timed out, timeout={pool_wait}. Downstream {db} healthy.",
+        "[ERROR] {trace_id} {service} pool wait exceeded deadline. Request abandoned after {pool_wait}ms without acquiring connection. {downstream} never reached. Returning 503.",
+        "[ERROR] {trace_id} ConnectionPool.acquire(): timeout {pool_wait}ms. Current pool: {active} active, {idle} idle. {downstream} query time for existing connections: {p50}ms (healthy).",
+        "[ERROR] {trace_id} Pool leak suspected: {active} connections active for over {duration}ms without release. Normal connection lifetime is {baseline}ms. Possible unreleased connection on error path.",
+        "[ERROR] {trace_id} {service} end-to-end latency {p99}ms: breakdown — pool wait {pool_wait}ms, {downstream} query {p50}ms, serialization {baseline}ms. Pool is sole bottleneck.",
+        "[ERROR] {trace_id} Worker thread blocked {pool_wait}ms waiting for connection slot to {db}. Active connections: {active}/{conn_max}. {downstream} is not the issue.",
+        "[ERROR] {trace_id} Request to {endpoint} failed: pool acquisition timeout. No connection to {downstream} was ever obtained. {downstream} health: OK.",
+        "[ERROR] {trace_id} Idle connection count for {downstream} pool reached zero {duration}ms ago. Pool configuration: max={conn_max}. Increase pool size or fix connection leak.",
+        "[ERROR] {trace_id} {service} -> {downstream} pool exhaustion event. Duration so far: {duration}ms. Requests failing due to wait, not {downstream} errors. Active: {active}, waiting: {waiting}.",
+        "[ERROR] {trace_id} SLO miss: {service} p99 {p99}ms ({timeout_pct}% above {timeout}ms budget). Entire excess attributable to connection pool wait. {downstream} p99: {p50}ms (normal)."
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "[WARN] {trace_id} {service} connection pool to {downstream} at {active}/{conn_max} ({cpu_pct}% utilized). Idle: {idle}. Consider pool size increase.",
+        "[WARN] {trace_id} Pool wait time for {downstream}:{port} elevated: {pool_wait}ms (threshold 50ms). {downstream} query time normal: {p50}ms.",
+        "[WARN] {trace_id} Idle connection count declining: {idle} remaining. {service} -> {downstream} pool may exhaust within {hours} hours at current consumption rate.",
+        "[WARN] {trace_id} {waiting} threads queued for connection to {db} via {downstream}. Normal queue depth is zero. Pool saturation imminent.",
+        "[WARN] {trace_id} Connection lifetime anomaly: {active} connections to {downstream} held open for {duration}ms. Expected max lifetime: {baseline}ms. Investigate for leaks.",
+        "[WARN] {trace_id} {service} pool utilization {cpu_pct}%. Traffic {rps} RPS may push pool beyond {conn_max} limit under peak load.",
+        "[WARN] {trace_id} Pool acquisition latency contributing {pool_wait}ms to {service} p99. {downstream} contribution: {p50}ms. Pool is now the dominant latency factor.",
+        "[WARN] {trace_id} Connection release not observed for {conn_count} connections to {downstream} opened over {duration}ms ago. Possible exception path not releasing pool resources.",
+        "[WARN] {trace_id} {service} pool health check: active={active}, idle={idle}, waiting={waiting}. Idle count below minimum healthy threshold of {conn_count}.",
+        "[WARN] {trace_id} {service} -> {db} connection count has grown from {conn_count} to {active} over last {hours} hours without corresponding traffic increase. Possible slow leak.",
+        "[WARN] {trace_id} Pool configuration review needed: max_connections={conn_max} was set at {normal_rate} RPS; current load is {rps} RPS. Pool may be undersized.",
+        "[WARN] {trace_id} {service} restarting connection pool monitoring: idle={idle}, active={active}, max={conn_max}. Last pool exhaustion event: {duration}ms ago."
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "[INFO] {trace_id} {service} connection pool to {downstream} recovering. Idle connections: {idle}. Pool wait time: {pool_wait}ms and declining.",
+        "[INFO] {trace_id} Pool size increase applied: {service} -> {downstream} max_connections raised from {conn_max} to {conn_count}. Immediate relief expected.",
+        "[INFO] {trace_id} Connection leak patched in {service}. All error paths now release connections to {db} pool. Idle count recovering: {idle} and rising.",
+        "[INFO] {trace_id} Pool exhaustion event cleared. {service} pool state: active={active}, idle={idle}, waiting={waiting}. End-to-end latency returning to {baseline}ms.",
+        "[INFO] {trace_id} {service} -> {downstream} pool metrics normal post-incident. Active: {active}/{conn_max}, idle: {idle}. {downstream} healthy throughout.",
+        "[INFO] {trace_id} Connection pool monitoring threshold updated: alert at {cpu_pct}% utilization and {pool_wait}ms wait time for {service} -> {downstream}.",
+        "[INFO] {trace_id} Post-incident review: connection pool to {db} exhausted due to unreleased connections on exception path. Fix deployed. {downstream} was healthy.",
+        "[INFO] {trace_id} {service} startup: connection pool to {downstream}:{port} initialized. max={conn_max}, min_idle={idle}. Pool health: OK."
+      ]
+    }
+  ]
+}

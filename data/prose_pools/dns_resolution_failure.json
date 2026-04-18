@@ -1,0 +1,119 @@
+{
+  "cause_class": "dns_resolution_failure",
+  "summaries": [
+    "3:02 PM UTC We are investigating connectivity failures affecting {service} in us-east-1. All attempts to resolve {downstream} are returning NXDOMAIN from {dns_server}. Services using hardcoded IP addresses are unaffected. A Route 53 zone change made at 14:55 UTC is under review.",
+    "Between 08:44 and 10:17 UTC on 11 Feb 2026, customers using {service} in eu-west-1 experienced complete connectivity loss to {downstream}. All callers failed simultaneously at onset with name resolution errors. No degradation curve was observed. The issue was traced to an erroneous deletion of a DNS A record during routine zone maintenance.",
+    "Post Incident Review – DNS Resolution Failure, us-east-1. Tracking ID: DNS-3381. What happened? At 06:15 UTC, a Terraform apply removed the CNAME record for {downstream} from the hosted zone served by {dns_server}. All {affected_count} services that resolve {downstream} by hostname failed instantly. Services configured with static IPs continued operating normally. The record was restored at 07:02 UTC.",
+    "The DNS issue affecting {service} connectivity to {downstream} has been resolved for all affected projects as of 11:30 US/Pacific. The missing record has been re-published to {dns_server} and propagation is complete. Customers should see immediate restoration of service.",
+    "6:45 AM PST We are aware that {service} in us-west-2 cannot reach {downstream}. Resolver logs show SERVFAIL responses from {dns_server} for the {downstream} zone. IP-based connections to {downstream} are healthy. We are working with our DNS provider to restore zone authority.",
+    "Between 19:30 and 21:05 UTC, a subset of workloads in ap-southeast-1 lost connectivity to {downstream}. The failure was binary and simultaneous across all callers — consistent with a DNS control-plane event rather than a network or application issue. A TTL of {duration}s meant that once cached entries expired, all callers failed within seconds of each other.",
+    "10:48 AM CET {service} in eu-central-1 is unable to resolve {downstream}. Queries to {dns_server} for the {downstream} hostname are returning NXDOMAIN. Internal services reachable by IP are unaffected. Cache miss rate has reached {cache_miss_pct}%. An incident has been opened with the DNS operations team.",
+    "PIR – {service} Total Connectivity Loss, ap-northeast-1. Tracking ID: DNS-7720. Between 02:10 and 03:55 UTC, {service} could not establish any new connections to {downstream} due to NXDOMAIN responses. Existing long-lived connections persisted normally. The failure was caused by an automated certificate rotation script that incorrectly deleted the DNS record for {downstream} as a cleanup step.",
+    "11:58 PM UTC We have confirmed the root cause of {service} connectivity failures in us-east-1. A DNS record for {downstream} at {dns_server} was not renewed before its TTL expired following a zone transfer issue. Callers with cached records continued to operate until {duration}s TTL elapsed, at which point all failed simultaneously. The record has been republished.",
+    "The issue affecting {service} name resolution in us-central1 has been resolved as of 04:00 US/Pacific. NXDOMAIN responses from {dns_server} for {downstream} have ceased. All new connections are resolving correctly. A post-incident review will examine why the automated DNS health check did not alert before customer impact.",
+    "Between 15:10 and 16:40 UTC, {service} in West Europe experienced a total loss of new connections to {downstream}. Dig queries against {dns_server} confirmed NXDOMAIN for the {downstream} hostname throughout the window. Long-lived connections that had already resolved the address prior to the failure continued to function. The DNS record was corrupted during a zone file import.",
+    "2:30 PM PST We are investigating why {service} in us-west-2 cannot reach {downstream}. Resolver traces show the {downstream} hostname resolving to NXDOMAIN at {dns_server}. Direct connectivity tests to the {downstream} IP address succeed. We have escalated to the DNS infrastructure team and expect a resolution within 30 minutes.",
+    "Tracking ID: DNS-5502. On 27 Mar 2026 between 13:20 and 14:45 UTC, {affected_count} services in us-east-1 lost the ability to connect to {downstream}. All failures were name resolution errors; no TCP or application layer faults were observed. The outage began exactly {duration}s after the DNS record TTL for {downstream} was last seen, confirming a propagation failure as the record was not refreshed.",
+    "4:15 AM UTC RESOLVED – DNS resolution for {downstream} has been restored in eu-west-1. {dns_server} is now returning correct A records. {service} is reconnecting successfully. We will publish a post-incident review within five business days.",
+    "We are aware that {service} in us-east-2 is failing to connect to {downstream}. All resolution attempts are returning NXDOMAIN. No network-level issues have been identified; the {downstream} application and infrastructure are healthy. The problem is isolated to the DNS layer at {dns_server}. A fix is being applied.",
+    "9:15 AM JST {service} in ap-northeast-1 lost all connectivity to {downstream} at 09:02 JST. The failure was instantaneous and uniform across all {affected_count} callers. Resolver diagnostics confirm SERVFAIL from {dns_server}. The {downstream} zone appears to have been removed from the authoritative name server. Emergency restoration is in progress.",
+    "Post Incident Summary – Automated Zone Cleanup Bug. On 05 Jan 2026, a deployment pipeline cleanup job incorrectly identified the {downstream} DNS record as orphaned and deleted it from the {dns_server} zone. All {service} instances lost hostname resolution simultaneously as cached entries expired. Static IP connections were unaffected. The cleanup job has been patched to exclude production DNS records.",
+    "1:20 PM EST We are seeing name resolution failures for {downstream} across all {service} instances in us-east-1. NXDOMAIN is being returned by {dns_server} for the {downstream} hostname. Connectivity using direct IP addresses is confirmed healthy. We expect to restore the DNS record within 15 minutes.",
+    "Between 22:05 and 23:50 UTC, {service} in eu-west-2 could not establish new connections to {downstream}. DNS query logs showed {cache_miss_pct}% cache miss rate and NXDOMAIN for all {downstream} lookups. The failure was isolated to hostname-based connections; every service using a static IP endpoint continued without interruption throughout the incident window.",
+    "RESOLVED 10:25 UTC – DNS resolution for {downstream} has been restored in us-east-1. {dns_server} is returning correct records. {service} has reconnected to {downstream} and error rates have dropped to zero. A full root cause analysis will be published. Customers do not need to take any action."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL: {service} cannot resolve {downstream} in us-east-1. {dns_server} returning NXDOMAIN. {affected_count} services affected simultaneously. IP-based paths unaffected.",
+        "CRITICAL: Complete connectivity loss from {service} to {downstream} in eu-west-1. DNS resolution failing: NXDOMAIN from {dns_server}. Onset was instantaneous, not gradual.",
+        "CRITICAL: {dns_server} returning SERVFAIL for {downstream} zone. {service} and {affected_count} other services cannot establish new connections. Existing connections unaffected.",
+        "CRITICAL: DNS record for {downstream} missing from {dns_server}. Cache miss rate {cache_miss_pct}%. All {service} hostname lookups failing. Static IP connections healthy.",
+        "CRITICAL: {service} total connectivity failure to {downstream} in us-west-2. Diagnostic: nslookup {downstream} returns NXDOMAIN. No network-layer issues detected.",
+        "CRITICAL: {affected_count} services in {namespace} simultaneously lost connectivity to {downstream}. Binary failure mode — consistent with DNS control-plane event, not application fault.",
+        "CRITICAL: DNS zone for {downstream} appears deleted or unreachable at {dns_server}. {service} error rate 100% on new connections. Long-lived connections still active.",
+        "CRITICAL: {downstream} hostname resolution returning NXDOMAIN in ap-southeast-1. TTL {duration}s expired. All {service} instances now failing. DNS restoration required immediately.",
+        "CRITICAL: {service} -> {downstream} connectivity: 0% success rate on new connections. DNS: NXDOMAIN. Direct IP connectivity: healthy. DNS infrastructure incident confirmed.",
+        "CRITICAL: {dns_server} zone authority lost for {downstream} domain. {service} in eu-central-1 cannot resolve {downstream}. {affected_count} callers impacted. Escalate to DNS ops."
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING: {downstream} DNS TTL expiring in {duration}s. If record is not refreshed at {dns_server}, all {service} callers will begin failing simultaneously.",
+        "WARNING: {cache_miss_pct}% DNS cache miss rate for {downstream} at {dns_server}. Elevated miss rate may indicate the record was recently modified or removed.",
+        "WARNING: Intermittent SERVFAIL responses from {dns_server} for {downstream} hostname. {service} connections relying on hostname resolution are at risk.",
+        "WARNING: DNS resolution latency for {downstream} via {dns_server} elevated. P99 {p99}ms (normal: {baseline}ms). Possible zone delegation issue.",
+        "WARNING: {service} connection attempts to {downstream} failing at DNS layer. IP-direct probes succeed. Hostname-based probes fail. DNS fault suspected.",
+        "WARNING: {dns_server} returned NXDOMAIN for {downstream} on {conn_count} of last 10 DNS queries. Possible zone propagation lag after recent changes.",
+        "WARNING: {service} DNS resolver cache for {downstream} will expire in {duration}s. Confirm DNS record is healthy at {dns_server} before TTL elapses.",
+        "WARNING: A DNS zone change was applied to {dns_server} at {cert_expiry}. Verify {downstream} records are correct. {service} depends on this hostname.",
+        "WARNING: {affected_count} services share a dependency on {downstream} DNS resolution via {dns_server}. A zone fault would produce simultaneous multi-service failure.",
+        "WARNING: {downstream} lookup returning NXDOMAIN on {conn_count}% of queries in {namespace}. Inconsistent responses may indicate partial zone propagation failure."
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO: DNS record for {downstream} restored at {dns_server}. {service} is resuming successful hostname resolution. New connections being established.",
+        "INFO: {service} connectivity to {downstream} fully restored. DNS resolution confirmed healthy. Affected window: approximately {hours} hours.",
+        "INFO: {dns_server} zone health confirmed normal. {downstream} A record present and returning correct IP. {service} cache repopulated.",
+        "INFO: Post-incident: DNS automation scripts reviewed. Production DNS records now tagged to prevent accidental deletion by cleanup pipelines.",
+        "INFO: {service} reconnected to {downstream} successfully following DNS restoration. Error rate returned to zero. {affected_count} previously impacted services recovered."
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "[ERROR] {trace_id} java.net.UnknownHostException: {downstream} — Name resolution failed. DNS server {dns_server} returned NXDOMAIN.",
+        "[ERROR] {trace_id} dial tcp: lookup {downstream} on {dns_server}:{port}: no such host. Cannot connect to {endpoint}.",
+        "[ERROR] {trace_id} getaddrinfo failed for host '{downstream}': Name or service not known (NXDOMAIN). service={service}.",
+        "[ERROR] {trace_id} ConnectionError: Failed to resolve '{downstream}'. DNS response: NXDOMAIN from {dns_server}. All {conn_count} connection attempts failed.",
+        "[ERROR] {trace_id} requests.exceptions.ConnectionError: HTTPSConnectionPool(host='{downstream}', port={port}): Max retries exceeded. Caused by: NewConnectionError: Failed to establish connection: [Errno -2] Name or service not known.",
+        "[ERROR] {trace_id} DNS resolution failure for {downstream}: SERVFAIL from {dns_server}. Unable to reach {endpoint}. IP-based healthcheck to same host: SUCCESS.",
+        "[ERROR] {trace_id} socket.gaierror: [Errno 8] Servname not supported for ai_socktype — {downstream} not resolvable via {dns_server}.",
+        "[ERROR] {trace_id} All {affected_count} lookup attempts for {downstream} returned NXDOMAIN. DNS cache miss rate: {cache_miss_pct}%. Zone may be deleted or unreachable.",
+        "[ERROR] {trace_id} {service} startup failed: cannot resolve required dependency {downstream}. Check DNS zone at {dns_server} for {downstream} record.",
+        "[ERROR] {trace_id} Circuit opened due to sustained NXDOMAIN responses for {downstream}. {conn_count} consecutive DNS failures. No network-layer errors observed.",
+        "[ERROR] {trace_id} TLS handshake skipped — connection could not be established. Root cause: DNS resolution of {downstream} returned NXDOMAIN prior to TCP connect.",
+        "[ERROR] {trace_id} Health check for {downstream} failing: cannot resolve hostname. Direct IP health check passes. DNS record missing from {dns_server}.",
+        "[ERROR] {trace_id} {service} dependency {downstream} unreachable. Error class: DNS_NXDOMAIN. First failure timestamp correlates with TTL expiry of cached record.",
+        "[ERROR] {trace_id} gRPC connection to {downstream}:{port} failed: name resolution failure. Resolver: dns. Server: {dns_server}. Response: NXDOMAIN.",
+        "[ERROR] {trace_id} {affected_count} concurrent goroutines failed with identical NXDOMAIN error for {downstream}. Binary failure pattern — DNS control-plane event suspected."
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "[WARN] {trace_id} DNS cache for {downstream} expiring in {duration}s. Pre-fetching record from {dns_server} to avoid resolution gap.",
+        "[WARN] {trace_id} Intermittent SERVFAIL from {dns_server} for {downstream} hostname. {conn_count} of last 10 DNS queries failed.",
+        "[WARN] {trace_id} {downstream} DNS lookup latency elevated: {p99}ms (normal {baseline}ms) via {dns_server}. Possible zone delegation issue.",
+        "[WARN] {trace_id} DNS record for {downstream} has TTL={duration}s. Recent zone change detected. Verify record integrity at {dns_server}.",
+        "[WARN] {trace_id} {cache_miss_pct}% DNS cache miss rate for {downstream} in last 60 seconds. Higher than normal; possible record churn.",
+        "[WARN] {trace_id} Connection pool warm-up failed for {downstream}: initial DNS resolution returned NXDOMAIN. Pool will remain empty until DNS resolves.",
+        "[WARN] {trace_id} Service discovery for {downstream} in {namespace} returned empty result. DNS-based discovery via {dns_server} may be impaired.",
+        "[WARN] {trace_id} {service} falling back to stale cached IP for {downstream}: DNS TTL expired and refresh returned NXDOMAIN. Stale entry will be used for {duration}s.",
+        "[WARN] {trace_id} DNS negative cache entry created for {downstream}: NXDOMAIN TTL {duration}s. Connections will fail for at least {duration} seconds even after record is restored.",
+        "[WARN] {trace_id} {service} health check: {downstream} resolution status FAILING. IP connectivity to same host: PASSING. DNS layer fault confirmed.",
+        "[WARN] {trace_id} {dns_server} responding to {downstream} queries with empty answer section. NOERROR but no records — possible zone configuration error.",
+        "[WARN] {trace_id} {affected_count} services share DNS dependency on {downstream} via {dns_server}. A zone fault would produce correlated multi-service outage."
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "[INFO] {trace_id} DNS resolution for {downstream} restored. {dns_server} returning correct A record. {service} establishing new connections.",
+        "[INFO] {trace_id} DNS cache repopulated for {downstream}: TTL={duration}s. Connection pool warming up. {service} back online.",
+        "[INFO] {trace_id} {downstream} DNS record confirmed present at {dns_server}. Record type: A. TTL: {duration}s. Previous state: missing (NXDOMAIN).",
+        "[INFO] {trace_id} {service} recovered from DNS failure. All {affected_count} previously failing callers now resolving {downstream} successfully.",
+        "[INFO] {trace_id} DNS zone audit completed for {dns_server}. {downstream} record verified correct. Negative cache entries will expire within {duration}s.",
+        "[INFO] {trace_id} Monitoring alert cleared: {downstream} DNS resolution healthy. Cache miss rate returning to normal from peak {cache_miss_pct}%.",
+        "[INFO] {trace_id} Post-incident: DNS zone change automation updated to validate record existence after apply. Will alert if required records are absent.",
+        "[INFO] {trace_id} {service} startup succeeded. {downstream} DNS resolution: OK ({dns_server} returning correct IP). All dependency checks passing."
+      ]
+    }
+  ]
+}

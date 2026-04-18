@@ -1,0 +1,119 @@
+{
+  "cause_class": "data_corruption",
+  "summaries": [
+    "Starting approximately 2023-10-04 and continuing through the investigation period, a subset of {service} requests were failing with deserialization errors. The failures were traced to {corrupted_records} rows in {db}.{table} where the {column} field contains malformed binary payloads. Requests that do not access the affected record IDs ({corrupted_ids}) succeed without error. The database schema and all infrastructure metrics are normal.",
+    "Intermittent 500 errors on {service} were reported beginning around 2024-02-19. Error volume does not correlate with time of day or traffic level. Investigation isolated the failures to reads of specific records in {table}: {corrupted_records} rows have {column} values that fail checksum verification (expected {expected_checksum}, actual {actual_checksum}). All other records in {db} serve correctly.",
+    "On 2023-07-11, {service} on-call began receiving alerts for {deserialize_error} exceptions. The errors were non-continuous and appeared to affect a fixed set of record identifiers. A data audit of {db}.{table} confirmed {corrupted_records} rows with byte-level corruption in {column} at offset {byte_offset}. Records outside the affected set deserialize without issue. Schema validation passes for all rows.",
+    "The {service} platform has experienced sporadic internal errors since approximately 2024-05-22. The errors are strictly data-dependent: the same request type succeeds for the majority of record IDs and fails consistently for a specific subset ({corrupted_ids}). Root cause identified as corrupted values in {db}.{table}.{column}. No time-based pattern has been observed; errors appear whenever the affected rows are accessed.",
+    "Tracking ID: COR-20231215-007. {service} engineering identified {corrupted_records} rows in {db}.{table} whose {column} payloads cannot be deserialized. The corruption appears to be confined to records written during a storage anomaly window. Affected IDs ({corrupted_ids}) return {deserialize_error} on every access. Records written outside the anomaly window are clean. Schema-level validation passes for all rows.",
+    "On 2024-08-07, a user report of inconsistent {service} responses triggered an investigation into {db}.{table}. The investigation found {corrupted_records} rows where the {column} field stores {bad_value}, violating domain constraint {constraint}. The values bypass database-level enforcement but cause application-layer failures at read time. The issue is strictly record-specific; no time correlation has been established.",
+    "2023-09-14 Post-Incident Summary — {service}. Protobuf deserialization errors were traced to {corrupted_records} records in {db}.{table} with field length prefix mismatches in {column}: declared {expected_checksum} bytes, actual payload {actual_checksum} bytes. The discrepancy causes {deserialize_error} for every access to those record IDs. All other records in the table are unaffected. Infrastructure and schema are healthy.",
+    "Between approximately 2024-01-09 and the time of resolution, {service} returned errors for a small but consistent fraction of API requests. Error rate analysis showed the failures were not time-correlated but were record-correlated: {corrupted_ids} in {table} always failed while all other record IDs succeeded. A data integrity scan of {db} confirmed {corrupted_records} rows with checksum mismatches on {column} (expected {expected_checksum}, computed {actual_checksum}).",
+    "Incident INC-20230503: {service} reported {deserialize_error} exceptions from the {table} read path. The exceptions were non-deterministic from an observer perspective but fully deterministic given the requested record ID. Of {total_queries} records scanned, {corrupted_records} had corrupted {column} values with embedded null bytes that truncate string parsing and misalign subsequent field reads. The remaining records served without error.",
+    "Tracking ID: DC-20240320-14. Users of {service} reported that certain {entity} records consistently failed to load while others loaded correctly. Engineering confirmed {corrupted_records} rows in {db}.{table} with referential integrity violations: {column} references {record_id} values that no longer exist in the parent table, violating {constraint}. The corruption is confined to those rows; the surrounding schema and infrastructure are intact.",
+    "2024-06-18 — {service} data integrity incident. A bulk processing job surfaced {deserialize_error} for {corrupted_records} of {total_queries} records in {table}. Byte-level inspection of the {column} field for affected rows reveals wire-format corruption at offset {byte_offset}. Clean records parse without issue. The error rate tracks access to specific record IDs, not overall request volume or time of day.",
+    "On 2023-11-29, automated integrity monitoring for {db} flagged checksum failures on {corrupted_records} rows in {table}.{column}. Stored checksums do not match recomputed values (expected {expected_checksum}, actual {actual_checksum}), indicating the data was silently altered after the initial write. Reads of clean records are unaffected. The corruption is value-level; schema structure is correct for all rows.",
+    "Sporadic {service} failures were escalated to engineering on 2024-03-07. The error pattern — consistent failures for a fixed set of identifiers and zero failures for all others — pointed to data-level rather than infrastructure-level root cause. Inspection of {db}.{table} confirmed {corrupted_records} rows with malformed {column} payloads. The affected record IDs ({corrupted_ids}) fail on every read attempt regardless of which pod handles the request.",
+    "Post-mortem 2023-08-22 — {service}. An encoding corruption was discovered in {table}.{column}: {corrupted_records} rows were written with invalid character encoding sequences, causing {deserialize_error} when the {service} string parser processes them. Healthy rows are unaffected. The corruption appears to stem from a prior data import that did not enforce encoding validation. No infrastructure anomalies were identified.",
+    "Incident summary 2024-09-11: {service} support escalations identified a class of {entity} records that consistently returned errors. A targeted scan of {db}.{table} isolated {corrupted_records} rows where {column} contains {bad_value}, which violates {constraint} enforced by the application layer. The database accepted the values at write time; the constraint is not replicated at the storage layer. All other rows serve correctly.",
+    "2023-12-01 — Tracking ID: INT-20231201-003. A routine data quality audit of {db}.{table} discovered {corrupted_records} rows with field-level corruption in {column}. The corruption pattern — truncated values at byte offset {byte_offset} — is consistent with a partial write during a prior storage event. Reads of affected records raise {deserialize_error} in {service}. The {total_queries} remaining rows in the table are clean.",
+    "On 2024-07-23, {service} engineering investigated a cluster of user-reported errors that did not correlate with any deployment or infrastructure event. The errors were reproduced deterministically by requesting the specific record IDs listed in the initial reports. Data inspection of {db}.{table} found {corrupted_records} rows with NULL in {column}, violating application-level invariants. Schema enforcement had not been applied retroactively to these legacy rows.",
+    "The {service} incident from 2023-06-09 was caused by {corrupted_records} rows in {db}.{table} carrying out-of-range values in {column}. The stored value {bad_value} passes database validation but fails the domain constraint {constraint} checked by the application. The failure is strictly data-dependent; errors appear whenever the affected rows are accessed. Rows with valid {column} values serve without issue.",
+    "Tracking ID: DC-20240415-09. {service} reported intermittent failures on the {entity} read path starting 2024-04-15. The error rate was stable at {error_pct}% across all time windows, ruling out time-based triggers. An integrity scan of {db}.{table} identified {corrupted_records} rows where the {column} binary field has a varint overflow at position {byte_offset}, producing {deserialize_error} on every access. Schema and infrastructure checks passed for all records.",
+    "2024-02-06 Post-Incident Report — {service}. A partial write during a prior failover event left {corrupted_records} records in {db}.{table} with truncated {column} payloads. The service raises {deserialize_error} exclusively for those record IDs ({corrupted_ids}). Healthy records return correctly on every request. The corruption is at the value level; schema structure, indexes, and all infrastructure metrics are normal. Affected records were repaired by re-fetching from a clean replica."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL [{service}] Deserialization failure rate exceeded threshold: {deserialize_error} on {corrupted_records} records in {db}.{table} — errors are record-specific, not time-correlated — immediate data integrity investigation required",
+        "CRITICAL [{db}] Checksum mismatch detected on {corrupted_records} rows in {table}.{column} — expected={expected_checksum} actual={actual_checksum} — silent data mutation after write suspected",
+        "CRITICAL [{service}] Application crash triggered by {deserialize_error} at byte offset {byte_offset} in {table}.{column} for record IDs {corrupted_ids} — infrastructure healthy",
+        "CRITICAL [{db}] Referential integrity violation: {corrupted_records} rows in {table} reference nonexistent parent records — constraint {constraint} broken — {service} returning 500 for affected record IDs",
+        "CRITICAL [{service}] {deserialize_error} confirmed on {corrupted_records} rows in {db}.{table} — error pattern is data-dependent: failures are 100% reproducible for {corrupted_ids} and 0% for all other IDs",
+        "CRITICAL [{db}] Data corruption confirmed: {corrupted_records} records in {table}.{column} fail integrity checks — stored checksums do not match recomputed values — {service} reads failing for affected IDs",
+        "CRITICAL [{service}] NULL constraint violation in application layer on {table}.{column}: {corrupted_records} rows affected — schema intact, data values invalid — serialization crash on access",
+        "CRITICAL [{db}] Integrity scan of {table} complete — {corrupted_records} of {total_queries} rows fail checksum validation — repair operation required — {service} errors active for affected record IDs",
+        "CRITICAL [{service}] Field length mismatch in {table}.{column}: expected {expected_checksum} bytes, found {actual_checksum} — {deserialize_error} thrown for all accesses to corrupted record IDs {corrupted_ids}",
+        "CRITICAL [{db}] Out-of-domain value {bad_value} in {table}.{column} violating {constraint} — {corrupted_records} records affected — {service} returning errors for all requests touching those rows"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING [{service}] Elevated {deserialize_error} rate on {db}.{table} — errors are record-specific (IDs: {corrupted_ids}), not time-correlated — possible data corruption at value level",
+        "WARNING [{db}] Checksum discrepancy on {corrupted_records} rows in {table}.{column} — expected {expected_checksum}, computed {actual_checksum} — investigate write path for silent corruption",
+        "WARNING [{service}] Intermittent foreign key failures — {record_id} missing from parent table for {corrupted_records} rows in {table} — constraint {constraint} violated at read time",
+        "WARNING [{db}] Data audit of {table} found {corrupted_records} rows with {column}={bad_value} — violates domain constraint {constraint} — {service} may return errors for those records",
+        "WARNING [{service}] {deserialize_error} occurring exclusively for record IDs in set {corrupted_ids} — all other {table} records healthy — targeted corruption likely, not infrastructure failure",
+        "WARNING [{db}] Encoding anomaly in {table}.{column}: {corrupted_records} rows contain invalid byte sequences — {service} decoding errors expected on every access to affected records",
+        "WARNING [{service}] Payload length anomaly in {table}.{column}: actual length {actual_checksum} bytes does not match expected {expected_checksum} for {corrupted_records} records",
+        "WARNING [{db}] Data integrity scan in progress on {table}: {corrupted_records} checksum failures found — errors are row-specific, schema structure is correct for all rows",
+        "WARNING [{service}] Error pattern analysis: {deserialize_error} has zero time correlation — same error rate at all hours — consistent with fixed corrupted record set rather than transient fault",
+        "WARNING [{db}] Corruption suspected in records written during anomaly window — {corrupted_records} records from that window fail integrity checks — records written outside the window pass"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO [{service}] Data integrity investigation opened: {corrupted_records} rows in {db}.{table}.{column} flagged with checksum failures — error pattern is data-dependent, not time-dependent",
+        "INFO [{db}] Integrity scan of {table} completed: {total_queries} records checked — {corrupted_records} with checksum mismatch (expected {expected_checksum} / actual {actual_checksum}) — schema valid for all rows",
+        "INFO [{service}] Corrupted record IDs quarantined: {corrupted_ids} — reads for those IDs now returning structured error responses rather than unhandled exceptions",
+        "INFO [{db}] Read-repair job initiated: re-fetching {corrupted_records} rows from clean replica to overwrite corrupted primary copies identified by checksum mismatch in {table}.{column}",
+        "INFO [{service}] Mitigation applied — {corrupted_records} bad rows in {db}.{table} skipped during batch processing — {total_queries} remaining records processed without errors"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "[{service}] Failed to deserialize record {record_id} from {db}.{table}: {deserialize_error} — column={column} byte_offset={byte_offset} — schema valid, data value corrupted",
+        "[{service}] JSON parse failure on {table}.{column} for record_id={record_id}: unexpected end of input — actual_len={actual_checksum} expected_len={expected_checksum}",
+        "[{db}] Checksum mismatch record_id={record_id} table={table} column={column}: expected={expected_checksum} actual={actual_checksum} — data integrity violation confirmed",
+        "[{service}] Protobuf decode error: wire type mismatch at byte {byte_offset} in {table}.{column} for record {record_id} — {deserialize_error} — all other records unaffected",
+        "[{db}] Foreign key constraint {constraint} violated: {table}.{column}={record_id} references nonexistent parent row — schema intact, data references are stale",
+        "[{service}] Domain constraint violation reading {table}.{column}: value={bad_value} fails {constraint} for record_id={record_id} — database accepted value at write time",
+        "[{service}] NullPointerException during result mapping — {table}.{column} is NULL for record_id={record_id} — violates application-level NOT-NULL invariant — schema does not enforce at storage layer",
+        "[{db}] Record {record_id} in {table}: declared payload length {expected_checksum} bytes but only {actual_checksum} available — truncated write suspected",
+        "[{service}] Encoding decode failure record_id={record_id}: {deserialize_error} — unexpected byte sequence in {table}.{column} at offset {byte_offset}",
+        "[{db}] Integrity check failed for {corrupted_records} rows in {table}.{column}: computed checksums do not match stored values — first bad ID={record_id}",
+        "[{service}] Batch read aborted: encountered {deserialize_error} on record_id={record_id} in {db}.{table} — error is data-dependent, not infrastructure-related",
+        "[{db}] Referential scan found {corrupted_records} orphaned rows in {table}: {column} values ({corrupted_ids}) have no matching parent records — constraint {constraint} broken at data level",
+        "[{service}] Character decoding exception on {table}.{column} record_id={record_id}: invalid byte sequences prevent UTF-8 interpretation — other records in same table unaffected",
+        "[{db}] Varint decoding overflow at position {byte_offset} in {table}.{column} for record_id={record_id}: {deserialize_error}",
+        "[{service}] Deserialization error pattern confirmed for {db}.{table}: all {corrupted_records} failures trace to record IDs {corrupted_ids} — zero errors on all other record IDs — schema is correct"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "[{service}] Unexpected value in {table}.{column} for record_id={record_id}: got {bad_value} — constraint {constraint} not enforced at DB layer — will fail application validation on read",
+        "[{db}] Checksum recompute mismatch on record_id={record_id}: stored={expected_checksum} recomputed={actual_checksum} — possible in-place corruption after initial write",
+        "[{service}] Payload length anomaly record_id={record_id}: {table}.{column} claims {expected_checksum} bytes but buffer contains {actual_checksum} — attempting partial read",
+        "[{db}] Integrity scan progress: {total_queries} records checked — {corrupted_records} failures, remaining records clean — continuing scan of {table}",
+        "[{service}] Deserialization of record_id={record_id} succeeded with fallback parser — original {deserialize_error} suggests {table}.{column} payload is non-canonical",
+        "[{service}] Skipping record_id={record_id} in {table}: {deserialize_error} — error is isolated to this record — batch processing continues for clean records",
+        "[{db}] NULL value in {table}.{column} for record_id={record_id} — contradicts application-level NOT-NULL expectation — data predates current enforcement",
+        "[{service}] Record_id={record_id} read returned {column}={bad_value} — downstream validation will reject per {constraint} — error is data-dependent, not transient",
+        "[{db}] Foreign key reference in {table}.{column} is dangling for record_id={record_id} — parent row was deleted without cascading to child records",
+        "[{service}] Error rate analysis for {db}.{table}: {error_pct}% failure rate is constant across all time windows — consistent with fixed corrupt record set, not intermittent fault",
+        "[{db}] Scan of {table} complete: {corrupted_records} corrupted rows identified out of {total_queries} scanned — all failures have {deserialize_error} on {column} field",
+        "[{service}] Protobuf unknown field at position {byte_offset} in {table}.{column} for record_id={record_id}: may indicate corruption or version mismatch at write time"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "[{service}] Starting integrity verification of {db}.{table} — checking checksum column against recomputed values for all records — initiated following user-reported errors on specific IDs",
+        "[{db}] Integrity scan results for {table}: total={total_queries} clean records={total_queries} corrupt={corrupted_records} — schema valid for all rows, corruption is at value level",
+        "[{service}] Corrupted record quarantine activated — IDs {corrupted_ids} in {db}.{table} will return structured error responses — all other records continue normal service",
+        "[{db}] Read-repair completed for {corrupted_records} rows in {table}.{column}: values restored from clean replica — recomputed checksums now match stored values",
+        "[{service}] Deserialization error confirmed as data-dependent: same request type succeeds for all clean record IDs and fails only for {corrupted_ids} — no time pattern observed",
+        "[{db}] Schema validation passed for all records in {table} — corruption is at value level, not schema level — {column} types and lengths are correctly declared for all rows",
+        "[{service}] Error pattern summary for {db}.{table}.{column}: all failures are record-specific ({corrupted_ids}) — zero failures on all other record IDs — infrastructure and schema are healthy",
+        "[{db}] Post-repair integrity scan of {table}: {corrupted_records} previously failing rows now pass checksum validation — {service} error rate for affected IDs dropped to zero"
+      ]
+    }
+  ]
+}

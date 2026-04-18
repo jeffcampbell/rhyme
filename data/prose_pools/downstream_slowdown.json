@@ -1,0 +1,119 @@
+{
+  "cause_class": "downstream_slowdown",
+  "summaries": [
+    "2:47 PM UTC We are investigating elevated latency on {service} in us-east-1. P99 response times have risen to {p99}ms against a baseline of {baseline}ms. Traces confirm the slowdown originates inside {downstream}; our own processing path is unaffected. We are in contact with the {downstream} team.",
+    "Between 09:21 and 17:32 UTC on 03 Sep 2026, a subset of customers may have experienced intermittent latency or timeouts on requests routed through {service} in eu-west-1. The root cause was elevated response times from {downstream}. {service} request rate matched inbound load throughout; no amplification was observed.",
+    "Post Incident Review – {service} Latency Degradation. Tracking ID: DS-2291. What happened? Between 11:05 and 13:40 UTC, {downstream} in us-east-1 began serving responses at {p99}ms p99 versus a normal {baseline}ms. {service} latency rose uniformly in lockstep. No retry amplification occurred. {downstream} team identified a slow query introduced in a backend release.",
+    "The latency issue affecting {service} in us-central1 has been resolved for all affected projects as of 06:30 US/Pacific. {downstream} returned to normal response times after a configuration rollback. End-to-end p99 latency on {service} has returned to {baseline}ms.",
+    "8:12 AM PST We are seeing elevated p99 latency on {service} calls to {downstream} in us-west-2. Latency is rising uniformly across all request types with no bimodal distribution. Inbound RPS is stable at {normal_rate}. The issue appears to be inside {downstream} and we are investigating with that team.",
+    "Between 04:15 and 06:50 UTC, customers in ap-southeast-1 may have experienced slow responses on {endpoint}. Distributed traces showed the majority of added latency — approximately {latency}ms — accumulating inside a single {downstream} call. All other service components performed within normal parameters.",
+    "10:33 AM CET {service} in eu-central-1 is experiencing uniform latency elevation. P50 has risen from {baseline}ms to {p50}ms and P99 is at {p99}ms. The latency distribution is unimodal, ruling out partial retry effects. {downstream} query times are elevated; a full table scan introduced in last night's release is under investigation.",
+    "PIR – {service} SLO Miss, eu-west-2. Tracking ID: DS-5540. On 22 Jan 2026 between 14:00 and 16:30 UTC, {service} burned {error_pct}% of its monthly error budget. All slow requests traced directly to {downstream}, which was experiencing resource contention following a schema migration. Inbound request rate to {service} was steady throughout at {normal_rate} RPS.",
+    "11:05 PM UTC We have confirmed that latency on {service} in us-east-1 is caused by slow responses from {downstream}. Current {downstream} p99 is {p99}ms; normal is {baseline}ms. Our service is passing requests through without amplification. A mitigation is in place on the {downstream} side and recovery is expected within 20 minutes.",
+    "The issue with {downstream} response times has been resolved as of 09:45 US/Pacific. Customers who experienced slow responses on {service} in us-west-2 between 07:00 and 09:45 AM should see normal latency restored. The {downstream} team has published a separate incident report.",
+    "Between 16:20 and 18:05 UTC, {service} in West Europe recorded {error_pct}% of requests exceeding the {timeout}ms SLO threshold. Waterfall traces showed all excess latency inside {downstream} spans. Our service added less than 5ms of processing overhead throughout. The {downstream} team identified a misconfigured read replica as the root cause.",
+    "3:30 PM EST We are monitoring elevated end-to-end latency on {service} in us-east-1. Diagnostic traces confirm a uniform slowdown originating in {downstream}. Unlike amplification events, outbound request count matches inbound exactly at {rps} RPS. We expect recovery once the {downstream} team completes their rollback.",
+    "Tracking ID: DS-9013. On 08 Mar 2026 between 05:30 and 08:15 UTC, {service} in ap-northeast-1 returned elevated latency to customers. Median latency climbed from {baseline}ms to {p50}ms; p99 reached {p99}ms. Every slow trace contained a long {downstream} span. The {downstream} service had been subjected to an unexpected increase in query complexity following a data migration.",
+    "5:18 AM UTC RESOLVED – Latency on {service} in eu-west-1 has returned to normal. {downstream} response times stabilized at {baseline}ms p99 following a cache warm-up. Customers who experienced slow responses between 02:00 and 05:18 UTC are advised that no data was lost.",
+    "We are aware of elevated response times on {service} in us-east-2 affecting {affected_count} customers. All distributed traces point to {downstream} as the origin of the slowdown. {service} itself is healthy and processing requests at normal throughput. We will provide an update within 30 minutes.",
+    "9:02 AM JST {service} in ap-northeast-1 is exhibiting latency consistent with a slow upstream dependency. Latency distribution is uniform — p50 and p99 are both elevated proportionally — which rules out a partial failure mode. Traces confirm {downstream} is returning responses at {p99}ms p99 versus a normal {baseline}ms.",
+    "Post Incident Summary – {downstream} Database Contention. On 15 Feb 2026, a routine index rebuild on {db} caused {downstream} query times to spike for {hours} hours. All {service} calls to {downstream} were affected uniformly. No retry amplification occurred. Peak p99 latency on {service} reached {p99}ms. The index rebuild procedure has been updated to run off-peak.",
+    "2:00 PM PST Customers in us-west-2 may experience slow responses on {endpoint}. {service} is operating normally but its dependency {downstream} is returning responses more slowly than usual. Current {downstream} p99 is {p99}ms against a {baseline}ms baseline. We are working with the {downstream} team to identify the cause.",
+    "Between 07:45 and 09:20 UTC, {service} in eu-west-1 recorded a uniform increase in response times. P99 reached {p99}ms. The latency rise was gradual and correlated precisely with a traffic increase on {downstream}. No circuit breakers were triggered and request rates remained stable, confirming the issue was in the dependency, not a client-side problem.",
+    "RESOLVED 13:15 UTC – {downstream} performance has recovered in us-east-1. {service} end-to-end latency has returned to {baseline}ms p99. The {downstream} team applied a read-replica failover at 13:10 UTC. Customers who experienced degraded response times between 10:30 and 13:15 UTC do not need to take any action."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL: {service} P99 latency {p99}ms ({amp_ratio}x baseline {baseline}ms). All slow traces contain long {downstream} spans. {downstream} dependency confirmed degraded in us-east-1.",
+        "CRITICAL: {service} SLO breach. {error_pct}% of requests exceeding {timeout}ms threshold. Traces confirm latency originates in {downstream}. No amplification; request rate stable at {rps} RPS.",
+        "CRITICAL: {downstream} response time {p99}ms p99 in eu-west-1 (normal: {baseline}ms). {service} is passing all requests through; downstream slowdown is the sole latency driver.",
+        "CRITICAL: {service} error budget depleting at {rate}x normal rate due to {downstream} latency in us-east-1. Estimated SLO breach in {hours} hours if {downstream} does not recover.",
+        "CRITICAL: {affected_count} customers experiencing slow responses on {service} in us-east-1. Waterfall traces isolate latency to {downstream} call at {endpoint}. Escalate to {downstream} team immediately.",
+        "CRITICAL: {service} {endpoint} p99 latency {p99}ms. Uniform distribution — no bimodal shape — confirms a genuine dependency slowdown, not a retry event. {downstream} team must be engaged.",
+        "CRITICAL: {downstream} query duration has risen from {baseline}ms to {p99}ms over the last 15 minutes. {service} latency is tracking this increase with near-zero offset. Downstream is the bottleneck.",
+        "CRITICAL: {service} timeout rate {timeout_pct}% on calls to {downstream}:{port} in ap-southeast-1. Latency histogram unimodal at {p99}ms. No retry amplification detected.",
+        "CRITICAL: {service} SLO {slo}% over last 30 minutes (target 99.9%). All SLO-breaking requests traceable to slow {downstream} spans exceeding {timeout}ms.",
+        "CRITICAL: {downstream} in us-west-2 returning {p99}ms p99 for {duration} minutes. {service} request rate unchanged at {rps} RPS. Downstream slowdown fully explains observed latency."
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING: {downstream} p99 response time rising: {p99}ms (baseline {baseline}ms). {service} latency increasing in step. No amplification detected in us-east-1.",
+        "WARNING: {service} latency distribution is unimodal and elevated. P50={p50}ms, P99={p99}ms. Pattern consistent with uniform dependency slowdown rather than partial failure.",
+        "WARNING: {service} {endpoint} latency has risen {latency}ms above baseline over the last 10 minutes. All excess latency attributable to {downstream} spans in distributed traces.",
+        "WARNING: {downstream} in eu-west-1 showing increased response variability. {service} outbound call rate matches inbound exactly at {rps} RPS — no retry contribution.",
+        "WARNING: {service} p99 latency is now {p99}ms in us-east-1. At current trajectory, {timeout}ms SLO threshold will be breached in approximately {hours} hours.",
+        "WARNING: {downstream} health metrics show elevated processing time. {service} is absorbing the impact; end-to-end latency rising uniformly across all request classes.",
+        "WARNING: Slow {downstream} response times are beginning to fill {service} active connection slots. Active: {active}, idle: {idle}. Pool pressure may compound latency.",
+        "WARNING: {service} timeout rate on {downstream} calls is {timeout_pct}%. {downstream} p99 is {p99}ms vs SLO threshold {timeout}ms. Risk of cascading timeouts if {downstream} does not improve.",
+        "WARNING: {service} error budget consumption rate elevated due to {downstream} latency in ap-northeast-1. {error_pct}% of requests are slow. No amplification in progress.",
+        "WARNING: {downstream} query count has not changed ({query_count} vs normal {normal_queries}) but duration per query is elevated. Likely resource contention or lock wait on {db}."
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO: {downstream} response times normalizing in us-east-1. {service} p99 latency returning toward {baseline}ms. No customer action required.",
+        "INFO: {service} latency event resolved. Root cause was {downstream} performance degradation. {service} itself operated normally throughout. Duration: {hours} hours.",
+        "INFO: {downstream} team has applied a mitigation. {service} latency trending down. P99 currently {p99}ms, down from peak. Monitoring continues.",
+        "INFO: Distributed trace analysis confirms {service} processing time was stable throughout the incident. All added latency ({latency}ms) was in the {downstream} dependency span.",
+        "INFO: {service} SLO recovery in progress. P99 latency now {p99}ms, approaching {baseline}ms baseline. {downstream} reported healthy by their on-call team."
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "[ERROR] {trace_id} Timeout calling {downstream} at {endpoint} after {timeout}ms. {downstream} did not respond within SLO. Returning 504 to caller.",
+        "[ERROR] {trace_id} RequestTimeout: {downstream}:{port} exceeded deadline of {timeout}ms. Elapsed: {duration}ms. No retry attempted (non-retryable timeout policy).",
+        "[ERROR] {trace_id} Slow dependency detected: {downstream} span duration {p99}ms exceeds alert threshold {timeout}ms. service={service} endpoint={endpoint}.",
+        "[ERROR] {trace_id} HTTP 504 Gateway Timeout from {downstream} on {endpoint}. Downstream latency has been elevated for {duration}ms. Escalation triggered.",
+        "[ERROR] {trace_id} {service} request failed: {downstream} response time {p99}ms exceeded caller deadline. No amplification — this is the first and only attempt.",
+        "[ERROR] {trace_id} SLO violation: request to {endpoint} completed in {p99}ms against {timeout}ms budget. {downstream} accounted for {latency}ms of total duration.",
+        "[ERROR] {trace_id} DeadlineExceeded propagated from {downstream} to {service}. {downstream} processing time: {duration}ms. {service} overhead: negligible.",
+        "[ERROR] {trace_id} {service} returning 503 to upstream caller. Root cause: {downstream} has been unresponsive for {duration}ms. Request rate is normal at {rps} RPS.",
+        "[ERROR] {trace_id} Slow query on {db} via {downstream}: duration {duration}ms, normal {baseline}ms. Query count unchanged at {query_count}. Likely lock contention or index issue.",
+        "[ERROR] {trace_id} {downstream} health check latency {p99}ms (threshold {timeout}ms). Marking {downstream} as degraded. {service} will surface elevated response times.",
+        "[ERROR] {trace_id} End-to-end latency {p99}ms on {endpoint}. Trace breakdown: {service} processing {p50}ms, {downstream} call {latency}ms. Downstream is the bottleneck.",
+        "[ERROR] {trace_id} {service} worker thread blocked waiting on {downstream} response for {duration}ms. Thread pool pressure building. Active workers: {active}/{conn_max}.",
+        "[ERROR] {trace_id} {downstream} returned HTTP 200 but response time {p99}ms violated latency SLO {slo}%. Marking as slow success.",
+        "[ERROR] {trace_id} Latency budget exceeded on {endpoint}: allocated {timeout}ms, actual {duration}ms. Entire excess in {downstream} span.",
+        "[ERROR] {trace_id} {service} p99 latency breach: {p99}ms vs SLO {timeout}ms. Uniform distribution confirms downstream source. Retry rate normal at {retry_pct}%."
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "[WARN] {trace_id} {downstream} response time {p99}ms is 2x normal {baseline}ms. {service} latency rising. Monitoring for SLO impact.",
+        "[WARN] {trace_id} Slow span detected: {downstream} call on {endpoint} took {latency}ms. Alert threshold is {timeout}ms. Trace ID: {trace_id}.",
+        "[WARN] {trace_id} {service} p99 latency trending up: {p99}ms (was {baseline}ms 15 minutes ago). Outbound RPS matches inbound at {rps} — not an amplification issue.",
+        "[WARN] {trace_id} {downstream} is responding slower than usual. Latency histogram is unimodal at {p99}ms. All request classes uniformly affected.",
+        "[WARN] {trace_id} {service} timeout rate on {downstream} calls: {timeout_pct}%. Up from near-zero 30 minutes ago. {downstream} processing time elevated.",
+        "[WARN] {trace_id} {db} query duration rising via {downstream}: {duration}ms vs normal {baseline}ms. Query count stable at {query_count}/{normal_queries}.",
+        "[WARN] {trace_id} {service} active threads waiting on {downstream} responses: {active}/{conn_max}. Idle threads: {idle}. Pool health at risk if latency persists.",
+        "[WARN] {trace_id} {downstream} p99 {p99}ms in eu-west-1. {service} request rate unchanged. Uniform latency elevation is consistent with resource contention on {downstream}.",
+        "[WARN] {trace_id} Error budget consumption rate for {service} elevated in {namespace}. {error_pct}% of requests are slow. Source: {downstream} latency.",
+        "[WARN] {trace_id} {downstream} slow-response count: {affected_count} in the last 60 seconds. Normal: near zero. No retry activity. Single-attempt slowdowns.",
+        "[WARN] {trace_id} P50 latency on {service} rising: {p50}ms (normal {baseline}ms). Unimodal distribution. Distinct from partial-failure bimodal pattern.",
+        "[WARN] {trace_id} {service} -> {downstream} call latency {latency}ms. Total {service} budget is {timeout}ms. Remaining headroom: {p50}ms. Risk of timeout if {downstream} slows further."
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "[INFO] {trace_id} {downstream} response times improving. P99 dropping from {p99}ms toward {baseline}ms. {service} latency following.",
+        "[INFO] {trace_id} {service} latency event cleared. Duration {hours}h. {downstream} was sole latency driver throughout. {service} request rate was stable at {rps} RPS.",
+        "[INFO] {trace_id} Trace summary: {service} processing time {p50}ms (normal). {downstream} time {latency}ms (elevated). Total end-to-end: {p99}ms.",
+        "[INFO] {trace_id} {downstream} team applied mitigation. {service} p99 now {p50}ms and declining. No customer action required.",
+        "[INFO] {trace_id} {service} SLO recovery confirmed. P99 latency {p50}ms, within {timeout}ms threshold. Error budget drain has stopped.",
+        "[INFO] {trace_id} Downstream latency event logged for post-incident review. Trace ID {trace_id} and {downstream} metrics exported to incident channel.",
+        "[INFO] {trace_id} {service} operating normally. {downstream} dependency reported healthy by on-call team. Latency monitoring interval reduced back to 5 minutes.",
+        "[INFO] {trace_id} End-to-end {endpoint} latency normalized to {baseline}ms p99. {downstream} query times returned to {normal_queries} queries at normal duration."
+      ]
+    }
+  ]
+}

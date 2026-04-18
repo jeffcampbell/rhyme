@@ -1,0 +1,119 @@
+{
+  "cause_class": "load_balancer_misconfiguration",
+  "summaries": [
+    "4:33 PM PDT We are investigating elevated 5xx responses for {service} in the us-east-1 Region. Load balancer metrics show {unhealthy_count} of {total_backends} targets marked unhealthy. Direct health checks to those pods are returning 200 OK. We are investigating the discrepancy and will provide an update within 30 minutes.",
+    "Between {config_time} and the time of mitigation, customers using {service} experienced 502 and 503 errors. Direct requests to individual pods succeeded on every attempt. ALB {lb_name} health check configuration was targeting {hc_path} with an incorrect scheme, causing all backends to be removed from rotation despite the pods remaining healthy.",
+    "PIR – {service} – ALB {lb_name} – Backend Drain Following Health Check Misconfiguration. At {config_time}, a configuration change to {lb_name} updated the health check path to {hc_path}. The actual readiness endpoint differs, causing {hc_error} responses. {unhealthy_count} of {total_backends} backends were removed from the rotation. Direct curl to each pod returned 200 OK throughout.",
+    "{service} is returning 503 errors to all callers. Envoy sidecar on {lb_name} is failing health checks against {hc_path} with {hc_error}. Calling {hc_path} directly against each pod IP returns HTTP 200 in under 15ms. The fault is in the proxy health check configuration, not in the application.",
+    "9:58 AM UTC We are investigating 502 errors from {service}. Load balancer {lb_name} shows {unhealthy_count}/{total_backends} backends in a failed state. Engineering has confirmed the pods are running and responding correctly when contacted directly. The issue is under active investigation. 10:27 AM UTC The health check path on {lb_name} has been corrected. Backends are recovering and error rates are returning to normal.",
+    "Post-Incident Review – {service} – {lb_name} – Listener Rule Reordering. During a deployment at {config_time}, ALB listener rules were reordered. A catch-all rule at lower priority began matching before the {service}-specific rule. Traffic was forwarded to a deprecated target group with zero registered instances, producing 503 for all requests.",
+    "ingress-nginx {ingress_name} path-routing rules for {service} were updated at {config_time} and now forward /api/v2/* requests to an incorrect backend service. The backends themselves are healthy; clients receive responses intended for a different service. Correcting the routing annotation in {ingress_name} resolved the issue.",
+    "HAProxy {lb_name} backend pool for {service} has drifted: the endpoint list contains {unhealthy_count} stale pod IPs from a previous deployment. Those IPs are unroutable. Only {total_backends} minus {unhealthy_count} current pods are reachable. The service appears degraded despite all current pods being healthy and ready.",
+    "11:15 AM PST We can confirm that {service} is returning 503 errors for clients in two of four availability zones. ALB {lb_name} has cross-zone load balancing disabled. Two AZs contain zero registered targets for {service}. All {total_backends} pods are healthy; clients in the other two AZs see normal responses. Enabling cross-zone load balancing resolved the issue.",
+    "The issue with {service} 5xx responses has been resolved. Root cause: Envoy outlier detection on {lb_name} ejected {unhealthy_count} backends following a brief latency spike that had already resolved. The backends were healthy but ejection cool-down had not elapsed, reducing effective capacity to {avail_pct}% for {duration}.",
+    "Traefik {ingress_name} circuit breaker opened against {service} at {config_time} after transient errors. The breaker's recovery expression requires {hc_failures} consecutive successes but was misconfigured with a {hc_timeout}ms check interval, extending the outage window far beyond the underlying error duration. Pods were healthy and responding normally throughout.",
+    "2:41 AM CET We are investigating elevated error rates for {service} in eu-west-1. All pods are Running and passing readiness probes. Nginx upstream health checks are reporting {unhealthy_count} peers unavailable. Direct HTTP requests to those peers succeed. Configuration investigation is in progress. 3:09 AM CET A health check timeout value of {hc_timeout}ms, set below the service's p99 response time, was identified as the cause. The timeout has been corrected.",
+    "HAProxy {lb_name} maxconn limit per backend was set to 10 during a config audit at {config_time}. Under normal load {service} requires approximately 400 connections per backend. The limit causes queue exhaustion and 503 errors. No application-level issues exist; all pods are healthy and processing requests that reach them successfully.",
+    "ALB {lb_name} health check is configured against port 80, but {service} pods listen exclusively on port 8080. {unhealthy_count} of {total_backends} targets are marked unhealthy. Bypassing the ALB and calling port 8080 directly on any pod returns correct responses. The port mismatch in the target group health check configuration is the sole cause of the incident.",
+    "PIR – {service} – Envoy DestinationRule Subset Mismatch. At {config_time} the DestinationRule for {service} was updated to require subset label version=v2. Pods were not yet relabeled. No endpoint matched the subset filter, producing a no-healthy-upstreams condition. Zero of {total_backends} backends were selected for {duration} until pods were relabeled.",
+    "ingress-nginx rewrite-target annotation on {ingress_name} strips the /v1 path prefix before forwarding to {service}. A recent application change means {service} now requires the prefix. All requests to {endpoint} return 404 at the application layer. The backends are healthy; the issue is in the ingress rewrite rule introduced at {config_time}.",
+    "5:02 PM SGT We are investigating 5xx errors from {service}. The pods are healthy and their readiness probes are passing. {lb_name} health checks are returning {hc_error} on {hc_path}, causing {unhealthy_count} backends to be removed. The application's actual health endpoint differs from what is configured in the load balancer. 5:29 PM SGT The health check path has been corrected and backends have been restored to the pool.",
+    "{service} TLS termination was moved from pods to {lb_name} at {config_time}. The load balancer's active health check still uses HTTPS, producing SSL handshake failures ({hc_error}) against backends that now speak plain HTTP. {unhealthy_count} of {total_backends} backends have been removed from rotation. Direct HTTP requests to any backend return 200 OK.",
+    "ingress-nginx {ingress_name} upstream keepalive directive was removed from the ConfigMap at {config_time}. {service} backends see a 10x increase in connection setup overhead under normal load, leading to connection exhaustion at the proxy layer. Backends are healthy and responding; the bottleneck is entirely in the ingress connection handling configuration.",
+    "Root cause confirmed: ALB {lb_name} slow-start configuration was set to {duration} seconds for the {service} target group. New pods during every deploy receive full production traffic before warm-up completes, causing elevated 5xx on each rollout. The underlying application is healthy; the traffic ramp configuration is incorrect and must be corrected before the next deployment."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL | {lb_name} | {service} target group: {unhealthy_count}/{total_backends} backends UNHEALTHY | error_rate=100% | lb_layer=ALB | direct_pod_health_check=PASSING | hc_path={hc_path}",
+        "CRITICAL | ingress-nginx/{ingress_name} | no healthy upstreams for {service} | total_pods={total_backends} | lb_reported_healthy=0 | pod_status=Running+Ready | discrepancy=true",
+        "CRITICAL | {lb_name} | {service} 5xx rate={error_pct}% | hc_path={hc_path} | hc_error={hc_error} | duration={duration} | direct_pod_request=200OK | lb_layer_fault=confirmed",
+        "CRITICAL | HAProxy/{lb_name} | backend pool for {service} exhausted | active={healthy_count}/{total_backends} | maxconn_limit=misconfigured | queued_conns=HIGH | application_healthy=true",
+        "CRITICAL | Envoy/{lb_name} | outlier ejection | service={service} | ejected={unhealthy_count} | remaining_capacity={avail_pct}% | all_ejected_pods_pass_active_hc=true",
+        "CRITICAL | ALB/{lb_name} | listener rule mismatch | service={service} | catch_all_rule_matching_first=true | traffic_routed_to=deprecated_target_group | registered_targets=0 | client_error_rate=100%",
+        "CRITICAL | Traefik/{ingress_name} | circuit_breaker=OPEN | service={service} | recovery_threshold={hc_failures} misconfigured | open_since={config_time} | all_backends_healthy=true",
+        "CRITICAL | ALB/{lb_name} | cross_zone_lb=DISABLED | service={service} | AZs_with_zero_targets=2 | affected_client_pct={error_pct}% | all_pods_healthy=true | config_changed={config_time}",
+        "CRITICAL | Envoy/{lb_name} | no_matching_subset | service={service} | DestinationRule subset label mismatch | zero_endpoints_selected | {total_backends} pods healthy but unlabeled | since={config_time}",
+        "CRITICAL | ingress-nginx/{ingress_name} | rewrite_rule_error | service={service} | endpoint={endpoint} | http_status=404 | path_prefix_stripped_incorrectly | backends_healthy=true"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING | ALB/{lb_name} | health_check_port_mismatch | service={service} | hc_port=80 | pod_listener_port=8080 | unhealthy_targets={unhealthy_count} | direct_port_8080_check=OK",
+        "WARNING | ingress-nginx/{ingress_name} | uneven_traffic_distribution | service={service} | hot_backend={pod} | hot_pct={error_pct}% | remaining_pods=idle | weight_annotation_incorrect=true",
+        "WARNING | HAProxy/{lb_name} | stale_endpoints_detected | service={service} | stale_ips={unhealthy_count} | routable_backends={healthy_count} | endpoint_list_drift=true",
+        "WARNING | {lb_name} | {service} health_check_timeout too low | hc_path={hc_path} | timeout_ms={hc_timeout} | consecutive_failures={hc_failures} | pods_removed={unhealthy_count} | actual_p99_exceeds_timeout",
+        "WARNING | Traefik/{ingress_name} | sticky_session_routing_failure | service={service} | missing_backend_ip={pod} | backend_no_longer_exists_post_rollout | new_sessions=OK | returning_sessions=503",
+        "WARNING | ALB/{lb_name} | slow_start_misconfiguration | service={service} | warm_up_period={duration} | new_pods_receiving_full_traffic_immediately=true | elevated_5xx_on_every_deploy=true",
+        "WARNING | Envoy/{lb_name} | health_check_scheme_mismatch | service={service} | hc_scheme=HTTPS | backend_scheme=HTTP | hc_error={hc_error} | unhealthy_count={unhealthy_count}",
+        "WARNING | ingress-nginx/{ingress_name} | keepalive_removed_from_configmap | service={service} | connection_overhead_10x_increase | config_changed={config_time} | backends_healthy=true",
+        "WARNING | {lb_name} | {service} ejection_cooldown_active | ejected_backends={unhealthy_count} | cooldown_remaining={duration} | backend_health=PASSING | effective_capacity={avail_pct}%",
+        "WARNING | ALB/{lb_name} | listener_rule_priority_reordered | service={service} | changed_at={config_time} | catch_all_rule_now_precedes_service_rule=true | target_group_has_zero_hosts=true"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO | {lb_name} | health_check_config | service={service} | hc_path={hc_path} | hc_timeout_ms={hc_timeout} | interval_s=10 | threshold={hc_failures} | last_modified={config_time}",
+        "INFO | ingress-nginx/{ingress_name} | upstream_peer_status | service={service} | total={total_backends} | lb_reported_healthy={healthy_count} | pod_actual_healthy={total_backends} | discrepancy=true",
+        "INFO | HAProxy/{lb_name} | backend_pool_status | service={service} | active={healthy_count} | stale={unhealthy_count} | total_configured={total_backends} | last_sync={config_time}",
+        "INFO | Envoy/{lb_name} | load_assignment | service={service} | total_endpoints={total_backends} | subset_matched=0 | DestinationRule_version={config_time} | pod_labels_version=prior_release",
+        "INFO | ALB/{lb_name} | target_group_health | service={service} | healthy={healthy_count} | unhealthy={unhealthy_count} | draining=0 | direct_probe=healthy | lb_hc_result=unhealthy | discrepancy=confirmed"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "[{config_time}] nginx: connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.1.45, server: {service}, request: \"GET {endpoint} HTTP/1.1\", upstream: \"http://{pod}:{hc_timeout}/\", host: \"{service}\"",
+        "[{config_time}] ALB {lb_name}: Target {pod}:8080 health check failed. Reason: {hc_error}. HealthCheckPath: {hc_path}. ConsecutiveFailures: {hc_failures}. Removing from rotation.",
+        "[{config_time}] envoy|{lb_name}|{service}|no_healthy_upstreams|cluster={service}_v2|attempted_endpoints={total_backends}|response=503|detail=no_healthy_upstreams",
+        "[{config_time}] traefik | level=error | msg=\"{hc_error}\" | service={service} | provider=kubernetes | ingress={ingress_name} | attempt={hc_failures}/{hc_failures} | url=http://{pod}{hc_path}",
+        "[{config_time}] haproxy[{lb_name}]: Server {service}/{pod} is DOWN, reason: {hc_error}, check duration: {hc_timeout}ms/{hc_timeout}ms, {unhealthy_count} active and 0 backup servers left.",
+        "[{config_time}] envoy wasm log {lb_name}: outlier_detection: ejecting host={pod} service={service} consecutive_errors={hc_failures} error_rate={error_pct}% ejection_time={duration}",
+        "[{config_time}] ingress-nginx/{ingress_name}: upstream timed out (110: Connection timed out) while reading response header, upstream: \"{service}\", host: \"{endpoint}\"",
+        "[{config_time}] ALB {lb_name} ERROR: No registered targets in target group for service={service} in us-east-1b. All requests to AZ us-east-1b will fail. Cross-zone load balancing is DISABLED.",
+        "[{config_time}] haproxy[{lb_name}]: Proxy {service}: Stopping. {unhealthy_count} servers are down. Degraded mode ON. Clients may not get optimal service.",
+        "[{config_time}] traefik | level=error | msg=\"circuit breaker open\" | service={service} | expression=\"NetworkErrorRatio() > 0.30\" | open_since={config_time} | pods_healthy=true | recovery_failures_required={hc_failures}",
+        "[{config_time}] envoy|{lb_name}|{service}|ssl_error|upstream=http://{pod}:{hc_timeout}|error={hc_error}|note=backend_expects_plaintext_lb_sends_tls",
+        "[{config_time}] nginx/ingress: rewrite error for {service}: rewrite \"/api/v1(/|$)(.*)\" -> \"/$2\" removed required path prefix; upstream returned 404 for {endpoint}",
+        "[{config_time}] ALB {lb_name}: Listener rule evaluation for {service}: matched rule priority=999 (catch-all) before priority=10 ({service}-specific). Target group has 0 healthy hosts. Returning 503.",
+        "[{config_time}] haproxy[{lb_name}]: {service} backend reached maxconn limit (10). New connections queued. Queue length: 847. Rejecting connections after timeout. Raise maxconn to resolve.",
+        "[{config_time}] envoy/{lb_name}: load_balancer_type=ROUND_ROBIN cluster={service} subset_lb: no endpoint matched metadata filter labels={{version: v2}}; 0/{total_backends} hosts selected; request dropped"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "[{config_time}] ALB {lb_name}: Health check for {service} configured on port 80 but instance {pod} reports listener on port 8080 only. Target marked unhealthy. Verify HealthCheckPort setting.",
+        "[{config_time}] ingress-nginx/{ingress_name}: upstream {service} has {unhealthy_count} peer(s) unavailable per nginx upstream check; direct k8s endpoint probe shows {total_backends} pods Ready",
+        "[{config_time}] haproxy[{lb_name}]: Server {service}/{pod} is UP but only {healthy_count}/{total_backends} servers available ({avail_pct}% capacity). Traffic distribution will be uneven.",
+        "[{config_time}] envoy|{lb_name}|{service}|uneven_distribution|hot={pod}|hot_rps={error_pct}%|remaining_pods=idle|lb_policy=RING_HASH|ring_size_too_small=true",
+        "[{config_time}] traefik | level=warn | msg=\"sticky session backend unreachable\" | service={service} | cookie_backend={pod} | backend_exists=false | fallback=none | affected=returning_sessions",
+        "[{config_time}] ALB {lb_name}: slow_start_duration={duration}s for {service}. Pod {pod} registered {duration}s ago and receiving full traffic weight. 5xx rate on new pods: {error_pct}%.",
+        "[{config_time}] ingress-nginx/{ingress_name}: upstream keepalive not configured for {service}. Connection pool exhausted under load. Config last modified: {config_time}. Recommend keepalive=32.",
+        "[{config_time}] haproxy[{lb_name}]: Detected {unhealthy_count} backends for {service} with stale IPs (last seen {duration} ago). Endpoint list may be out of sync with cluster state.",
+        "[{config_time}] envoy/{lb_name}: outlier_detection ejection for {service}: host={pod} ejected for {duration}. Note: host passed active health check at same timestamp. Review ejection policy thresholds.",
+        "[{config_time}] ALB {lb_name}: Listener rule priority change detected for {service} at {config_time}. New ordering may cause unintended catch-all rule matching. Validate rule priorities.",
+        "[{config_time}] ingress-nginx/{ingress_name}: weighted traffic for {service}: canary={error_pct}% stable={avail_pct}%. Canary pod count={unhealthy_count}, may be undersized for current weight.",
+        "[{config_time}] traefik | level=warn | msg=\"health check failed\" | service={service} | url=http://{pod}{hc_path} | status={hc_error} | timeout={hc_timeout}ms | consecutive={hc_failures} | direct_curl=200OK"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "[{config_time}] ALB {lb_name}: Target group {service} state change. Healthy: {healthy_count}, Unhealthy: {unhealthy_count}, Total: {total_backends}. Health check path: {hc_path}.",
+        "[{config_time}] envoy/{lb_name}: cluster_manager: adding cluster {service} with {total_backends} endpoints; health_check={hc_path}; lb_policy=LEAST_REQUEST; active_hc_interval={hc_timeout}ms",
+        "[{config_time}] ingress-nginx/{ingress_name}: configuration reloaded. Upstream {service}: {total_backends} peers configured, {healthy_count} considered up by nginx, {unhealthy_count} marked down by hc.",
+        "[{config_time}] haproxy[{lb_name}]: Proxy {service} started. {healthy_count}/{total_backends} servers UP. Health check: {hc_path} timeout={hc_timeout}ms failures_threshold={hc_failures}.",
+        "[{config_time}] traefik | level=info | msg=\"provider configuration applied\" | ingress={ingress_name} | service={service} | backends={total_backends} | hc_path={hc_path} | hc_interval=10s",
+        "[{config_time}] ALB {lb_name}: Cross-zone load balancing setting changed to DISABLED for target group {service}. AZ distribution: us-east-1a={healthy_count} targets, us-east-1b=0 targets.",
+        "[{config_time}] envoy/{lb_name}: DestinationRule updated for {service} at {config_time}. Subset 'stable' now requires label version=v2. Current pod label version=stable. Subset matches 0/{total_backends} endpoints until pods are relabeled.",
+        "[{config_time}] ingress-nginx/{ingress_name}: upstream {service} peer {pod} health check recovered. Direct pod response: 12ms. Note: peer was removed by LB health check despite returning 200 on {hc_path}."
+      ]
+    }
+  ]
+}

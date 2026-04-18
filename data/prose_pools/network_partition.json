@@ -1,0 +1,119 @@
+{
+  "cause_class": "network_partition",
+  "summaries": [
+    "3:12 PM PDT We are investigating connectivity issues between availability zones in the us-west-2 Region. A subset of customers may be experiencing errors connecting to services located in a different AZ than their origin. Services communicating within the same AZ are unaffected. We will provide an update within 30 minutes.",
+    "Between {az} and {downstream_az}, TCP SYN packets to {dest_ip}:{port} are timing out at hop {hop_num} with no SYN-ACK returned. {service} cannot establish new connections to {downstream}. Intra-AZ calls within {az} remain fully operational. The failure boundary aligns precisely with the inter-AZ transit gateway segment.",
+    "Post-Incident Review – {service} – Cross-AZ Connectivity Loss – {az} to {downstream_az}. At the onset of the incident, {service} lost all reachability to {downstream}. Packet captures confirmed SYN retransmits with no corresponding acknowledgment. The fault was isolated to a routing table entry in the transit VPC, not to any application-level change.",
+    "VPC route propagation failure has isolated {az} from {downstream_az}. {service} and {affected_count} co-located services cannot reach {downstream} at {dest_ip}:{port}. Instances in {fallback_az} reach the same endpoint successfully in under 5ms, ruling out a {downstream}-side failure.",
+    "5:47 AM UTC We are investigating reports of elevated timeout errors for {service} in the eu-west-1 Region. The errors are connection-layer timeouts, not application errors. Services in the same AZ as the caller are responding normally. Network engineers are engaged. 6:19 AM UTC We have identified a routing asymmetry in the inter-AZ fabric. Traffic from {az} to {downstream_az} is being silently discarded at hop {hop_num}. Remediation is under way.",
+    "PIR – Managed Connectivity – {az} / {downstream_az} Isolation Event. A stale NACL entry on the transit VPC caused {packet_loss_pct}% packet loss between {az} and {downstream_az}. {service} dependency on {downstream} was severed. {affected_count} upstream services were degraded. Services co-located in the same AZ continued operating normally throughout.",
+    "A flapping BGP session on the inter-AZ backbone escalated from {packet_loss_pct}% packet loss to a complete blackout for traffic between {az} and {downstream_az}. {service} is queuing requests to {downstream} that cannot be served until routing is restored. ICMP unreachable is not returned; packets are silently dropped.",
+    "Traceroutes from multiple {az} hosts to {dest_ip} lose all probes at hop {hop_num}. Security group {sg_id} and NACL configurations have been verified correct. The fault is isolated to the underlying routing fabric, not to any firewall rule or application configuration.",
+    "2:03 AM SGT We can confirm a routing event in the ap-southeast-1 Region is causing connectivity failures for traffic between {az} and {downstream_az}. Services in {fallback_az} are healthy and serving traffic normally. Network teams are investigating the transit gateway route table. 2:38 AM SGT Routing has been restored. {service} is recovering and error rates are returning to baseline.",
+    "The issue with cross-AZ connectivity in us-east-1 has been resolved as of {duration} after onset. Root cause: a transit gateway route propagation failure removed the {downstream_az} CIDR from the {az} route table. {affected_count} service-to-service paths were affected. All services communicating within the same AZ remained healthy throughout the incident.",
+    "{service} began experiencing {error_pct}% failure rate on all calls to {downstream} when a routing blackhole formed between {az} and {downstream_az}. The failure presents as TCP SYN timeout after {timeout}ms, not as application errors. MTR confirms probes are lost at hop {hop_num} inside the transit segment.",
+    "Transit gateway route propagation failure has partitioned {az} from the rest of the VPC. {affected_count} services, including {service}, cannot reach any endpoint in {downstream_az}. Failover to {fallback_az} is restoring partial capacity while the routing issue is investigated.",
+    "10:44 PM CET We are investigating connectivity failures between us-east-1 availability zones affecting {service} and {affected_count} other service pairs. TCP connection establishment to {downstream_az} is failing from all nodes in {az}. The issue is network-layer. Application health checks within the same AZ are passing. 11:22 PM CET Routing has been restored. Recovery is in progress.",
+    "Network-level isolation confirmed via simultaneous traceroutes from {affected_count} nodes in {az}. All paths to {dest_ip} fail at hop {hop_num}. VPC flow logs show egress traffic leaving {az} with no corresponding ingress recorded in {downstream_az}. Security group {sg_id} is unchanged from its pre-incident state.",
+    "{service} health checks against {downstream} in {downstream_az} have been failing at {timeout}ms intervals. Parallel health checks from {fallback_az} to the same target succeed consistently in under 5ms. The connectivity matrix cleanly follows AZ boundary lines, distinguishing this from a {downstream} process failure.",
+    "Cross-AZ traffic between {az} and {downstream_az} degraded to zero. {affected_count} distinct service-to-service communication paths are broken. The partition boundary matches the VPC route table modified during the preceding maintenance window. Intra-AZ mesh traffic is entirely healthy.",
+    "PIR – {service} – us-east-1 – AZ Isolation – {az}. Packet loss between {az} and {downstream_az} climbed from baseline to {packet_loss_pct}% over 12 minutes before reaching total blackout. Security group {sg_id} was verified unchanged. Root cause: stale BGP advertisement on the transit gateway introduced a routing loop that eventually dropped all inter-AZ packets.",
+    "A routing blackhole between {az} and {downstream_az} is confirmed. {service} cannot reach {downstream} at {dest_ip}. Packet captures on {source_ip} show SYN retransmits with no SYN-ACK. The issue is network-layer only; no application errors were logged before connection failures began. Direct connections from {fallback_az} to {dest_ip}:{port} succeed immediately.",
+    "{service} is reporting {error_pct}% errors on all outbound calls to {downstream}. TCP connections to {dest_ip}:{port} stall at SYN_SENT for {timeout}ms before being abandoned. All {affected_count} instances in {az} are affected. No instances in {fallback_az} report degradation. The failure boundary is consistent with an inter-AZ routing event.",
+    "Connectivity between {az} and {downstream_az} is fully restored as of this update. The root cause was a misconfigured transit gateway route that silently discarded inter-AZ packets for {duration}. {service} and {affected_count} other services in {az} were unable to reach {downstream} during the incident. All same-AZ services and {fallback_az}-routed services were unaffected throughout."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL [{service}] 100% connection failure rate to {downstream} in {downstream_az} — TCP SYN timeout after {timeout}ms; no SYN-ACK; intra-AZ traffic fully healthy; network partition suspected",
+        "CRITICAL: All TCP connections from {source_ip} to {dest_ip}:{port} timing out — routing blackhole at hop {hop_num}; {affected_count} services in {az} impacted; {fallback_az} unaffected",
+        "CRITICAL: {affected_count} service pairs partitioned from {downstream_az}; {packet_loss_pct}% packet loss on inter-AZ path; escalate to network oncall immediately",
+        "CRITICAL [{service}] Error rate {error_pct}% — complete loss of TCP connectivity to {downstream}; no application errors precede connection failures; AZ isolation event in progress",
+        "CRITICAL: VPC route anomaly — {az} to {downstream_az} path unreachable; {affected_count} downstream dependencies broken; {fallback_az} routes operating normally",
+        "CRITICAL: Network partition confirmed {az}/{downstream_az} — {service} cannot establish any TCP connection to {dest_ip}:{port}; connection attempt fails at SYN_SENT after {timeout}ms",
+        "CRITICAL: Transit gateway blackhole isolating {az} — all egress to {downstream_az} silently dropped; security group {sg_id} verified unchanged; routing fabric fault confirmed",
+        "CRITICAL: {service} SYN packets to {downstream} ({dest_ip}) not receiving SYN-ACK — TCP connection establishment impossible from {az}; {fallback_az} unaffected",
+        "CRITICAL: {affected_count} instances in {az} cannot reach {downstream} in {downstream_az} — health check failure cascade; failover to {fallback_az} triggered",
+        "CRITICAL: AZ isolation event — {az} routing table shows no valid path to {downstream_az} CIDR; {packet_loss_pct}% inter-AZ packet loss; all same-AZ traffic nominal"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING [{service}] Connection timeout rate to {downstream} rising — {error_pct}% of requests failing with ETIMEDOUT; SYN timeout at {timeout}ms; no application-layer errors",
+        "WARNING: Intermittent packet loss ({packet_loss_pct}%) detected between {az} and {downstream_az} — monitoring for partition development; intra-AZ traffic unaffected",
+        "WARNING: TCP connection establishment to {dest_ip}:{port} degraded — {timeout}ms SYN timeouts from {source_ip}; no corresponding application errors logged",
+        "WARNING [{service}] Latency spike to {downstream} — possible routing instability between {az} and {downstream_az}; traceroute shows anomaly at hop {hop_num}",
+        "WARNING: NACL evaluation discrepancy on {sg_id} — egress from {az} logged, ingress in {downstream_az} not recorded; asymmetric routing suspected",
+        "WARNING: {affected_count} cross-AZ health checks failing — {az} to {downstream_az} reachability degraded; same-AZ checks pass cleanly",
+        "WARNING: MTR probe loss at hop {hop_num} between {az} and {downstream_az} — {packet_loss_pct}% loss rate; possible routing fabric instability",
+        "WARNING [{service}] Circuit breaker approaching threshold — {error_pct}% timeout errors on calls to {downstream} from {az}; no errors on calls within {az}",
+        "WARNING: Transit gateway route propagation delay detected — {az} may lose connectivity to {downstream_az} if unresolved within minutes",
+        "WARNING: Asymmetric routing detected between {source_ip} and {dest_ip} — forward and return paths traverse different hops; elevated risk of partition"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO: Partition investigation ongoing — {fallback_az} instances are healthy and serving traffic normally; failover routing has been activated",
+        "INFO: {service} traffic rerouted from {az} to {fallback_az} pending resolution of {az}/{downstream_az} connectivity issue",
+        "INFO: Security group {sg_id} and NACL rules verified unchanged — root cause isolated to routing table or transit gateway layer",
+        "INFO: Network oncall engaged — investigating hop {hop_num} failure on path from {az} to {downstream_az}; {affected_count} service pairs affected",
+        "INFO: Traceroute from {source_ip} to {dest_ip} confirms blackhole at hop {hop_num} — all probes lost beyond that hop; no ICMP unreachable returned"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "connect to {dest_ip}:{port} failed: connection timed out after {timeout}ms — no SYN-ACK received; ETIMEDOUT; SYN retransmit limit reached",
+        "TCP connect() to {dest_ip}:{port} failed: ETIMEDOUT — kernel SYN retransmit limit reached without response from remote host",
+        "health check FAIL: {downstream} ({dest_ip}:{port}) unreachable from {az} — consecutive failures: {affected_count}; same check from {fallback_az} succeeds",
+        "request to {downstream} aborted after {timeout}ms — TCP connection to {dest_ip} could not be established; no bytes received; error=ETIMEDOUT",
+        "circuit breaker OPEN for {downstream} — {error_pct}% of last 100 requests ended in connection timeout, not application error; {az} to {downstream_az} path suspect",
+        "network probe to {dest_ip} via {source_ip} failed at hop {hop_num} — traceroute shows silent packet drop inside transit path; no ICMP unreachable",
+        "cross-AZ connectivity check FAILED: {az} -> {downstream_az} — {packet_loss_pct}% packet loss over 60-second probe window; intra-AZ probes clean",
+        "service {downstream} marked UNREACHABLE — all {affected_count} backend instances in {downstream_az} unresponsive; direct check from {fallback_az} succeeds",
+        "TCP SYN to {dest_ip}:{port} retransmitted 6 times without ACK — connection abandoned; scheduling retry in {timeout}ms; error=ETIMEDOUT",
+        "VPC flow log anomaly: egress from {source_ip}:{port} recorded in {az} subnet; no corresponding ingress entry in {downstream_az} subnet for same flow",
+        "dead connection: socket to {dest_ip}:{port} in SYN_SENT state for {timeout}ms — forcibly closed; zero bytes transferred; {service} returning 503",
+        "dependency {downstream} in {downstream_az} unreachable — {service} returning 503 to {affected_count} in-flight requests; no application-level error precedes TCP failure",
+        "MTR report: path from {source_ip} to {dest_ip} drops all probes at hop {hop_num} — routing blackhole confirmed; packets not forwarded beyond transit segment",
+        "gRPC dial context deadline exceeded targeting {dest_ip}:{port} — no TCP-level response within {timeout}ms connect timeout; same dial from {fallback_az} succeeds in <10ms",
+        "bulk connection pool exhaustion in {service}: all {affected_count} pooled connections to {downstream} entered ETIMEDOUT state simultaneously — consistent with AZ-level partition"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "elevated TCP SYN timeout rate to {dest_ip}:{port} — {error_pct}% of connection attempts timing out over last 5 minutes; intra-AZ connection success rate unchanged",
+        "route table entry for {downstream_az} CIDR may be stale — packet TTL at hop {hop_num} inconsistent with expected path length to {downstream_az}",
+        "security group {sg_id} permits traffic to {port} but SYN packets are not being acknowledged — suspect upstream routing issue between {az} and {downstream_az}",
+        "retry budget for {downstream} at {error_pct}% consumed — connection timeouts to {dest_ip}:{port} indicate inter-AZ network degradation, not application failure",
+        "packet loss probe {az}->{downstream_az}: {packet_loss_pct}% — threshold exceeded; possible network partition forming; same-segment probes nominal",
+        "transit gateway attachment for {az} showing route flap — {affected_count} prefixes oscillating in route table; connectivity to {downstream_az} intermittent",
+        "new connection attempts to {dest_ip} spending {timeout}ms in SYN_SENT before timeout — consistent with routing blackhole rather than firewall rejection (no RST received)",
+        "NACL inbound rule evaluation skipped for traffic from {source_ip} — traffic may not be reaching {downstream_az} subnet; egress side shows normal transmit counts",
+        "slow TCP handshake to {dest_ip}:{port} — {timeout}ms round-trip on SYN, expected <10ms within same region; cross-AZ path likely routing through incorrect hop",
+        "health check latency for {downstream} in {downstream_az} crossed warning threshold — {timeout}ms average, baseline 4ms; same check from {fallback_az} returns 3ms",
+        "{service} async task queue building — {affected_count} tasks pending dispatch to {downstream} as new connections fail; tasks will be replayed on connectivity restoration",
+        "cross-zone load balancer reporting all targets in {downstream_az} unhealthy — zonal isolation suspected; target processes are running and pass local health checks"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "network diagnostic initiated: running MTR from {source_ip} to {dest_ip} to characterize hop {hop_num} packet loss",
+        "failover routing enabled: {service} requests redirected from {az} to {fallback_az} endpoints while partition persists",
+        "security group {sg_id} audit complete — all inbound and outbound rules verified correct; SG is not the root cause",
+        "VPC flow log capture started on {az} subnet for traffic destined to {downstream_az} — collecting evidence for network engineering team",
+        "transit gateway route table inspection: expected route to {downstream_az} CIDR is present; investigating propagation status and advertisement health",
+        "{service} graceful degradation mode active — non-critical calls to {downstream} suppressed; essential calls retrying with exponential backoff",
+        "incident scoping complete: partition affects {affected_count} service pairs across {az}/{downstream_az} boundary; {fallback_az} unaffected; failover restoring capacity",
+        "network oncall acknowledged — reviewing transit gateway and inter-AZ fabric logs for changes preceding the partition onset"
+      ]
+    }
+  ]
+}

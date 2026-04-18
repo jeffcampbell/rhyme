@@ -1,0 +1,119 @@
+{
+  "cause_class": "cpu_throttling",
+  "summaries": [
+    "Between 10:15 and 15:42 UTC on 08 Apr 2026, customers using {service} on Amazon EKS in the us-east-1 Region experienced elevated request latency. CPU utilization on pod {pod} reached the cgroup limit of {cpu_limit}, and the Linux CFS scheduler throttled {throttle_pct}% of scheduling periods. P99 latency increased from {slo} ms to {latency} ms. No pod restarts or memory pressure were observed. The deployment's CPU limit was adjusted at 15:42 UTC.",
+    "Tracking ID: AZ-CP8-20260410 — Between approximately 08:30 and 13:00 UTC on 10 Apr 2026, a subset of customers using Azure Kubernetes Service in the East US region observed progressive latency degradation for {service}. Container CPU utilization was capped at the configured limit of {cpu_limit}. The CFS throttle rate reached {throttle_pct}%, driving p99 response times to {latency} ms. No OOM events were recorded. The CPU limit was increased at 13:00 UTC to mitigate the issue.",
+    "03:45 PM PDT — We are investigating elevated latency for {service} in the us-west1 region. CPU throttle events have been occurring since approximately 02:00 PM PDT, with {throttle_count} throttle events logged in the last hour. Container CPU usage is pegged at {cpu_pct}% of the {cpu_limit} cgroup quota. P50 latency is {p50} ms and p99 is {p99} ms. The service remains up and processing requests at reduced throughput.",
+    "Google Cloud Status — The issue with Google Kubernetes Engine affecting {service} in europe-west1 has been resolved as of 11:30 US/Pacific. Between 06:00 and 11:30 US/Pacific, the container CFS scheduler throttled {service} pods at a rate of {throttle_pct}% due to CPU limit exhaustion at {cpu_limit}. Latency degraded progressively from baseline to p99={latency} ms. No crashes or data loss occurred. The CPU quota was increased as a mitigation.",
+    "Tracking ID: 8_P5-RK1 — Summary of impact: Between approximately 17:00 and 22:30 UTC on 11 Apr 2026, customers accessing {service} on Azure Container Apps in West Europe experienced sustained latency increases. CPU throttle count reached {throttle_count} events over the incident window. P99 latency climbed from baseline to {latency} ms while p50 remained at {p50} ms. Memory metrics were nominal throughout. CPU limits were adjusted at 22:30 UTC.",
+    "04/07/2026 EKS CPU Throttling Incident — Resolved — Between 09:20 and 14:55 PDT, {service} pods in the ap-southeast-1 Region experienced progressive request slowdown due to CPU quota exhaustion. The kernel CFS scheduler throttled pod {pod} at {throttle_pct}% of scheduling periods, with {throttle_count} total throttle events logged. P99 latency reached {latency} ms. The service continued operating without crashes or OOM events throughout the incident.",
+    "Between 21:00 and 02:30 UTC on 06–07 Apr 2026, a subset of customers running {service} in Google Cloud region us-central1 experienced increased response times. Container CPU utilization reached the configured limit of {cpu_limit} and remained there for the duration of the incident. CFS throttling drove p99 latency to {latency} ms and p50 to {p50} ms. Pod health checks passed throughout. The issue was resolved by increasing the CPU limit.",
+    "We experienced degraded request latency for {service} in the eu-west-1 Region between 11:30 and 16:45 UTC. Container CPU was consistently throttled at {throttle_pct}% by the cgroup CFS quota mechanism. Throttle event count reached {throttle_count} over the incident window. P99 latency was {latency} ms vs an SLO of {slo} ms. No memory anomalies were detected. CPU limit adjustment at 16:45 UTC restored normal latency.",
+    "Tracking ID: AZ-KS3-20260412 — Customers using Azure Kubernetes Service in the Japan East region reported latency increases for {service} between 05:00 and 09:45 UTC on 12 Apr 2026. CPU utilization for the affected container reached {cpu_pct}% of the {cpu_limit} limit. The CFS scheduler issued {throttle_count} throttle events during the incident. P99 latency reached {latency} ms. No restarts were recorded. CPU limits were increased to resolve the issue.",
+    "07:55 PM PDT — Amazon ECS tasks running {service} in the ca-central-1 Region are experiencing elevated latency due to CPU throttling. Container CPU is at {cpu_pct}% of the {cpu_limit} task limit. The CFS scheduler has issued {throttle_count} throttle events in the current hour. P99 latency is {latency} ms against an SLO of {slo} ms. The service is operational but degraded. We are adjusting CPU limits.",
+    "Google Cloud Status Update — 14:00 US/Pacific — We are investigating latency degradation for {service} in the asia-northeast1 region. CPU throttle events began accumulating at 10:30 US/Pacific. The container is consuming its full CPU quota of {cpu_limit} each scheduling period, resulting in {throttle_pct}% of periods being throttled. P50 latency is {p50} ms, p99 is {p99} ms. Memory and pod health metrics are normal.",
+    "Between 16:00 and 20:30 UTC on 13 Apr 2026, customers running {service} on Amazon EKS in the eu-central-1 Region experienced progressive latency degradation. CPU was pinned at the {cpu_limit} cgroup limit, causing the CFS scheduler to throttle {throttle_pct}% of periods. Throttle events totaled {throttle_count}. P99 latency reached {latency} ms. The service did not crash or experience memory pressure at any point during the incident.",
+    "Tracking ID: GCP-INC-20260409-002 — Between 03:15 and 08:00 UTC on 09 Apr 2026, GKE clusters in europe-west2 running {service} experienced sustained latency degradation. The container CPU utilization was capped at {cpu_limit} throughout the incident. CFS throttle rate reached {throttle_pct}%, with {throttle_count} throttle events recorded. P99 latency was {latency} ms vs a {slo} ms SLO. No container restarts occurred.",
+    "04/15/2026 CPU Throttling Incident — Mitigated — Tracking ID: AZ-WE2-20260415 — Between 12:00 and 17:45 UTC, {service} on Azure Kubernetes Service in the Australia Southeast region experienced request slowdown due to CFS CPU throttling. Container CPU usage reached {cpu_pct}% of the {cpu_limit} limit. Throttle events accumulated at a rate corresponding to {throttle_pct}% of scheduling periods. P99 latency peaked at {latency} ms. Mitigation was applied at 17:45 UTC by increasing the CPU limit.",
+    "10:18 AM PDT — We have resolved the latency issue affecting {service} pods in the us-east-2 Region. Between 07:30 and 10:18 AM PDT, container CPU was throttled by the CFS scheduler at {throttle_pct}% of periods. Throttle event count reached {throttle_count}. P99 latency peaked at {latency} ms vs a {slo} ms SLO. No OOM events or pod restarts were observed at any point. CPU limit was increased to restore normal response times.",
+    "Between 19:00 and 23:30 UTC on 14 Apr 2026, customers in the Google Cloud europe-west4 region running {service} experienced elevated p99 response times. The container CPU quota of {cpu_limit} was exhausted each scheduling period, causing the kernel to issue {throttle_count} throttle events. P99 latency degraded from baseline to {latency} ms. P50 was less affected at {p50} ms. Pod health checks returned healthy throughout the incident.",
+    "Tracking ID: AZ-NC2-20260416 — Summary of impact: Between approximately 09:00 and 14:15 UTC on 16 Apr 2026, a subset of Azure Kubernetes Service customers in the Korea Central region running {service} experienced elevated latency. The container CPU was throttled at {throttle_pct}% of CFS scheduling periods, accumulating {throttle_count} throttle events. P99 latency reached {p99} ms. No memory pressure, OOM events, or pod restarts were observed.",
+    "11:05 PM PDT — Amazon EKS pods running {service} in the ap-northeast-2 Region are experiencing CPU throttle-driven latency degradation. CPU utilization has been pegged at {cpu_pct}% of the {cpu_limit} cgroup limit since 09:30 PM PDT. Throttle event count is {throttle_count} and rising. P99 latency is {latency} ms against an SLO of {slo} ms. Memory and readiness probe metrics are normal. We are working on a mitigation.",
+    "Google Cloud Status — Resolved — 10:45 US/Pacific — The latency incident affecting {service} in GKE clusters in northamerica-northeast1 has been resolved. Between 05:15 and 10:45 US/Pacific, the container CFS scheduler throttled {throttle_pct}% of scheduling periods due to CPU quota exhaustion at {cpu_limit}. P99 latency peaked at {latency} ms. No pod restarts or memory anomalies occurred. CPU limits were increased as the mitigation.",
+    "Between 08:00 and 12:30 UTC on 05 Apr 2026, customers running {service} on Amazon EKS in the me-south-1 Region experienced degraded response times without any pod restarts or availability impact. Container CPU was constrained at the {cpu_limit} cgroup quota, causing the Linux CFS scheduler to throttle {throttle_pct}% of scheduling periods. Throttle events totaled {throttle_count}. P99 latency reached {latency} ms while p50 remained near {p50} ms."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL: {service} p99 latency {latency}ms — SLO breach ({slo}ms threshold) — CPU throttle rate {throttle_pct}% — {throttle_count} throttle events — pod {pod} at {cpu_pct}% of {cpu_limit} limit",
+        "CRITICAL: CPU quota exhausted — {service}/{pod} — CFS throttle rate {throttle_pct}% — p99={latency}ms p50={p50}ms — {throttle_count} throttle events — increase CPU limit now",
+        "CRITICAL: {service} latency SLO breached — p99={latency}ms vs {slo}ms SLO — root cause: CFS throttling at {throttle_pct}% — container CPU pegged at {cpu_limit} limit — escalate",
+        "CRITICAL: CFS throttle storm — {service}/{pod} — {throttle_count} throttle events — CPU at {cpu_pct}% of {cpu_limit} — p99={p99}ms — service degraded but not crashed",
+        "CRITICAL: {service} CPU throttling severe — {throttle_pct}% of scheduling periods throttled — p99 latency {latency}ms — {slo}ms SLO breached — no OOM risk — CPU limit adjustment required",
+        "CRITICAL: Latency spike in {service} — CPU throttle_count={throttle_count} — CFS quota={cpu_limit} exhausted per period — p99={latency}ms p50={p50}ms — pods healthy",
+        "CRITICAL: {service} throughput degraded — CPU throttle rate {throttle_pct}% on pod {pod} — p99={p99}ms exceeds SLO={slo}ms — increase cpu_limit from {cpu_limit} — no memory issue",
+        "CRITICAL: {service} SLO violation — {error_pct}% of requests exceeding latency budget — CPU throttle events {throttle_count} — cgroup limit {cpu_limit} — pods not restarting",
+        "CRITICAL: CPU CFS throttle rate {throttle_pct}% for {service} — p99={latency}ms — pod {pod} at {cpu_pct}% utilization — limit={cpu_limit} — immediate CPU limit increase required",
+        "CRITICAL: Progressive latency degradation in {service} — throttle_count={throttle_count} — cpu_limit={cpu_limit} — p99={latency}ms — p50={p50}ms — no restarts, no OOM — CPU-bound"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING: {service} pod {pod} CPU at {cpu_pct}% of limit {cpu_limit} — CFS throttle rate {throttle_pct}% — p99 latency {latency}ms climbing toward SLO",
+        "WARNING: CPU throttle events accumulating for {service} — {throttle_count} events in last hour — throttle_pct={throttle_pct}% — p99={p99}ms — no memory pressure",
+        "WARNING: Container {pod} CPU quota nearing exhaustion — {cpu_pct}% of {cpu_limit} — CFS scheduler beginning to throttle — latency impact p99={latency}ms",
+        "WARNING: {service} latency trending up — CPU throttle_count={throttle_count} — throttle_pct={throttle_pct}% — p50={p50}ms p99={p99}ms — SLO={slo}ms — no OOM events",
+        "WARNING: CFS throttle rate {throttle_pct}% on {service}/{pod} — CPU limit={cpu_limit} — latency degrading progressively — p99 now {latency}ms — pods remain healthy",
+        "WARNING: CPU limit headroom exhausted for {service} — {cpu_pct}% utilization vs {cpu_limit} limit — throttle events={throttle_count} — latency impact visible in p99",
+        "WARNING: {service} slowdown without crashes — CPU throttle_pct={throttle_pct}% — p99={latency}ms — memory normal — review cpu_limit={cpu_limit} before SLO breach",
+        "WARNING: Throttle event rate increasing — {service}/{pod} — {throttle_count} events, {throttle_pct}% of periods — p99={p99}ms trending toward {slo}ms SLO",
+        "WARNING: {service} CPU-bound — container at {cpu_pct}% of {cpu_limit} cgroup quota — CFS throttle rate {throttle_pct}% — no restarts, no OOM — latency {latency}ms",
+        "WARNING: p99 latency drift detected in {service} — CPU throttle events={throttle_count} — throttle_rate={throttle_pct}% — p50={p50}ms — review CPU allocation"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO: CPU limit increased for {service}/{pod} — previous limit {cpu_limit} — throttle rate was {throttle_pct}% — monitoring latency recovery",
+        "INFO: CFS throttle events cleared for {service} after CPU limit adjustment — last throttle_count={throttle_count} — p99 returning toward {slo}ms baseline",
+        "INFO: {service} pod {pod} CPU utilization {cpu_pct}% of {cpu_limit} — throttle_count={throttle_count} — no OOM events — latency under review",
+        "INFO: CPU throttle alert acknowledged for {service} — p99={latency}ms — throttle_pct={throttle_pct}% — CPU limit change in review — no pod restarts",
+        "INFO: Post-incident review scheduled — {service} experienced {throttle_count} CFS throttle events over {hours}h — p99 peaked at {latency}ms — CPU limit tuning recommended"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "request timeout: {service} handler exceeded deadline — latency={latency}ms — cpu_throttle_events={throttle_count} — cpu_usage={cpu_pct}% of {cpu_limit}",
+        "ERROR [{service}] response time SLO breached — p99={latency}ms slo={slo}ms — container CPU throttled {throttle_pct}% by CFS scheduler — no OOM",
+        "downstream timeout: {service} failed to respond within {slo}ms — cpu_throttle_count={throttle_count} — container cpu={cpu_pct}% limit={cpu_limit}",
+        "ERROR: {service}/{pod} latency={latency}ms exceeded budget — cpu_throttle_rate={throttle_pct}% — cgroup_cpu_limit={cpu_limit} — memory_normal",
+        "request rejected: {service} queue full — upstream latency={latency}ms — cause: CFS cpu throttling at {throttle_pct}% — throttle_events={throttle_count}",
+        "ERROR [{service}] p99_latency={p99}ms p50_latency={p50}ms — cpu_throttle_count={throttle_count} — cpu_limit={cpu_limit} — pod_restarts=0",
+        "health check latency breach: {service}/{pod} — response_time={latency}ms — cpu_quota_exhausted={cpu_pct}% of {cpu_limit} — throttle_rate={throttle_pct}%",
+        "ERROR: {service} request handling delayed — cpu_cfs_throttled_seconds increasing — pod={pod} cpu_limit={cpu_limit} throttle_count={throttle_count}",
+        "SLO violation: {service} — latency_p99={latency}ms — budget={slo}ms — cpu_throttle_pct={throttle_pct} — no memory events — no restarts",
+        "ERROR [{service}] response degraded — container_cpu_usage={cpu_pct}% cgroup_limit={cpu_limit} — cfs_periods_throttled={throttle_count} — p99={p99}ms",
+        "timeout: upstream {service} did not respond in {slo}ms — measured_latency={latency}ms — cpu_throttle_events={throttle_count} this period",
+        "ERROR: {service}/{pod} cpu_throttle_rate={throttle_pct}% — p99_latency={latency}ms — p50_latency={p50}ms — memory_usage=normal — no OOM risk",
+        "request processing delay: {service} — avg_latency={latency}ms — cpu_cfs_quota={cpu_limit} — cpu_utilization={cpu_pct}% — throttle_count={throttle_count}",
+        "ERROR [{service}] slow response: {latency}ms — CFS scheduler throttling pod {pod} — cpu_pct={cpu_pct}% of limit={cpu_limit} — no pod restarts",
+        "circuit breaker open: downstream {service} p99={p99}ms exceeds threshold — root_cause=cpu_cfs_throttle throttle_pct={throttle_pct}% events={throttle_count}"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "WARN [{service}] CPU throttle rate {throttle_pct}% — container={pod} cpu_used={cpu_pct}% of {cpu_limit} — latency drift p99={latency}ms",
+        "CFS quota exhaustion warning: {service}/{pod} — cpu_limit={cpu_limit} — throttle_events={throttle_count} — p99={p99}ms — no memory pressure",
+        "WARN: cpu_cfs_throttled_seconds_total increasing for {service} — throttle_rate={throttle_pct}% — p50={p50}ms p99={p99}ms — pods healthy",
+        "container CPU limit approaching: {pod} at {cpu_pct}% of {cpu_limit} — CFS will throttle — current throttle_count={throttle_count} — latency {latency}ms",
+        "WARN [{service}] latency increasing without memory pressure — cpu_throttle_pct={throttle_pct}% — p99={p99}ms — pods not restarting — CPU-bound",
+        "CFS throttle warning: {service} pod {pod} — periods_throttled={throttle_count} — cpu_quota={cpu_limit} — latency_p99={latency}ms — latency_p50={p50}ms",
+        "WARN: {service} response times degrading — cpu_cfs_quota={cpu_limit} exhausted — throttle_rate={throttle_pct}% — no OOM — increase CPU limit",
+        "progressive slowdown alert: {service}/{pod} — cpu_throttle_events={throttle_count} — p50={p50}ms p99={p99}ms — memory_ok — cpu_limit={cpu_limit}",
+        "WARN [{service}] {throttle_pct}% of CFS periods throttled — cpu_limit={cpu_limit} cpu_used={cpu_pct}% — p99 approaching SLO={slo}ms",
+        "cpu saturation warning: pod={pod} service={service} — utilization={cpu_pct}% limit={cpu_limit} — throttle_count={throttle_count} — latency_p99={p99}ms",
+        "WARN: request latency {latency}ms in {service} — not correlated with memory or restarts — cpu_throttle_rate={throttle_pct}% suggests CPU-bound workload",
+        "throttle_count trend: {service}/{pod} — {throttle_count} events in {hours}h — cpu_limit={cpu_limit} — p99={p99}ms — no OOM events observed"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "INFO [{service}] cpu_limit updated — throttle_rate was {throttle_pct}% — {throttle_count} events recorded — p99 was {latency}ms — monitoring recovery",
+        "cpu_limit change applied: {service}/{pod} previous={cpu_limit} — CFS throttle events ceased — latency recovering toward {slo}ms baseline",
+        "INFO: {service} CPU throttle incident resolved — throttle_count={throttle_count} over {hours}h — peak_p99={latency}ms — no restarts, no OOM events",
+        "post-throttle stabilization: {service} pod {pod} — p99={p50}ms returning to baseline — cpu_throttle_rate dropping — memory normal throughout",
+        "INFO [{service}] cfs_periods_throttled cleared — previous throttle_rate={throttle_pct}% — cpu_used={cpu_pct}% of updated limit — latency recovering",
+        "incident update: {service} CPU throttling mitigated — adjusted cpu_limit — throttle_count was {throttle_count} — p99_peak={latency}ms",
+        "INFO: {service}/{pod} cpu_throttle_events={throttle_count} during incident — memory_events=0 — oom_kills=0 — pod_restarts=0 — CPU-only degradation confirmed",
+        "monitoring active: {service} post-adjustment — cpu_limit={cpu_limit} — current_throttle_rate=0% — p99={slo}ms — all pods healthy"
+      ]
+    }
+  ]
+}

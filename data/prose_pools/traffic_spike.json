@@ -1,0 +1,119 @@
+{
+  "cause_class": "traffic_spike",
+  "summaries": [
+    "Between {from_time} and {to_time} UTC on {date}, customers using {service} in the {region} Region may have experienced elevated error rates and increased latency. The issue was caused by a sustained surge in legitimate inbound traffic correlated with the '{campaign_name}' promotional event. Horizontal scaling from {from_replicas} to {to_replicas} replicas restored normal service.",
+    "1:14 PM PST We are investigating elevated 5xx error rates for {service} in us-east-1. Request volume has increased to {rps} req/s against a provisioned capacity of {capacity} req/s. Auto-scaling is in progress. 1:38 PM PST The {service} error rate has returned to normal levels following the addition of {to_replicas} instances. The event was driven by organic traffic growth; no security incident is involved.",
+    "The issue with {service} has been resolved for all affected customers as of {resolved_time} US/Pacific. Between {from_time} and {resolved_time} UTC, a subset of customers in us-east-1 and eu-west-1 may have experienced HTTP 503 responses or elevated response times. The event was caused by request volume reaching {traffic_mult}x the provisioned baseline during the '{campaign_name}' launch window.",
+    "Post Incident Review – {service} Capacity Event. Tracking ID: SRE-{incident_id}. What happened? Between {from_time} UTC and {to_time} UTC, {service} experienced degraded availability due to request volume exceeding provisioned capacity. Peak inbound rate was {rps} req/s against a {baseline_rps} req/s baseline. Traffic originated from {unique_ips} distinct IP addresses across {unique_uas} user-agent strings, consistent with organic user growth from the '{campaign_name}' campaign.",
+    "3:07 AM UTC We are aware of increased error rates affecting {service}. Current request rate is {rps} req/s, approximately {traffic_mult}x the normal {baseline_rps} req/s baseline. HPA scale-out has been triggered; {to_replicas} target replicas are provisioned with {from_replicas} currently healthy. Users may experience intermittent 503 responses during the replica warm-up window.",
+    "Customers using {service} in the West Europe and East US regions may have experienced intermittent HTTP 503 errors or latency increases between {from_time} UTC and {to_time} UTC. The event was associated with the '{campaign_name}' marketing campaign, which generated {unique_ips} unique source IPs and drove throughput to {rps} req/s. Scale-out to {to_replicas} replicas resolved the incident. No data loss occurred.",
+    "10:52 AM PDT We are seeing elevated request volumes to {service} consistent with the '{campaign_name}' product launch. Current load is {rps} req/s ({traffic_mult}x baseline). Thread pool utilization is at capacity across all {from_replicas} running replicas; request queue depth has reached {queue_depth}. We are scaling out to {to_replicas} replicas and will update in 15 minutes.",
+    "Between {from_time} and {to_time} UTC, {service} request throughput climbed from {baseline_rps} req/s to {rps} req/s over approximately {ramp_minutes} minutes. The {from_replicas}-replica fleet was unable to absorb the load; error rate peaked at {error_pct}% and p99 latency reached {latency}ms. Traffic analysis confirmed {unique_ips} distinct source IPs, {unique_uas} user-agent values, and a normal endpoint distribution across {endpoint_count} routes — all consistent with an organic surge.",
+    "We believe the elevated error rate affecting {service} in us-central1 has been resolved for all affected customers as of {resolved_time} US/Pacific. Root cause was a {traffic_mult}x increase in inbound request volume tied to the '{campaign_name}' announcement. The auto-scaling group expanded from {from_replicas} to {to_replicas} pods; request queue depth has returned to zero.",
+    "9:33 AM EST Service Health Notification – {service}: We are investigating elevated 4xx and 5xx rates. Inbound volume is {rps} req/s. Provisioned capacity is {capacity} req/s. Rate limiting has engaged at {rate_limit} req/s; legitimate users may receive HTTP 429 responses. This is a capacity event, not a security event — traffic is attributed to the '{campaign_name}' campaign. ETA to resolution: 20 minutes pending replica warm-up.",
+    "Summary of impact: Between approximately {from_time} and {to_time} UTC, a subset of customers accessing {service} may have encountered HTTP 503 errors or elevated response times. p99 latency peaked at {latency}ms. The underlying cause was a {traffic_mult}x surge in organic traffic driven by the '{campaign_name}' referral event, which exhausted the {from_replicas}-instance pool before auto-scaling could respond. No configuration changes or deployments preceded the event.",
+    "2:41 PM UTC {service} is currently experiencing degraded performance due to high request volume. The '{campaign_name}' campaign has driven {unique_ips} new unique visitors in the past {ramp_minutes} minutes. HPA has initiated a scale-out from {from_replicas} to {to_replicas} replicas; new pods are in the Pending state and not yet serving traffic. Estimated recovery time is 8–12 minutes. Error rate is currently {error_pct}%.",
+    "Preliminary root cause: Between {from_time} UTC and {to_time} UTC, {service} in the us-east-1 Region experienced an organic traffic surge that exceeded provisioned capacity. Inbound rate peaked at {rps} req/s ({traffic_mult}x the {baseline_rps} req/s baseline). The request queue reached {queue_depth} entries. User-agent diversity ({unique_uas} distinct values) and endpoint distribution (normal across {endpoint_count} routes) confirmed legitimate traffic. Scaling to {to_replicas} replicas cleared the backlog.",
+    "8:17 PM SGT We are investigating increased latency and error rates for {service} in the ap-southeast-1 Region. CPU utilization is at saturation across all {from_replicas} replicas. The surge appears organic and is correlated with the '{campaign_name}' promotion. We are manually pre-scaling to {to_replicas} replicas ahead of the HPA threshold. Further updates in 10 minutes.",
+    "The {service} incident on {date} has been resolved. Customers in eu-west-1 and us-east-1 experienced a degraded service window of approximately {duration_minutes} minutes during which error rate reached {error_pct}% and p99 latency reached {latency}ms. The event was triggered by the '{campaign_name}' campaign generating {unique_ips} concurrent active IPs — {traffic_mult}x the provisioned baseline of {baseline_rps} req/s. Auto-scaling expanded the fleet from {from_replicas} to {to_replicas} pods.",
+    "11:05 AM PST Update: {service} scaling is progressing. {to_replicas} replicas are now desired; {from_replicas} are currently passing health checks. We expect full capacity restoration in approximately 6 minutes. Customers may continue to experience intermittent 503 responses during this window. The load event is attributable to the '{campaign_name}' launch and involves no anomalous traffic patterns.",
+    "Between {from_time} UTC and {to_time} UTC on {date}, {service} experienced availability degradation in the us-east-1 Region. The immediate trigger was a rapid increase in user traffic correlated with the '{campaign_name}' email blast. At peak, {rps} req/s was observed versus a {baseline_rps} req/s normal baseline. The {from_replicas} provisioned replicas saturated; thread pool depth reached {thread_max} with {waiting} requests queued. Scale-out to {to_replicas} replicas resolved the condition.",
+    "4:02 AM UTC Alert: {service} — request rate has crossed the {capacity} req/s capacity threshold. Current rate: {rps} req/s. Source: '{campaign_name}' campaign traffic. HPA is scaling from {from_replicas} to {to_replicas} replicas. During the scale-up window, approximately {error_pct}% of requests are returning HTTP 503. Users are advised to retry. No action required by customers.",
+    "Post-mortem: the '{campaign_name}' launch drove a {traffic_mult}x surge to {service} that the provisioned {from_replicas}-replica fleet could not absorb. Peak load was {rps} req/s against a {baseline_rps} req/s baseline. Traffic was entirely organic: {unique_ips} source IPs, {unique_uas} user agents, even distribution across {endpoint_count} endpoints, normal session durations. Remediation was horizontal scale-out to {to_replicas} replicas. Action items include pre-scaling for future campaigns and raising the HPA ceiling.",
+    "The issue affecting {service} availability in the {region} Region has been mitigated. Between {from_time} and {to_time} UTC, customers may have experienced intermittent failures and elevated latency up to {latency}ms p99. The event was caused by inbound request volume growing to {rps} req/s — {traffic_mult}x above the {baseline_rps} req/s operational baseline — following the '{campaign_name}' announcement. Auto-scaling increased replica count from {from_replicas} to {to_replicas}. We are conducting a capacity planning review to prevent recurrence."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL [{service}] Request rate {rps} rps exceeds provisioned capacity {capacity} rps by {traffic_mult}x — error rate {error_pct}% and climbing | region=us-east-1 | HPA scale-out initiated to {to_replicas} replicas",
+        "CRITICAL [{service}] All {from_replicas} replicas at CPU saturation — thread pool exhausted, {queue_depth} requests queued | p99={latency}ms | cause: '{campaign_name}' traffic surge | scale-out in progress",
+        "CRITICAL [{service}] SLO breach: error rate {error_pct}% over 5-minute window | inbound {rps} rps vs baseline {baseline_rps} rps ({traffic_mult}x) | HPA target: {to_replicas} | current healthy: {from_replicas}",
+        "CRITICAL [{service}] Request queue depth {queue_depth} — average wait {wait_ms}ms | {from_replicas}/{from_replicas} replicas at max capacity | organic surge from '{campaign_name}' campaign | emergency scale-out triggered",
+        "CRITICAL [{service}] HPA maximum replica ceiling {to_replicas} reached — load {rps} rps still exceeds capacity {capacity} rps | manual intervention required | error_rate={error_pct}% | latency_p99={latency}ms",
+        "CRITICAL [{service}] Error budget depleted: {error_pct}% error rate sustained >10 min | traffic {traffic_mult}x above {baseline_rps} rps baseline | '{campaign_name}' attribution confirmed | scale-out to {to_replicas} pods in progress",
+        "CRITICAL [{service}] Rate limiter active at {rate_limit} rps — legitimate users receiving HTTP 429 | current load: {rps} rps | this is a capacity event, not a security event | ETA to resolution: ~10 min",
+        "CRITICAL [{service}] OOM risk: heap utilisation >90% on all {from_replicas} replicas under {rps} rps load from '{campaign_name}' surge | GC pressure elevated | scaling to {to_replicas} replicas underway",
+        "CRITICAL [{service}] Load balancer health checks failing: {from_replicas} of {to_replicas} backends unhealthy | cause: CPU throttle under {traffic_mult}x surge | new replicas not yet passing readiness probe",
+        "CRITICAL [{service}] p99 latency {latency}ms — {traffic_mult}x SLO threshold | {unique_ips} concurrent unique IPs observed | queue_depth={queue_depth} | HPA scale-out from {from_replicas} to {to_replicas} active"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING [{service}] Request rate {rps} rps approaching provisioned capacity {capacity} rps ({traffic_mult}x baseline) — HPA not yet triggered | monitor: queue_depth={queue_depth}",
+        "WARNING [{service}] HPA scale-out initiated: {from_replicas} → {to_replicas} replicas | new pods not yet ready — degraded capacity window active | estimated warm-up: 4–6 min",
+        "WARNING [{service}] CPU utilisation {cpu_pct}% across all replicas | auto-scaling cooldown active — cannot scale for next 120s | error rate: {error_pct}% | inbound: {rps} rps",
+        "WARNING [{service}] Traffic surge from '{campaign_name}' detected: {unique_ips} unique IPs in last {ramp_minutes} min | current rate {rps} rps vs baseline {baseline_rps} rps | pre-scale recommended",
+        "WARNING [{service}] p99 latency {latency}ms — 2x normal | queue depth {queue_depth} rising | {from_replicas} replicas healthy of {to_replicas} desired | scale-out lag window in progress",
+        "WARNING [{service}] Error rate {error_pct}% — consistent with capacity pressure, not application regression | no recent deploys | '{campaign_name}' campaign is likely trigger",
+        "WARNING [{service}] Rate limit headroom narrowing: current {rps} rps is {traffic_mult}x baseline | configured ceiling {rate_limit} rps may engage within 2 minutes | {unique_ips} active source IPs",
+        "WARNING [{service}] Downstream back-pressure increasing: {backlog} requests in retry queue | cause: {service} saturation | {queue_depth} items pending | organic load from '{campaign_name}' unabated",
+        "WARNING [{service}] Replica warm-up in progress — {from_replicas} ready of {to_replicas} desired | partial capacity window | error rate {error_pct}% expected to decrease once new pods pass readiness",
+        "WARNING [{service}] Thread pool utilisation {cpu_pct}% — GC pause duration elevated at 280ms | inbound {rps} rps from '{campaign_name}' surge | queue_depth={queue_depth} | scale-out will relieve pressure"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO [{service}] Traffic surge attributed to '{campaign_name}' campaign — {unique_ips} IPs, {unique_uas} user agents, {endpoint_count} endpoints | organic source confirmed | no abuse pattern detected",
+        "INFO [{service}] HPA scale-out complete: {from_replicas} → {to_replicas} replicas | all pods healthy and passing readiness checks | error rate recovering toward baseline",
+        "INFO [{service}] Error rate returned to <0.1% following scale-out to {to_replicas} replicas | incident window closed | queue_depth={queue_depth} and decreasing",
+        "INFO [{service}] Request distribution normal across {endpoint_count} endpoints — no single-endpoint hot-spotting | {unique_uas} distinct user agents observed | consistent with organic browser traffic",
+        "INFO [{service}] Traffic rate stabilising: {rps} rps trending toward {baseline_rps} rps baseline | '{campaign_name}' campaign activity subsiding | HPA will scale down after cooldown period"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "ERROR [{service}] Request timeout after {wait_ms}ms waiting for available worker thread (pool={pool_name}, active={active}, waiting={waiting}, max={thread_max}) — returning HTTP 503 to caller",
+        "ERROR [{service}] HTTP 503 Service Unavailable: upstream worker pool exhausted — all {from_replicas} replicas at capacity under {rps} rps inbound load from '{campaign_name}' surge",
+        "ERROR [{service}] Connection refused: listener backlog overflow — {backlog} queued connections dropped (provisioned_capacity={capacity} rps, observed={rps} rps)",
+        "ERROR [{service}] Circuit breaker OPEN: error_rate={error_pct}% exceeds 50% threshold over 30s window | cause: capacity exhaustion at {rps} rps, not application fault",
+        "ERROR [{service}] Database connection pool exhausted: all {capacity} connections held — inbound_rps={rps} | blocked_threads={active} | acquiring thread timed out after {wait_ms}ms",
+        "ERROR [{service}] OOMKilled: heap exhausted under concurrent session load ({unique_ips} active IPs from '{campaign_name}' surge) — pod evicted, replacement scheduled",
+        "ERROR [{service}] HTTP 429 Too Many Requests: rate limiter threshold {rate_limit} rps breached (current={rps} rps) — legitimate users affected; this is a capacity event",
+        "ERROR [{service}] Request queue overflow: {queue_depth} items exceeds max_queue_size={thread_max} — shedding load, dropping {error_pct}% of inbound requests",
+        "ERROR [{service}] gRPC deadline exceeded after {wait_ms}ms: server overloaded at {rps} rps with {from_replicas} replicas | cause: thread pool saturation under '{campaign_name}' load",
+        "ERROR [{service}] Kubernetes readiness probe returned 503 on pod {service}-{pod_suffix}: CPU throttled at {cpu_pct}% under surge — pod temporarily removed from load balancer rotation",
+        "ERROR [{service}] Worker thread blocked {wait_ms}ms on downstream acquire — upstream {rps} rps exceeds {from_replicas}-replica serving capacity | queue_depth={queue_depth}",
+        "ERROR [{service}] Load balancer health check failing: {from_replicas} of {to_replicas} backends unhealthy under {traffic_mult}x surge | removing unhealthy pods from rotation",
+        "ERROR [{service}] GC overhead limit exceeded on replica {service}-{pod_suffix}: heap pressure from {rps} rps concurrent sessions during '{campaign_name}' event — JVM restarting",
+        "ERROR [{service}] Thread pool deadlock risk: {backlog} goroutines blocked on semaphore acquire (pool={pool_name}, max={thread_max}) — shedding oldest requests to prevent full stall",
+        "ERROR [{service}] Retry amplification detected: {backlog} in-flight retries increasing effective load on already-saturated pool | underlying cause: '{campaign_name}' volume at {rps} rps"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "WARN [{service}] CPU throttling active on {from_replicas} replicas ({cpu_pct}% utilisation) — request latency increasing, p99={latency}ms | inbound: {rps} rps from '{campaign_name}' surge",
+        "WARN [{service}] HPA scale-out initiated: {from_replicas} → {to_replicas} replicas | scale-up trigger: CPU metric {cpu_pct}% (target=70%) | new pods not yet ready",
+        "WARN [{service}] Request queue depth {queue_depth} exceeds warn threshold 100 — average wait {wait_ms}ms | inbound rate {rps} rps vs baseline {baseline_rps} rps",
+        "WARN [{service}] Connection pool utilisation 95%: {capacity} connections allocated | inbound_rps={rps}, baseline={baseline_rps} | surge attributed to '{campaign_name}' campaign",
+        "WARN [{service}] Traffic spike from '{campaign_name}' detected: {unique_ips} IPs in {ramp_minutes} min window — scaling proactively to {to_replicas} replicas",
+        "WARN [{service}] Replica warm-up in progress: {to_replicas} desired, {from_replicas} currently ready — partial capacity window active, some requests may 503",
+        "WARN [{service}] GC pause duration elevated: 300ms pauses observed under {cpu_pct}% heap pressure from {rps} rps concurrent load | scaling out to relieve pressure",
+        "WARN [{service}] Downstream response time {latency}ms — SLA threshold 200ms | upstream traffic {traffic_mult}x normal | cause: capacity pressure, not application regression",
+        "WARN [{service}] Rate limit approaching: current throughput {rps} rps approaching configured ceiling {rate_limit} rps | traffic_mult={traffic_mult}x | {unique_ips} active source IPs",
+        "WARN [{service}] HPA cooldown period active — cannot scale beyond {to_replicas} replicas for 120s | current load {rps} rps still exceeds capacity {capacity} rps | manual override available",
+        "WARN [{service}] Slow consumer on message queue: {backlog} events pending — producer (rps={rps}) outpacing consumer capacity under '{campaign_name}' load",
+        "WARN [{service}] Unique source IPs: {unique_ips} in 5-minute window | traffic_mult={traffic_mult}x | endpoint distribution normal across {endpoint_count} routes | organic surge, not DDoS"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "INFO [{service}] Traffic attribution complete: '{campaign_name}' campaign identified as source | unique_ips={unique_ips}, unique_uas={unique_uas}, endpoints_hit={endpoint_count} | no abuse pattern",
+        "INFO [{service}] Auto-scaling complete: replica count {from_replicas} → {to_replicas} | all new pods passing readiness checks and receiving traffic",
+        "INFO [{service}] Error rate recovered to <0.1% following scale-out to {to_replicas} replicas | incident window closed | p99 latency returning toward baseline",
+        "INFO [{service}] HPA status: desiredReplicas={to_replicas}, currentReplicas={to_replicas}, CPU={cpu_pct}% (target=70%) | scaled successfully | queue_depth={queue_depth} and decreasing",
+        "INFO [{service}] Request distribution across {endpoint_count} endpoints normal — no single-endpoint concentration | session pattern consistent with organic browser traffic",
+        "INFO [{service}] Request rate stabilising: {rps} rps trending toward baseline {baseline_rps} rps | '{campaign_name}' activity subsiding | HPA scale-down will initiate after cooldown",
+        "INFO [{service}] Session pattern analysis: avg session duration normal, UA distribution ({unique_uas} agents) matches organic browser traffic | bounce rate within normal range",
+        "INFO [{service}] Post-scale health confirmed: p99 latency {latency}ms → recovering | error budget consumption halted | all {to_replicas} replicas healthy and serving"
+      ]
+    }
+  ]
+}

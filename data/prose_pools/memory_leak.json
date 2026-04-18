@@ -1,0 +1,119 @@
+{
+  "cause_class": "memory_leak",
+  "summaries": [
+    "Between 03:14 and 07:52 UTC on 09 Apr 2026, customers running {service} on Amazon EKS in the us-east-1 Region experienced pod restarts and elevated error rates. Pod {pod} consumed {mem_used} of its {mem_limit} memory limit and was terminated by the OOM killer. The issue affected approximately {error_pct}% of requests during the incident window. The restart counter reached {restart_count} before a fix was deployed at 07:52 UTC.",
+    "Tracking ID: AZ-CRX-77031 — Between approximately 01:30 and 06:15 UTC on 11 Apr 2026, a subset of customers using Azure Kubernetes Service in the East US 2 region observed repeated container restarts for workloads running {service}. Heap utilization grew from {start_heap} MB to {heap_mb} MB over a period of {hours} hours before the container was evicted. The issue has been mitigated as of 06:15 UTC.",
+    "11:03 AM PDT — We are investigating elevated OOMKilled events for {service} deployments in us-central1. Affected pods show a consistent pattern of memory growth reaching {mem_pct}% of the configured limit ({mem_limit}) prior to termination. The average time between restarts is approximately {hours} hours. Our engineering team is actively investigating.",
+    "Google Cloud Status — The issue with Google Kubernetes Engine affecting {service} workloads in us-east4 has been resolved as of 14:20 US/Pacific. Between 08:45 and 14:20 US/Pacific, pods running {service} were repeatedly restarted after heap usage reached {heap_mb} MB. Resident set size grew at a consistent rate independent of incoming request volume throughout the incident window.",
+    "Tracking ID: 8_M2-GH7 — Summary of impact: Between approximately 22:10 UTC on 14 Apr and 04:55 UTC on 15 Apr 2026, customers deploying {service} on Azure Container Apps in West Europe experienced container instance recycling. Memory consumption climbed from {start_heap} MB at start to {heap_mb} MB at termination across each {hours}-hour cycle. Root cause analysis is ongoing.",
+    "04/09/2026 EKS Pod Restart Incident — Resolved — Between 17:30 and 23:14 PDT, pods running {service} on node {node} in the us-west-2 Region were OOMKilled after consuming {mem_used} against a {mem_limit} limit. AWS CloudWatch metrics confirmed heap growth was independent of request throughput. The restart counter reached {restart_count} before a hotfix was deployed.",
+    "Between 06:00 and 11:47 UTC on 07 Apr 2026, a subset of workloads running {service} in Google Cloud region europe-west1 experienced container crashes preceded by steady heap growth. GKE system logs recorded {restart_count} OOMKilled events. GC pause durations grew from a baseline of {gc_baseline} ms to {gc_pause} ms as the heap approached {heap_mb} MB, consistent with garbage collector pressure in the period immediately before each termination.",
+    "We experienced elevated container restart rates for {service} in the ap-southeast-1 Region between 13:22 and 18:05 UTC. Pod {pod} was terminated {restart_count} times. Each termination was preceded by a {hours}-hour ramp in resident memory from {start_heap} MB to approximately {mem_used}. The pattern was uniform across all affected pods regardless of traffic volume at the time of each termination.",
+    "Tracking ID: AZ-KS9-88214 — Customers using Azure Kubernetes Service in the UK South region reported repeated pod evictions for the {service} workload between 00:45 and 08:30 UTC on 12 Apr 2026. Live heap profiling captured during the incident window showed {object_type} instances accumulating at a rate that did not decrease during low-traffic periods. Mitigation was applied at 08:30 UTC.",
+    "05:17 AM PDT — Amazon ECS tasks running {service} in the eu-west-1 Region are being stopped and restarted due to memory limit violations. Container memory reached {mem_used} ({mem_pct}% of the {mem_limit} task limit) before each stop event. The inter-restart interval has been consistent at approximately {hours} hours across {restart_count} observed cycles. We are continuing to investigate.",
+    "Google Cloud Status Update — 17:45 US/Pacific — The issue affecting GKE workloads running {service} in us-west1 is ongoing. Since 11:20 US/Pacific, pod {pod} has been restarted {restart_count} times following OOM termination. Heap analysis shows {object_type} objects growing without bound. GC pause time has escalated from {gc_baseline} ms to {gc_pause} ms over the course of each accumulation cycle.",
+    "Between 20:00 UTC on 10 Apr and 02:33 UTC on 11 Apr 2026, customers running {service} on Amazon EKS in the ca-central-1 Region experienced degraded availability. The container runtime reported OOMKilled for pod {pod} after memory consumption reached {mem_used} of the {mem_limit} configured limit. The time-to-termination was consistent at {hours} hours across all observed restart cycles.",
+    "Tracking ID: GCP-INC-20260408-001 — Between 09:15 and 15:40 UTC on 08 Apr 2026, GKE clusters in asia-northeast1 running {service} experienced repeated pod restarts. Each restart was preceded by a monotonic increase in JVM heap from {start_heap} MB to {heap_mb} MB. GC overhead increased proportionally and reached {gc_pause} ms pause durations in the final minutes before each OOM event. No increase in request rate was observed during the accumulation period.",
+    "04/13/2026 Container Restart Incident — Mitigated — Tracking ID: AZ-WE3-20260413 — Between 14:00 and 20:45 UTC, workloads running {service} on Azure Kubernetes Service in the Australia East region experienced {restart_count} container restarts. In each case, memory grew from {start_heap} MB to {mem_used} over approximately {hours} hours before the pod was killed. Object heap profiling identified {object_type} as the dominant growing allocation class.",
+    "11:58 PM PDT — We have mitigated the issue affecting {service} pods in the us-east-2 Region. Between 18:15 and 23:58 PDT, pod {pod} was OOMKilled {restart_count} times. Memory consumption followed an identical sawtooth pattern in each cycle, rising from {start_heap} MB at startup to {mem_used} at termination over a period of {hours} hours. The growth rate was not correlated with request throughput.",
+    "Between 03:30 and 09:15 UTC on 15 Apr 2026, customers in the Google Cloud europe-west4 region running {service} experienced service interruptions due to repeated pod evictions. The Kubernetes OOM killer terminated pod {pod} after heap reached {heap_mb} MB. GC logs recorded pause events of {gc_pause} ms compared to a pre-incident baseline of {gc_baseline} ms, indicating significant heap pressure in the period preceding each restart.",
+    "Tracking ID: AZ-NC7-20260416 — Summary of impact: Between approximately 07:15 and 13:50 UTC on 16 Apr 2026, a subset of Azure Container Instances customers in the Japan East region running {service} experienced container recycling. Memory consumption grew steadily from {start_heap} MB to {mem_used} ({mem_pct}% of the {mem_limit} limit) before each restart. The growth was consistent and independent of inbound request volume during the observation window.",
+    "04:22 AM PDT — Amazon EKS pods running {service} in the eu-central-1 Region are experiencing OOMKilled events. Pod {pod} has been restarted {restart_count} times since 01:05 AM PDT. Each termination occurs approximately {hours} hours after the pod starts, after heap grows from {start_heap} MB to {heap_mb} MB. We have identified {object_type} as the primary contributor to heap growth and are working on a resolution.",
+    "Google Cloud Status — Resolved — 22:10 US/Pacific — The incident affecting {service} in GKE clusters in northamerica-northeast1 has been resolved. Between 15:45 and 22:10 US/Pacific, pods were terminated {restart_count} times due to memory limit violations. Each termination cycle lasted approximately {hours} hours. Heap profiling showed {object_type} growing without deallocation between garbage collection runs.",
+    "Between 11:00 UTC on 06 Apr and 05:30 UTC on 07 Apr 2026, customers running {service} on Amazon EKS in the ap-northeast-1 Region experienced degraded performance due to repeated pod restarts. Pod {pod} was OOMKilled {restart_count} times. In each restart cycle, memory grew from {start_heap} MB at pod start to {mem_used} at termination — a pattern consistent across all {restart_count} events regardless of traffic conditions at the time of each termination."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL: Pod {pod} OOMKilled in namespace {service} — memory limit {mem_limit} exceeded ({mem_used} used, {mem_pct}% of limit) — restart count now {restart_count}",
+        "CRITICAL: Container {pod} terminated by OOM killer — heap reached {heap_mb} MB — GC pause {gc_pause} ms exceeds critical threshold — immediate action required",
+        "CRITICAL: {service} pod {pod} restarted {restart_count} times in {hours}h — OOMKilled each cycle — heap profile shows unbounded {object_type} growth — escalate now",
+        "CRITICAL: Node {node} reporting MemoryPressure — pod {pod} in {service} evicted — {mem_used} of {mem_limit} consumed at eviction — {restart_count} prior restarts this period",
+        "CRITICAL: OOMKilled loop detected — {service}/{pod} — average time to OOM: {hours}h — heap at termination: {heap_mb} MB — last GC pause: {gc_pause} ms — error rate: {error_pct}%",
+        "CRITICAL: Heap dump analysis complete — {object_type} count growing at unbounded rate — projected OOM for {pod} in under {hours}h — memory at {mem_used} of {mem_limit}",
+        "CRITICAL: {service} SLO breached — {error_pct}% error rate — driven by repeated OOMKilled events on pod {pod} — {restart_count} restarts recorded — escalation required",
+        "CRITICAL: JVM heap exhausted — {service}/{pod} — {heap_mb} MB allocated — GC overhead {gc_pause} ms — OOM imminent — restart #{restart_count} in progress",
+        "CRITICAL: Memory growth unabated — pod {pod} at {mem_pct}% of limit {mem_limit} — {object_type} objects not being reclaimed by GC — estimated time to OOM: {hours}h",
+        "CRITICAL: {service} availability degraded — {error_pct}% of requests failing — {restart_count} OOMKilled events in the last {hours}h — heap floor rising each restart cycle"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING: Pod {pod} memory usage at {mem_pct}% of limit {mem_limit} ({mem_used} used) — GC pause {gc_pause} ms above baseline {gc_baseline} ms — monitor closely",
+        "WARNING: Heap growth trend detected in {service}/{pod} — {start_heap} MB at start, now {heap_mb} MB after {hours}h — growth rate not correlated with traffic",
+        "WARNING: {service} pod {pod} restarted {restart_count} times this week — each restart preceded by identical memory growth curve — investigate for unbounded object retention",
+        "WARNING: GC pressure increasing in {pod} — pause duration {gc_pause} ms vs baseline {gc_baseline} ms — {object_type} instances accumulating — {mem_used} of {mem_limit} in use",
+        "WARNING: OOMKilled pattern detected — {service}/{pod} — consistent {hours}h time-to-OOM across {restart_count} restart cycles — heap profile review recommended",
+        "WARNING: Container {pod} memory at {mem_pct}% of configured limit — {object_type} heap objects growing — GC unable to reclaim — approaching OOM threshold",
+        "WARNING: {service} restart rate elevated — {restart_count} OOMKilled events in past {hours}h — residual heap floor rising with each restart cycle",
+        "WARNING: Heap allocation rate for {service}/{pod} exceeds GC reclamation rate — current heap {heap_mb} MB — growing at consistent rate over {hours}h intervals",
+        "WARNING: Memory utilization climbing on pod {pod} — {mem_used} used of {mem_limit} — growth independent of {rps} RPS traffic load — possible unbounded object retention",
+        "WARNING: {service} pod {pod} memory watermark increasing — was {start_heap} MB at last restart, now {heap_mb} MB — GC pause escalating to {gc_pause} ms — OOM risk elevated"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO: {service} pod {pod} restarted after OOMKilled — memory reset to {start_heap} MB — monitoring for recurrence — restart count: {restart_count}",
+        "INFO: Heap snapshot initiated for pod {pod} in {service} — current usage {heap_mb} MB — dominant object type: {object_type} — analysis in progress",
+        "INFO: Memory limit for {service}/{pod} adjusted as temporary mitigation — root cause investigation ongoing — current usage {mem_used}",
+        "INFO: GC tuning flags updated for {service} pod {pod} — baseline GC pause was {gc_baseline} ms — monitoring for improvement over next {hours}h",
+        "INFO: Post-incident review scheduled — {service} pod {pod} experienced {restart_count} OOMKilled events over {hours}h — heap profiles captured for analysis"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "OOMKilled: container {pod} in pod {service}/{pod} exceeded memory limit {mem_limit}; terminated by kernel OOM killer",
+        "java.lang.OutOfMemoryError: Java heap space — heap_used={heap_mb}MB limit={mem_limit} — {object_type} objects not reclaimable by GC",
+        "fatal: memory allocation failed for {service} — rss={mem_used} exceeded cgroup limit={mem_limit} — kernel OOM killer invoked",
+        "pod {pod} restarted due to OOMKilled — restart_count={restart_count} last_memory_usage={mem_used} limit={mem_limit}",
+        "GC overhead limit exceeded: pod={pod} pause_duration={gc_pause}ms heap_used={heap_mb}MB live_set_estimate={start_heap}MB dominant_type={object_type}",
+        "container runtime: pod {pod} evicted — reason=OOMKilled — memory.usage_in_bytes={mem_used} memory.limit_in_bytes={mem_limit}",
+        "FATAL [{service}] heap exhausted — allocated={heap_mb}MB limit={mem_limit} — {object_type} retained across {restart_count} GC cycles without reclamation",
+        "oom_kill_process: pid=1 comm={service} total_vm={mem_limit} anon_rss={mem_used} oom_score_adj=0 — container terminated",
+        "node {node}: evicting pod {pod} — condition=MemoryPressure — pod_memory={mem_used} eviction_threshold={mem_limit}",
+        "process exit: code=137 signal=SIGKILL reason=OOM pod={pod} namespace={service} memory_at_death={mem_used} restart_count={restart_count}",
+        "ERROR [{service}] allocation failure: requested={heap_mb}MB current_heap={mem_used} GC_pause_budget_exhausted={gc_pause}ms",
+        "Kubernetes OOMKilled event: containerName={pod} reason=OOMKilled restartCount={restart_count} limits.memory={mem_limit}",
+        "critical: {object_type} instance count exceeds safe threshold — heap={heap_mb}MB — GC reclaim rate insufficient — OOM in {hours}h at current growth rate",
+        "container {pod} memory limit violation: usage={mem_used} limit={mem_limit} utilization={mem_pct}% — container killed by runtime",
+        "JVM crash: OutOfMemoryError GC overhead limit exceeded — heap={heap_mb}MB last_gc_pause={gc_pause}ms — {object_type} dominates live set at termination"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "WARN [{service}] heap utilization {mem_pct}% — current={heap_mb}MB limit={mem_limit} — GC pause trending from {gc_baseline}ms to {gc_pause}ms",
+        "memory growth detected in {pod}: was {start_heap}MB {hours}h ago, now {mem_used} — growth rate not correlated with request traffic ({rps} RPS stable)",
+        "WARN: {object_type} instance count increasing without bound — pod={pod} heap={heap_mb}MB — last full GC reclaimed less than 1% of live set",
+        "GC pressure warning: pod={pod} pause={gc_pause}ms baseline={gc_baseline}ms heap_used={heap_mb}MB — escalating trend detected",
+        "approaching memory limit — container {pod} at {mem_pct}% of {mem_limit} — {start_heap}MB at start, {mem_used} now, {hours}h elapsed since last restart",
+        "WARN [{service}] OOMKilled restart pattern detected — {restart_count} kills over last {hours}h — avg inter-kill interval consistent — heap floor rising each cycle",
+        "heap snapshot diff: {object_type} count grew by {heap_mb}K over {hours}h — no corresponding deallocation events observed in GC logs",
+        "memory watermark breach: pod {pod} crossed 80% of {mem_limit} — historical OOM threshold at {mem_pct}% — {restart_count} prior OOM events recorded",
+        "WARN: GC reclaim rate below heap growth rate — net accumulation trending upward — container {pod} OOM projected in {hours}h at current rate",
+        "pod {pod} rss={mem_used} approaching eviction threshold — node={node} — previous OOM at {heap_mb}MB — current GC pause now {gc_pause}ms",
+        "WARN [{service}] {object_type} objects not released across GC boundaries — ref count non-zero in consecutive collections — heap pressure increasing",
+        "container memory trend alert: {pod} growing at consistent rate independent of load — {rps} RPS unchanged — heap {heap_mb}MB and climbing"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "INFO [{service}] pod {pod} started — initial_heap={start_heap}MB memory_limit={mem_limit} restart_count={restart_count}",
+        "heap snapshot captured: pod={pod} heap_mb={heap_mb} top_type={object_type} timestamp=now — forwarded to heap analysis pipeline",
+        "INFO: pod {pod} OOMKilled — restarting — previous_uptime={hours}h memory_at_termination={mem_used} peak_gc_pause={gc_pause}ms",
+        "memory limit increase applied as temporary mitigation — {service}/{pod} — monitoring for {hours}h before closing incident",
+        "INFO [{service}] GC tuning applied — target_pause={gc_baseline}ms heap_sizing_adjusted — current_usage={mem_used} — monitoring active",
+        "post-OOM restart complete: pod={pod} namespace={service} restartCount={restart_count} initialHeap={start_heap}MB",
+        "INFO: heap profiler attached to {pod} — sampling_interval=30s — tracking {object_type} allocation rate — baseline GC={gc_baseline}ms",
+        "incident update: {service} pod {pod} stable after restart — memory at {mem_pct}% of {mem_limit} — watching for recurrence over next {hours}h"
+      ]
+    }
+  ]
+}

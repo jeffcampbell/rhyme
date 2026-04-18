@@ -1,0 +1,119 @@
+{
+  "cause_class": "dependency_outage",
+  "summaries": [
+    "1:06 PM PST We are investigating elevated error rates affecting {service} in us-west-2. Calls to {downstream} are returning HTTP 503 immediately with no latency. Our own network is healthy — all other service-to-service calls are succeeding. We have checked the {downstream} status page, which confirms an active incident on their end.",
+    "Between 09:47 and 11:22 UTC on 14 Nov 2025, customers using {service} in eu-west-1 experienced {error_pct}% error rates on all requests that involved {downstream}. The dependency returned connection-refused errors within milliseconds, consistent with a complete service outage rather than degradation. {downstream} published a status page incident at 09:51 UTC. Our infrastructure and network were unaffected throughout.",
+    "Post Incident Review (PIR) – {service} – Dependency Unavailability. Tracking ID: DEP-4521. On 22 Oct 2025 at 14:33 UTC, {downstream} began returning HTTP 503 to all callers. {service} circuit breakers opened within 90 seconds, routing traffic to fallback mode. The {downstream} status page confirmed a global outage. Full service restoration occurred at 16:08 UTC when {downstream} recovered.",
+    "RESOLVED 04:15 UTC – {downstream} has recovered. {service} in ap-southeast-1 is exiting fallback mode and resuming normal operations. The {downstream} outage lasted {window}. During that period {error_pct}% of requests to {endpoint} returned errors immediately. No data was lost. Customers who received error responses should retry any failed transactions.",
+    "8:55 AM CET We are monitoring a third-party service disruption impacting {service} in eu-central-1. {downstream} is currently reporting a complete outage on their status page. Our service and network infrastructure are healthy; errors are caused entirely by {downstream} being unreachable. Circuit breakers have opened and graceful degradation is active.",
+    "PIR – {service} – Payment Processor Outage – {window}. Tracking ID: DEP-7803. {downstream} was completely unavailable for {window}, confirmed by their public status page. During the outage, {service} returned cached results where possible and queued write operations for replay. Outbound RPS to {downstream} reached zero immediately upon outage onset; failure mode was immediate connection refusal, not timeout.",
+    "10:22 PM UTC We have identified the root cause of errors on {service} in us-east-1. {downstream} is experiencing a platform-wide outage. Their status page shows all systems degraded. Our network team confirms all other inter-service connectivity is healthy. We have engaged our technical account representative at {downstream} and are monitoring their status page for recovery updates.",
+    "Between 06:30 and 08:47 UTC, {service} in us-east-2 returned {error_pct}% errors on {endpoint}. All failures were immediate — {downstream} returned HTTP 503 within milliseconds with no queuing or latency. Concurrent health checks to all other external dependencies passed normally, confirming our network was not the source of the issue. The {downstream} status page was updated at 06:34 UTC to reflect a confirmed outage.",
+    "3:41 AM JST {service} in ap-northeast-1 is experiencing complete failure on all calls to {downstream}. Errors are immediate — connection refused on port {port} — with no latency indicating the dependency is not slow but fully offline. We verified network health by confirming connectivity to all other external endpoints. The {downstream} status page was updated at 03:38 AM JST confirming a service outage.",
+    "Incident Summary – {downstream} Auth Provider Outage. At 17:15 UTC, {downstream} began refusing all authentication requests. {service} immediately saw {error_pct}% auth failure rates. Within 4 minutes our on-call team confirmed the {downstream} status page listed a critical incident. {service} fell back to cached session tokens for active sessions and queued new authentication attempts. Service was restored when {downstream} recovered at 19:02 UTC.",
+    "2:14 PM EST We are aware that {service} customers in us-east-1 are unable to complete transactions. The cause is a full outage of our payment processor {downstream}. Their status page at status.{downstream}.com confirms the incident. Our internal services, databases, and network are all healthy. We will update this page every 30 minutes until {downstream} recovers.",
+    "Post Incident Review – {service} – CDN Provider Outage – Tracking ID: DEP-0093. {downstream} CDN experienced a global routing failure affecting all edge nodes. {service} static asset delivery failed immediately for all regions. Our origin servers and application tier remained fully operational. The {downstream} status page confirmed the outage at 11:03 UTC; their engineering team resolved it at 13:47 UTC via a configuration rollback.",
+    "5:30 AM SGT Customers may be experiencing authentication failures on {service} in ap-southeast-1. The issue is traced to {downstream}, our identity provider, which is currently offline. Their status page shows a P1 incident opened 11 minutes ago. Our infrastructure health checks are passing. We have activated emergency session extension to reduce customer impact while {downstream} recovers.",
+    "Between 20:10 and 22:55 UTC, {service} in us-west-2 was unable to process any requests requiring {downstream}. The dependency was completely unreachable — all connection attempts were refused immediately on port {port}. No timeout behavior was observed, which distinguished this from network issues. {affected_count} customers were impacted. The {downstream} engineering team confirmed a database failure caused the total service outage.",
+    "INVESTIGATING 7:03 AM PST – {service} in us-west-1 is returning errors on {affected_count} request types. All failures involve calls to {downstream}. We have confirmed: (1) {downstream} status page shows an active incident; (2) our network team verified reachability to all other external services; (3) error responses from {downstream} are immediate 503s, not timeouts. Circuit breakers have opened. We are in fallback mode.",
+    "11:48 PM UTC {service} error rate has dropped to baseline. {downstream} confirmed recovery on their status page at 11:45 PM UTC. During the {window} outage, {service} circuit breakers remained open and fallback responses were served to {affected_count} affected customers. All queued write operations are being replayed. No retry storms were observed due to circuit breaker activation.",
+    "The {service} team is tracking an active outage at {downstream}, our SMS delivery provider. Since 13:20 UTC, all message delivery API calls have returned HTTP 503 immediately. The {downstream} engineering blog confirmed at 13:26 UTC that their Kafka cluster experienced a total failure. Our own infrastructure — API gateways, databases, and internal mesh — are operating normally at {rps} RPS.",
+    "Tracking ID: DEP-2204. On 05 Feb 2026, {downstream} experienced a {window} complete outage during which {service} returned errors to {affected_count} customers. Errors were immediate — mean time-to-error was under 50ms, indicating connection refusal rather than timeout. Concurrent connectivity tests confirmed all other external services were reachable from our infrastructure. Post-recovery, all {conn_count} circuit breaker connections were restored within 3 minutes.",
+    "4:17 AM UTC – RESOLVED. The outage affecting {service}'s integration with {downstream} has ended. {downstream} updated their status page to resolved at 04:14 UTC after completing a failover to a secondary region. During the incident, {service} served cached data where available and surfaced a maintenance page for {affected_count} users on paths that required live {downstream} data. No data integrity issues were identified.",
+    "We are investigating reports of complete failure on {endpoint} for {service} in us-east-1. Early diagnostics show {downstream} returning 503 errors with zero latency — the dependency is not slow, it is offline. Our SRE team has pulled up the {downstream} public status page, which shows a P0 incident opened {deploy_time}. All internal health checks are green. {error_pct}% of requests to {endpoint} are failing. Updates will follow every 15 minutes."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL [{service}] {error_pct}% error rate on {endpoint} — {downstream} returning immediate 503, connection refused on port {port}; {downstream} status page confirms active outage; circuit breakers OPEN",
+        "CRITICAL: {service} complete failure calling {downstream} — all {conn_count} connections refused immediately; network health verified OK to all other endpoints; {downstream} status page: INCIDENT ACTIVE",
+        "CRITICAL [{service}] Dependency hard down — {downstream} unreachable since {deploy_time}; {error_pct}% of requests failing with immediate errors; fallback mode engaged; {affected_count} customers impacted",
+        "CRITICAL: {service} in {az} — {downstream} fully offline, {conn_count} pooled connections all returning refused; confirmed NOT a network issue — all other external services reachable; SLA breach imminent",
+        "CRITICAL [{service}] Third-party outage — {downstream} status page shows P0 incident; {rps} RPS hitting circuit breaker; zero successful calls to {endpoint} in the last {window}; fallback responses being served",
+        "CRITICAL: {service} payment path DOWN — {downstream} processor returning 503 immediately on all auth and charge endpoints; {downstream} status page incident opened {deploy_time}; {affected_count} transactions failing",
+        "CRITICAL [{service}] Auth provider {downstream} completely unavailable — all token validation calls failing with immediate connection refused; {error_pct}% of login attempts failing; cached sessions extended as mitigation",
+        "CRITICAL: {service} CDN integration broken — {downstream} edge nodes returning 503 globally; static asset delivery failing for {affected_count} customers; origin servers healthy; {downstream} status page: DEGRADED ALL REGIONS",
+        "CRITICAL [{service}] {downstream} hard down — {rps} RPS being absorbed by fallback handler; error budget burning at {error_pct}% failure rate; {downstream} ETA to restore: unknown per status page",
+        "CRITICAL: {service} downstream fully offline — {downstream} returned 0 successful responses in last 5 minutes; connection refused in under 50ms; network partition ruled out; escalating to {downstream} enterprise support"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING [{service}] {downstream} error rate rising — {error_pct}% of calls to {endpoint} returning 503; {downstream} status page last updated {deploy_time}; circuit breaker at {conn_count}/{conn_count} trips; monitoring closely",
+        "WARNING: {service} circuit breaker HALF-OPEN for {downstream} — test probes returning 503; {downstream} status page still shows active incident; remaining in fallback mode; next probe in 30s",
+        "WARNING [{service}] {downstream} connectivity degraded — {error_pct}% failure rate on port {port}; other external endpoints fully reachable; possible early-stage {downstream} outage; checking status page",
+        "WARNING: {service} fallback mode active — {downstream} unavailable; serving cached responses to {affected_count} customers; cache TTL expires in {window}; escalating to on-call if {downstream} not recovered",
+        "WARNING [{service}] {downstream} status page now shows INVESTIGATING — {error_pct}% error rate on {endpoint}; failure mode is immediate refusal, not latency; preparing for extended outage procedures",
+        "WARNING: {service} SLO burn rate elevated — {downstream} outage causing {error_pct}% errors on {endpoint}; error budget impact: {window} at current rate until breach; {downstream} recovery ETA unknown",
+        "WARNING [{service}] Queued write operations accumulating — {conn_count} writes pending replay once {downstream} recovers; queue depth growing at {rps} items/s; monitoring replay lag",
+        "WARNING: {service} degraded mode — {downstream} offline confirmed by status page; non-critical paths returning maintenance responses; {affected_count} customers on affected endpoints; core paths using fallback",
+        "WARNING [{service}] {downstream} enterprise support ticket open — outage duration now {window}; all {conn_count} circuit breaker connections in OPEN state; preparing customer communication",
+        "WARNING: {service} in {az} — {downstream} not yet recovered; {window} since outage start; {affected_count} queued operations awaiting replay; circuit breaker will probe again in 60s"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO [{service}] {downstream} status page updated to RESOLVED — beginning circuit breaker reset; {conn_count} connections being re-established; monitoring error rate for 5 minutes before clearing incident",
+        "INFO: {service} returning to normal — {downstream} fully recovered; circuit breakers CLOSED; queued {conn_count} write operations beginning replay; {affected_count} customers will see restored functionality",
+        "INFO [{service}] Fallback mode deactivated — {downstream} responding successfully on port {port}; first {conn_count} health probes passed; error rate at baseline {error_pct}%",
+        "INFO: {service} post-outage replay complete — all {conn_count} queued operations successfully processed; no data loss detected; {downstream} status page shows all systems operational",
+        "INFO [{service}] {downstream} outage lasted {window} — incident closed; {affected_count} customers affected; post-incident review scheduled; {downstream} RCA expected within 72 hours per their status page"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "failed to connect to {downstream} host={endpoint} port={port} error=\"connection refused\" elapsed=12ms attempt=1/1 circuit_breaker=open",
+        "{downstream} client error: HTTP 503 Service Unavailable url={endpoint} response_time=8ms retry=false reason=\"circuit breaker open\" downstream_status_page=INCIDENT",
+        "dependency call failed service={downstream} endpoint={endpoint} status=503 latency=11ms — immediate refusal, not timeout; other_services=reachable; network_partition=false",
+        "request aborted — {downstream} unavailable since {deploy_time}; returning fallback response to caller; affected_path={endpoint}; fallback_mode=active",
+        "{downstream} health check FAILED host={endpoint} port={port} error=\"EOF on connect\" consecutive_failures={conn_count} circuit_state=OPEN",
+        "all {conn_count} pooled connections to {downstream} in refused state; pool_exhausted=false; dependency_down=true; network_ok=true (verified via probe to alternate endpoints)",
+        "payment processor {downstream} unreachable — charge attempt failed immediately; transaction_id={conn_count} status=not_submitted; error=connection_refused; customer notified",
+        "auth provider {downstream} down — token validation call returned 503 in 9ms; user={affected_count} session extended via cached token; downstream_confirmed_outage=true",
+        "write operation queued for replay — {downstream} offline; queue_depth={conn_count}; operation={endpoint}; enqueue_time={deploy_time}; max_queue_age=3600s",
+        "{downstream} status page polled — status=INCIDENT severity=P0 started={deploy_time} affected_regions=all; suspending retry attempts; using fallback path",
+        "circuit breaker TRIPPED for {downstream} — failure_rate={error_pct}% over last 60s; threshold=50%; all calls to {endpoint} short-circuited; circuit_state=OPEN",
+        "CDN provider {downstream} returning 503 on all edge node requests — static asset delivery failed for {affected_count} requests in last 60s; origin fallback activated",
+        "dependency {downstream} error — expected 2xx got 503; response_body=\"Service Unavailable\" response_time=7ms; rule_out_network=confirmed (other deps healthy); escalating",
+        "SMS delivery via {downstream} failing — send_message returned 503 immediately; message_id={conn_count} queued for retry post-recovery; outage_duration={window}",
+        "{downstream} TCP probe failed — connect to {endpoint}:{port} refused in 6ms; 15 consecutive failures; opening circuit breaker; fallback_mode=engaged"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "{downstream} error rate crossed 90% threshold — {error_pct}% of calls failing; failure_mode=immediate_503; network_healthy=true; checking {downstream} status page",
+        "circuit breaker for {downstream} approaching trip threshold — failure_rate={error_pct}% consecutive_errors={conn_count}; endpoint={endpoint}; pre-trip warning",
+        "fallback cache for {downstream} aging — ttl_remaining={window}; {downstream} still offline per status page; consider extending TTL or alerting customers",
+        "queued write backlog growing — {conn_count} operations pending {downstream} recovery; current_rate={rps} ops/s enqueued; max_capacity=10000; at {error_pct}% capacity",
+        "{downstream} status page polled — status=INVESTIGATING updated={deploy_time}; no ETA provided; maintaining circuit open; next status check in 120s",
+        "retries suppressed for {downstream} — circuit breaker OPEN; saving {rps} RPS of retry traffic; dependency confirmed offline not degraded; avoiding retry storm",
+        "{service} degraded mode — {affected_count} customers on {endpoint} receiving fallback responses; {downstream} outage duration={window}; stakeholder notification sent",
+        "health probe to {downstream} returned 503 — circuit half-open probe failed; resetting to OPEN state; next probe in {window}; {downstream} status page still INCIDENT",
+        "write queue replay at risk — {downstream} offline {window}; {conn_count} operations queued; queue will overflow in {window} at current intake rate of {rps} ops/s",
+        "dependency {downstream} unreachable — verified not a network issue: probes to {conn_count} other external hosts all succeeded; problem is on {downstream} side only",
+        "customer-facing error rate elevated — {error_pct}% due to {downstream} outage; non-affected endpoints healthy; isolating blast radius to {downstream}-dependent paths",
+        "{downstream} enterprise support case escalated — ticket_id=DEP-{conn_count} opened {deploy_time}; severity=P1; ETA from {downstream}: pending; on-call notified"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "{downstream} status page polled — status=RESOLVED updated={deploy_time}; initiating circuit breaker half-open probe sequence; probe_interval=15s",
+        "circuit breaker for {downstream} transitioning OPEN→HALF-OPEN — {conn_count} test probes scheduled; {downstream} status page shows recovery in progress",
+        "{downstream} circuit breaker CLOSED — {conn_count}/{conn_count} health probes succeeded; resuming normal traffic to {endpoint}; monitoring error rate",
+        "write queue replay started — {conn_count} operations dequeued; {downstream} confirmed healthy; replay_rate={rps} ops/s; estimated completion in {window}",
+        "{downstream} outage ended — total duration {window}; {affected_count} customers impacted; fallback mode deactivated; post-incident review scheduled",
+        "network health check passed during {downstream} outage — confirmed reachability to {conn_count} other external services; problem isolated to {downstream}",
+        "incident communication sent — {affected_count} customers notified of {downstream} outage; status page updated; next update in 30 minutes or upon resolution",
+        "circuit breaker metrics for {downstream} — total_short_circuited={conn_count}; fallback_served={affected_count}; retry_storms_prevented=true; outage_duration={window}"
+      ]
+    }
+  ]
+}

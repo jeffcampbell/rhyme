@@ -1,0 +1,119 @@
+{
+  "cause_class": "traffic_allocation",
+  "summaries": [
+    "Between 14:30 and 17:45 PDT on 10 Apr 2026, customers using {service} on Amazon EKS in the us-west-2 Region experienced elevated error rates coinciding with a traffic surge. Request throughput reached {rps} RPS, approximately {traffic_mult}x the provisioned baseline of {baseline_rps} RPS. Container memory rose in lockstep with inbound load, peaking at {mem_used} of {mem_limit} before pod {pod} was evicted. Error rates reached {error_pct}%. The issue resolved as traffic subsided.",
+    "Tracking ID: AZ-TR4-20260411 — Between approximately 09:15 and 12:00 UTC on 11 Apr 2026, a subset of customers using Azure Kubernetes Service in the West US 2 region experienced degraded performance for {service}. An unexpected traffic surge drove per-pod memory from baseline to {mem_used}, triggering OOM evictions. Scaling from {from_replicas} to {to_replicas} replicas at 11:30 UTC reduced per-pod load and resolved the issue.",
+    "02:10 AM PDT — We are investigating elevated error rates for {service} in the us-east1 region. Inbound traffic increased to {rps} RPS ({traffic_mult}x the {baseline_rps} RPS baseline) beginning at approximately 01:45 AM PDT. Pod {pod} has been evicted due to memory exhaustion. We are scaling the deployment to absorb the additional load.",
+    "Google Cloud Status — The issue with Google Kubernetes Engine affecting {service} in us-central1 has been resolved as of 16:55 US/Pacific. Between 13:20 and 16:55 US/Pacific, a traffic surge to {rps} RPS caused memory utilization on individual pods to reach {mem_used} ({mem_pct}% of the {mem_limit} limit). OOM evictions ceased after the deployment was scaled from {from_replicas} to {to_replicas} replicas.",
+    "Tracking ID: 8_N7-PQ2 — Summary of impact: Between approximately 20:00 and 23:30 UTC on 12 Apr 2026, customers accessing {service} on Azure Container Apps in North Europe experienced elevated latency and error rates. The service received {traffic_mult}x its provisioned traffic volume. Container memory pressure resulted in {restart_count} pod evictions during the peak window. Traffic normalization at 23:30 UTC resolved the issue without further intervention.",
+    "04/08/2026 EKS Memory Pressure During Traffic Peak — Resolved — Between 11:05 and 14:20 PDT, {service} pods in the ap-southeast-1 Region experienced OOM evictions driven by a sustained traffic surge. Per-pod memory reached {mem_used} of {mem_limit} at {rps} RPS. Scaling the deployment from {from_replicas} to {to_replicas} replicas distributed the load and eliminated OOM events. Error rate dropped from {error_pct}% to under 0.1% within five minutes of scaling.",
+    "Between 18:00 and 21:15 UTC on 06 Apr 2026, customers running {service} in Google Cloud region europe-west3 experienced intermittent failures correlated with a traffic increase. Memory utilization per pod tracked the inbound request rate, peaking at {mem_pct}% of the configured {mem_limit} limit at {rps} RPS. OOM kills were observed exclusively during peak traffic windows. The incident was resolved by scaling to {to_replicas} replicas at 21:15 UTC.",
+    "We experienced degraded performance for {service} in the eu-central-1 Region between 07:45 and 10:30 UTC. A spike in inbound traffic to {rps} RPS ({traffic_mult}x the {baseline_rps} RPS baseline) caused container memory to scale proportionally. Pod {pod} was evicted after memory reached {mem_used} of {mem_limit}. The deployment was scaled from {from_replicas} to {to_replicas} replicas at 09:55 UTC, which restored normal operation.",
+    "Tracking ID: AZ-KS7-20260409 — Customers using Azure Kubernetes Service in the Southeast Asia region reported intermittent errors for {service} between 03:30 and 07:00 UTC on 09 Apr 2026. Investigation confirmed that a {traffic_mult}x traffic increase drove per-pod memory consumption to {mem_used}, triggering OOM evictions. Memory utilization returned to baseline levels after traffic subsided at 07:00 UTC. No action was required beyond monitoring.",
+    "08:22 PM PDT — Amazon ECS tasks running {service} in the us-east-2 Region are experiencing elevated error rates following an unexpected traffic surge. Current inbound load is {rps} RPS vs a provisioned baseline of {baseline_rps} RPS. Per-task memory has reached {mem_pct}% of the {mem_limit} limit. We are increasing the desired count from {from_replicas} to {to_replicas} tasks.",
+    "Google Cloud Status Update — 11:30 US/Pacific — We are investigating elevated OOM eviction rates for {service} in the asia-northeast2 region. Inbound request rate climbed to {rps} RPS starting at 09:45 US/Pacific. Per-pod memory usage is tracking the traffic curve, currently at {mem_used} of {mem_limit}. We are scaling the deployment to address per-pod load. Error rate is {error_pct}%.",
+    "Between 15:00 and 19:45 UTC on 13 Apr 2026, customers running {service} on Amazon EKS in the sa-east-1 Region experienced degraded availability. A {traffic_mult}x surge in request volume drove memory utilization per pod to {mem_pct}% of the {mem_limit} limit. Pod {pod} was evicted {restart_count} times during the peak. Horizontal scaling to {to_replicas} replicas at 19:30 UTC restored normal error rates within minutes.",
+    "Tracking ID: GCP-INC-20260407-003 — Between 22:00 UTC on 07 Apr and 01:30 UTC on 08 Apr 2026, GKE clusters in northamerica-northeast2 running {service} experienced pod evictions. Memory per pod correlated directly with inbound RPS, reaching {mem_used} at peak load of {rps} RPS. Evictions ceased after traffic declined to near-baseline levels at 01:30 UTC. No configuration changes were required.",
+    "04/14/2026 Container OOM During Traffic Event — Mitigated — Tracking ID: AZ-WE9-20260414 — Between 16:00 and 20:15 UTC, {service} on Azure Kubernetes Service in the Canada Central region experienced {restart_count} pod evictions during a sustained traffic increase. Per-pod memory rose proportionally with load to {mem_used} of {mem_limit}. Scaling to {to_replicas} replicas at 19:45 UTC reduced per-pod memory to baseline within 10 minutes.",
+    "03:47 AM PDT — We have mitigated the issue affecting {service} pods in the ap-northeast-1 Region. Between 01:10 and 03:47 AM PDT, a traffic surge to {rps} RPS ({traffic_mult}x baseline) caused container memory to rise to {mem_used}, resulting in OOM evictions. The deployment was scaled from {from_replicas} to {to_replicas} replicas. Error rates returned below SLO thresholds at 03:47 AM PDT.",
+    "Between 10:30 and 14:00 UTC on 15 Apr 2026, customers in the Google Cloud europe-north1 region running {service} experienced elevated error rates. Memory consumption per pod scaled directly with request throughput, reaching {mem_pct}% of the {mem_limit} limit at peak load. Pod {pod} was evicted after memory reached {mem_used}. Scaling the deployment to {to_replicas} replicas resolved OOM events within minutes.",
+    "Tracking ID: AZ-NC4-20260416 — Summary of impact: Between approximately 08:00 and 11:30 UTC on 16 Apr 2026, Azure Kubernetes Service customers in the Brazil South region running {service} experienced elevated error rates. A surge in inbound traffic to {rps} RPS drove per-pod memory to {mem_used}, triggering OOM evictions. Error rates reached {error_pct}% during the peak. Adding {to_replicas} replicas reduced per-pod load and resolved the issue.",
+    "09:15 PM PDT — Amazon EKS pods running {service} in the me-south-1 Region are experiencing OOM evictions due to an elevated traffic load of {rps} RPS. Per-pod memory is at {mem_pct}% of the {mem_limit} limit and continues to track inbound request volume. We have initiated a scale-out from {from_replicas} to {to_replicas} replicas. Error rate is currently {error_pct}%.",
+    "Google Cloud Status — Resolved — 08:45 US/Pacific — The incident affecting {service} in GKE clusters in us-west2 has been resolved. Between 04:30 and 08:45 US/Pacific, a {traffic_mult}x traffic surge drove per-pod memory to {mem_used} of the {mem_limit} limit, causing pod {pod} to be evicted {restart_count} times. Scaling to {to_replicas} replicas at 08:00 US/Pacific resolved OOM events and restored normal error rates.",
+    "Between 21:00 UTC on 09 Apr and 00:45 UTC on 10 Apr 2026, customers running {service} on Amazon EKS in the eu-west-2 Region experienced degraded performance correlated with an inbound traffic surge. Request volume peaked at {rps} RPS, approximately {traffic_mult}x the {baseline_rps} RPS baseline. Container memory tracked the traffic increase, reaching {mem_used} before pod eviction. Memory utilization returned to baseline after traffic organically declined."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL: Pod {pod} OOMKilled during traffic peak — memory {mem_used} of {mem_limit} at {rps} RPS — scale deployment from {from_replicas} to {to_replicas} replicas immediately",
+        "CRITICAL: {service} OOM eviction storm — {restart_count} pods killed in last 10min — inbound traffic {rps} RPS ({traffic_mult}x baseline {baseline_rps} RPS) — error rate {error_pct}%",
+        "CRITICAL: {service} memory limit breached — {mem_used} of {mem_limit} used — traffic at {rps} RPS, {traffic_mult}x provisioned capacity — scale-out required now",
+        "CRITICAL: Pod evictions for {service} correlating with traffic surge — per-pod memory at {mem_pct}% of {mem_limit} — {from_replicas} replicas insufficient for {rps} RPS load",
+        "CRITICAL: {service} SLO breach — {error_pct}% error rate — OOM evictions during {rps} RPS traffic surge — scaling from {from_replicas} to {to_replicas} replicas in progress",
+        "CRITICAL: Container {pod} OOMKilled — memory {mem_used} scaled with request load to {mem_pct}% of limit — {traffic_mult}x baseline traffic volume — immediate scale-out needed",
+        "CRITICAL: {restart_count} OOMKilled events in {service} — memory usage tracks RPS — current load {rps} RPS exceeds capacity for {from_replicas} replicas — escalate",
+        "CRITICAL: {service} deployment undersized for current traffic — {rps} RPS driving per-pod memory to {mem_used} — {error_pct}% request failure rate — add replicas now",
+        "CRITICAL: Memory pressure on all {from_replicas} pods in {service} — load {rps} RPS ({traffic_mult}x baseline) — pod {pod} evicted — scale to {to_replicas} replicas to restore service",
+        "CRITICAL: {service} error rate {error_pct}% — OOM kills correlated with {traffic_mult}x traffic surge to {rps} RPS — replicas {from_replicas} — scale-out to {to_replicas} required"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING: {service} pod memory rising with inbound traffic — {mem_used} of {mem_limit} at {rps} RPS — {traffic_mult}x baseline load — consider scaling from {from_replicas} replicas",
+        "WARNING: Traffic surge detected — {service} receiving {rps} RPS vs {baseline_rps} RPS baseline — per-pod memory at {mem_pct}% of {mem_limit} — OOM risk increasing",
+        "WARNING: Pod {pod} memory correlating with request rate — {rps} RPS driving {mem_used} usage — approaching {mem_limit} limit — {from_replicas} replicas may be insufficient",
+        "WARNING: {service} memory utilization tracking traffic volume — {mem_pct}% of {mem_limit} at current {rps} RPS load — headroom shrinking — scale-out recommended",
+        "WARNING: Inbound traffic at {traffic_mult}x baseline — {service} per-pod memory {mem_used} of {mem_limit} — {from_replicas} replicas — OOM eviction possible at sustained load",
+        "WARNING: {service} scaling headroom low — {from_replicas} replicas at {rps} RPS — per-pod memory {mem_pct}% of limit — recommend scaling to {to_replicas} before OOM event",
+        "WARNING: Traffic-correlated memory growth in {service} — memory rises and falls with request volume — current pod usage {mem_used} — {rps} RPS still elevated",
+        "WARNING: {service} pod {pod} at {mem_pct}% memory — traffic {rps} RPS ({traffic_mult}x {baseline_rps} RPS baseline) — {from_replicas} replicas — OOM threshold approached during prior peaks",
+        "WARNING: Request surge ongoing — {service} at {rps} RPS — per-pod memory tracking load at {mem_used} of {mem_limit} — scale-out from {from_replicas} to {to_replicas} recommended",
+        "WARNING: {service} capacity margin thin — {rps} RPS against {from_replicas} replicas — per-pod memory {mem_used} — prior OOM event at comparable load level"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO: {service} scaled from {from_replicas} to {to_replicas} replicas — per-pod memory dropping from {mem_used} — traffic still {rps} RPS — monitoring for stabilization",
+        "INFO: Traffic surge subsiding — {service} load returning toward {baseline_rps} RPS baseline — pod memory declining from {mem_used} peak — no further OOM events observed",
+        "INFO: HPA triggered for {service} — scaling from {from_replicas} to {to_replicas} replicas — trigger: memory at {mem_pct}% of {mem_limit} — current traffic {rps} RPS",
+        "INFO: {service} incident resolved — traffic returned to {baseline_rps} RPS baseline — pod memory at normal levels — {to_replicas} replicas maintained for buffer",
+        "INFO: Post-incident review scheduled — {service} experienced {restart_count} OOM evictions during {traffic_mult}x traffic surge — capacity planning review in progress"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "OOMKilled: container {pod} in {service} — memory {mem_used} exceeded limit {mem_limit} — concurrent_requests={rps} at time of eviction",
+        "pod eviction: {pod} namespace={service} reason=OOMKilled — memory.usage={mem_used} memory.limit={mem_limit} — inbound_rps={rps}",
+        "FATAL [{service}] container killed — rss={mem_used} exceeded cgroup limit={mem_limit} — request_rate={rps} RPS at termination",
+        "oom_kill: pod={pod} namespace={service} memory_used={mem_used} limit={mem_limit} traffic_rps={rps} restarts={restart_count}",
+        "container runtime OOM: {pod} — usage={mem_used} limit={mem_limit} — error_rate={error_pct}% — rps={rps} — traffic_multiplier={traffic_mult}x",
+        "ERROR [{service}] memory limit exceeded during traffic peak — pod={pod} usage={mem_used} limit={mem_limit} rps={rps} replica_count={from_replicas}",
+        "Kubernetes OOMKilled: containerName={pod} restartCount={restart_count} limits.memory={mem_limit} — correlated traffic_rps={rps}",
+        "pod {pod} evicted: MemoryPressure — usage_at_eviction={mem_used} limit={mem_limit} — inbound_load={rps}RPS — replicas_available={from_replicas}",
+        "FATAL: per-pod memory {mem_used} breached limit {mem_limit} — load={rps}RPS ({traffic_mult}x baseline={baseline_rps}RPS) — error_rate={error_pct}%",
+        "container OOM event: {service}/{pod} — memory_at_kill={mem_used} configured_limit={mem_limit} — request_rate={rps} restarts={restart_count}",
+        "ERROR [{service}] allocation failure correlated with traffic — rps={rps} mem_used={mem_used} limit={mem_limit} — scale-out not yet complete",
+        "eviction: pod={pod} reason=OOMKilled namespace={service} — memory_pressure triggered by {rps}RPS load on {from_replicas} replicas",
+        "FATAL [{service}] insufficient replicas for current load — {from_replicas} pods at {rps}RPS — per-pod memory={mem_used} limit={mem_limit} — OOM kill",
+        "container killed signal=SIGKILL: {pod} — rss={mem_used} limit={mem_limit} traffic={rps}RPS error_pct={error_pct}",
+        "OOM eviction: {service}/{pod} restart_count={restart_count} — memory scaled proportionally with traffic to {mem_used} of {mem_limit}"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "WARN [{service}] per-pod memory tracking request rate — rps={rps} mem_used={mem_used} limit={mem_limit} — headroom={mem_pct}% consumed",
+        "traffic surge detected: {service} at {rps}RPS ({traffic_mult}x baseline {baseline_rps}RPS) — pod memory climbing proportionally — {from_replicas} replicas",
+        "WARN: pod {pod} memory {mem_pct}% of limit — correlated with inbound load {rps}RPS — OOM likely if traffic sustained with {from_replicas} replicas",
+        "per-pod memory approaching eviction threshold: {service} — traffic={rps}RPS — mem_used={mem_used} limit={mem_limit} — replica_count={from_replicas}",
+        "WARN [{service}] capacity margin thin — {rps}RPS load on {from_replicas} replicas — per-pod mem={mem_used} ({mem_pct}% of {mem_limit})",
+        "request rate {rps}RPS is {traffic_mult}x provisioned baseline — {service} pod memory rising — OOM threshold may be reached at peak",
+        "WARN: memory utilization correlates with traffic volume in {service} — current {rps}RPS pushing {pod} to {mem_used} of {mem_limit}",
+        "scaling headroom alert: {service} {from_replicas} replicas at {rps}RPS — per-pod memory {mem_used} — recommend HPA trigger at {mem_pct}%",
+        "WARN [{service}] inbound load {rps}RPS driving memory {mem_used} toward limit {mem_limit} — traffic_mult={traffic_mult}x — scale-out recommended",
+        "traffic-correlated memory pressure: pod={pod} mem={mem_used} limit={mem_limit} rps={rps} — memory drops when traffic subsides — replicas={from_replicas}",
+        "WARN: {service} pod memory at {mem_pct}% of {mem_limit} — load={rps}RPS — prior OOM event at comparable traffic level — consider preemptive scale",
+        "elevated request rate warning: {service} {rps}RPS vs {baseline_rps}RPS baseline — per-pod overhead scaling linearly — {from_replicas} replicas insufficient for sustained load"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "INFO [{service}] scaling from {from_replicas} to {to_replicas} replicas — trigger=memory_pressure — current_rps={rps} mem_used={mem_used}",
+        "HPA scale-out: {service} from_replicas={from_replicas} to_replicas={to_replicas} — metric=memory utilization={mem_pct}% — traffic={rps}RPS",
+        "INFO: traffic surge subsiding — {service} rps returning toward {baseline_rps} baseline — per-pod memory declining from {mem_used} — OOM risk low",
+        "scale-out complete: {service} now {to_replicas} replicas — per-pod memory dropped from {mem_used} — error_rate recovering from {error_pct}%",
+        "INFO [{service}] pod {pod} restarted after OOM eviction — restart_count={restart_count} — traffic={rps}RPS — replicas={from_replicas} — scale-out in progress",
+        "incident update: {service} scaling to {to_replicas} replicas — traffic={rps}RPS ({traffic_mult}x baseline) — per-pod memory stabilizing",
+        "INFO: {service} traffic returning to baseline {baseline_rps}RPS — per-pod memory {mem_used} — {to_replicas} replicas maintained for headroom",
+        "post-incident: {service} — {restart_count} OOM evictions during {traffic_mult}x traffic surge — resolved by scaling to {to_replicas} replicas"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "cause_class": "race_condition",
+  "summaries": [
+    "Between 09:17 and 10:44 UTC on 2024-05-14, {service} produced {duplicate_count} duplicate records in {table} under sustained write load. Duplication rate tracked concurrency linearly: at {baseline_concurrency} workers the insert path was clean, at {concurrency} workers duplicates accumulated at {duplicate_count} per minute. Single-threaded replay of the identical request sequence produced zero duplicates. The check-then-act pattern in the write path has no synchronization between the existence check and the INSERT.",
+    "On 2023-08-22, on-call was paged for intermittent 500 errors on {endpoint}. Error rate was {error_pct}% at peak concurrency and dropped to near zero when traffic was cut in half. All stack traces pointed to a unique-constraint violation on {table}.{column}: two threads were racing through the same existence check simultaneously. The issue was absent in all pre-production testing because load tests ran below {baseline_concurrency} concurrent workers.",
+    "Tracking ID: RC-20240301-005. Optimistic locking failures spiked on {service} starting at 14:30 UTC. Version mismatches occurred where application code read {expected_version} and by commit time the row had advanced to {actual_version}. At {baseline_concurrency} concurrent writers the failure rate was negligible; at {concurrency} it reached {error_pct}% of all update attempts. Retry logic existed but had no backoff, amplifying contention rather than resolving it.",
+    "The {service} platform silently discarded {lost_updates} updates over a {concurrency}-minute window on 2023-11-07. Two processes read the same row, computed independent changes, and the last writer overwrote the first without awareness of the intermediate write. Neither operation returned an error. The data loss was only detected by reconciling the audit log against expected state. The issue did not appear in any sequential test run.",
+    "2024-07-09 Incident Summary — {service}. A deadlock storm produced {deadlock_count} deadlocks in a {concurrency}-minute window. Transaction {txn_id} acquired locks on {table} in order A→B while concurrent transactions acquired them B→A. Under low concurrency the transactions serialized naturally; at {concurrency} workers they collided continuously. Victim selection was nondeterministic, causing error logs to appear random and initially masking the consistent root cause.",
+    "On 2023-04-18, {service} produced phantom reads under the {isolation_level} isolation level. Thread A read a count of 0 for a given key, Thread B inserted a row, Thread A also inserted — two rows existed for a key that should be unique. The bug reproduced only when {concurrency} or more threads targeted the same key within a short window. Switching to SERIALIZABLE isolation or adding SELECT FOR UPDATE eliminated the phantom entirely.",
+    "2024-10-02 Post-Incident Report — {service}. PostgreSQL serialization failures reached {error_pct}% of all writes on {table}. The application was not retrying on serialization error (SQLSTATE 40001), so failing transactions were silently dropped. The pattern was load-dependent: below {baseline_concurrency} concurrent sessions, conflicts were negligible; above {concurrency} they became the dominant failure mode. The issue was invisible to monitoring because no exceptions were logged.",
+    "Starting 2023-07-14 at 16:05 UTC, two {service} API nodes processed the same webhook event within milliseconds of each other. Both checked for an existing record, both found none, and both inserted — resulting in {duplicate_count} duplicate records in {db}.{table}. The idempotency key check has a TOCTOU window that only manifests when two nodes receive the same event near-simultaneously. The bug had existed undetected since the service launched because single-node delivery was the norm.",
+    "Incident INC-20240820: {service} silently dropped {lost_updates} writes per hour under high concurrency. A Java method performed a read-then-write on {record_id} without synchronization. When two threads interleaved on the same record, the second write overwrote the first without incorporating its changes. Neither write failed; both returned success. Only a concurrent stress test at {concurrency} threads exposed the issue — all unit tests ran sequentially and passed.",
+    "09/30/2023 RCA — {service} — EU-CENTRAL-1. A deadlock was detected between {txn_id} and a concurrent transaction on {db}. Both transactions locked rows in {table} but in different orders depending on the query plan chosen by the optimizer. At low load they serialized naturally; at {concurrency} concurrent sessions, deadlocks occurred every few seconds. {deadlock_count} were recorded in the incident window. Lock ordering was not enforced at the application level.",
+    "On 2024-04-17, a long-running analytics transaction on {table} caused write timeouts for {service} API traffic. The analytics job held a table-level lock while {concurrency} concurrent API writes queued behind it. Writes timed out after {concurrency}ms and returned errors to callers. At low API concurrency the analytics job finished before writes accumulated; at {concurrency} writers the queue grew faster than the job drained. The interaction had not been anticipated in capacity planning.",
+    "2023-10-25 Post-Mortem — {service}. Intermittent IntegrityError exceptions appeared in clusters separated by quiet periods. Root cause was a race between a DELETE and an INSERT on {table}: one thread deleted the parent row while another was mid-flight inserting a child row referencing it. The child INSERT failed with a foreign key violation. The failure rate was {error_pct}% and correlated precisely with the scheduling of the batch-delete job, which ran every 15 minutes.",
+    "Tracking ID: VVC-20240602-007. Version vector conflict rate on {service} jumped to {error_pct}% after scaling to {concurrency} replicas. Each replica read a document at {expected_version}, modified it, and wrote back expecting {expected_version} — but another replica had already advanced it to {actual_version}. Single-replica deployments had zero conflicts. The conflict rate scaled roughly with concurrency squared, suggesting O(n²) interactions between replicas.",
+    "On 2023-12-19, {service} accumulated {concurrency} unique-constraint violations per minute against {table}.{column} under {concurrency} parallel workers. The insert logic read the current maximum value of {column} to generate the next ID, then inserted. Two workers racing through this code read the same maximum, generated the same next value, and one failed with a duplicate key error. The root cause was application-level ID generation that should have used a database sequence.",
+    "2024-01-31 Incident Report — {service}. A race condition in the cache invalidation path caused stale data to persist indefinitely. A write to {db} was followed by a cache delete, but another thread read the stale value from cache between the write and the delete, then re-populated the cache with the stale value. The window was microseconds wide but at {concurrency} RPS it manifested at {error_pct}% of writes. The bug was not reproducible below {baseline_concurrency} RPS.",
+    "On 2023-05-08, {service} exhibited non-deterministic behavior on {endpoint} that defeated two prior debugging attempts because it did not reproduce locally. The failure rate was exactly zero at {baseline_concurrency} threads and climbed monotonically to {error_pct}% at {concurrency} threads. Logs showed alternating success and failure for the same {record_id} depending on which thread reached the lock check first. Sequential execution at any concurrency level produced no failures.",
+    "2024-11-05 Post-Mortem — {service}. An unsynchronized shared counter was identified as the root cause of data divergence. Java code performed counter++ which compiles to three non-atomic bytecode instructions: read, increment, write. At {concurrency} concurrent threads, increments were lost — the counter read lower than expected. Replacing with AtomicLong.incrementAndGet() eliminated the data loss. The bug had been latent since the thread pool was increased from {baseline_concurrency} to {concurrency} workers.",
+    "Tracking ID: RC-20230917-014. {service} error rate on {endpoint} was {error_pct}% during peak load and 0% during off-peak. The failure mode was a unique-constraint violation on {table}. Detailed analysis showed the error appeared only when {concurrency} or more concurrent requests targeted the same {record_id} within the same {concurrency}-millisecond window. Reproduced in a controlled load test; adding SELECT FOR UPDATE to the check path eliminated all violations.",
+    "On 2024-06-24, {service} engineering was alerted to a rising duplicate record count in {db}.{table}. The duplicates had accumulated gradually over 6 hours during a sustained traffic period. Analysis of insert timestamps confirmed all duplicates were created within tight time windows, consistent with concurrent inserts from multiple API nodes. The deduplication check operated on an eventually-consistent read that did not reflect in-flight inserts from other nodes. An idempotency key enforced at the database layer resolved the issue.",
+    "2023-09-12 Incident Summary — {service}. Non-deterministic failures on {endpoint} were escalated after three days of intermittent reports. Correlation analysis of failure logs against concurrency metrics confirmed the failure rate was concurrency-gated: zero failures at {baseline_concurrency} concurrent requests and {error_pct}% at {concurrency}. The root cause was a TOCTOU race in the {table} write path. Serial execution of any request sequence produced no errors, which had prevented reproduction in staging until a concurrent load test was run."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL [{service}] Unique constraint violation rate = {duplicate_count}/min on {db}.{table}.{column} — duplicate record storm in progress — concurrency={concurrency} workers — rate was 0 at {baseline_concurrency} workers",
+        "CRITICAL [Deadlock Monitor] {deadlock_count} deadlocks detected in incident window on {db}.{table} — transactions {txn_id} in circular lock wait — rollback rate exceeding SLO threshold",
+        "CRITICAL [{service}] Optimistic locking failure rate {error_pct}% — version mismatch {expected_version}→{actual_version} on {table} — {lost_updates} lost updates accumulating — retry storms as secondary impact",
+        "CRITICAL [PagerDuty] {service} {endpoint} error rate {error_pct}% at {concurrency} concurrent requests — errors absent below {baseline_concurrency} concurrent requests — concurrency-correlated failure — SEV-1 declared",
+        "CRITICAL [{db}] Lock wait timeout exceeded on {table}: {concurrency} write transactions queued behind blocking transaction {txn_id} — data writes failing — analytics job suspected as lock holder",
+        "CRITICAL [{service}] Data integrity violation: {duplicate_count} duplicate {record_id} records inserted in incident window — TOCTOU race in write path confirmed — deploy blocked pending fix",
+        "CRITICAL [{service}] {lost_updates} silent write discards confirmed via audit log reconciliation — non-atomic read-modify-write under {concurrency} threads — business data at risk",
+        "CRITICAL [{service}] Serialization failure rate {error_pct}% on {db} — SQLSTATE 40001 not being retried — transactions silently failing at {concurrency} concurrent sessions — data loss in progress",
+        "CRITICAL [{service}] {concurrency} concurrent threads accessing unsynchronized shared state — connection handle collision causing protocol corruption — all in-flight requests on affected node failing",
+        "CRITICAL [{service}] FK constraint violations spiking: {duplicate_count} violations in incident window on {table} — DELETE/INSERT race confirmed — data consistency compromised"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING [{service}] Duplicate key errors on {table}.{column}: {duplicate_count} in incident window — rate increases with concurrency — currently {concurrency} active workers — baseline (clean): {baseline_concurrency}",
+        "WARNING [PostgreSQL] Deadlock detected — {txn_id} rolled back as victim — lock contention on {table} — {deadlock_count} deadlocks this hour — lock ordering inconsistency suspected",
+        "WARNING [{service}] Optimistic lock retries elevated: expected version {expected_version}, found {actual_version} — retry-without-backoff may amplify contention — {concurrency} concurrent writers active",
+        "WARNING [{db}] Lock wait approaching threshold on {table} — {concurrency} transactions queued — failure imminent if lock holder {txn_id} does not release within timeout",
+        "WARNING [{service}] {endpoint} error rate elevated at {error_pct}% under {concurrency} concurrent requests — error rate drops to baseline when concurrency reduced by 50%",
+        "WARNING [{service}] Duplicate insert attempt rate rising on {table}: {duplicate_count}/min — baseline 0/min at {baseline_concurrency} workers — TOCTOU window in write path suspected",
+        "WARNING [{service}] {lost_updates} silent write discards detected via audit log reconciliation — last-writer-wins conflict on {record_id} — no error raised, data silently incorrect",
+        "WARNING [{db}] Serialization failure rate rising: {error_pct}% of transactions on {table} receiving SQLSTATE 40001 — application retry handler not confirmed — silent drops at {concurrency} sessions",
+        "WARNING [{service}] Version conflict rate jumped after scaling to {concurrency} replicas — expected_version={expected_version} actual_version={actual_version} — single-replica deployment had zero conflicts",
+        "WARNING [{service}] Cache invalidation race detected: stale reads following writes on {endpoint} — write-then-cache-delete sequence has observable TOCTOU window at {concurrency} RPS"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO [{service}] Concurrency stress test complete: duplicate rate = 0 at {baseline_concurrency} threads, {duplicate_count} duplicates at {concurrency} threads — race condition boundary identified",
+        "INFO [Runbook] Concurrency mitigation in progress: {service} worker pool scaled back from {concurrency} to {baseline_concurrency} — monitoring {error_pct}% error rate for improvement",
+        "INFO [{service}] Database sequence migration deployed to {db}.{table}.{column} — application-level ID generation removed — monitoring constraint violations, expected to drop to zero",
+        "INFO [Incident Update] Lock order standardized across all write paths in {service} — deadlock rate was {deadlock_count} per incident window — redeploying to confirm fix",
+        "INFO [{service}] Audit log reconciliation completed: {lost_updates} lost updates confirmed in incident window — atomic operation migration rolled out — monitoring for recurrence"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "[{service}] org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint \"{table}_{column}_key\" — Detail: Key ({column})=({record_id}) already exists — txn_id={txn_id} thread=worker-{concurrency}",
+        "[{service}] DeadlockLoserDataAccessException: Transaction {txn_id} was deadlocked on lock resources with another process and has been chosen as the deadlock victim — blocking_txn={txn_id} table={table}",
+        "[{service}] OptimisticLockException: Row was updated or deleted by another transaction: [{table}#{record_id}] expected_version={expected_version} actual_version={actual_version} — {concurrency} concurrent writers active",
+        "[{service}] Lost-update conflict on {record_id}: {lost_updates} updates rolled back — non-atomic read-modify-write interleaved at {concurrency} concurrent threads — table={table}",
+        "[{db}] ERROR 1213 (40001): Deadlock found when trying to get lock; try restarting transaction — txn={txn_id} table={table} — {deadlock_count} deadlocks this window",
+        "[{service}] pq: could not serialize access due to concurrent update — SQLSTATE=40001 table={table} record={record_id} isolation={isolation_level} concurrent_sessions={concurrency}",
+        "[{service}] IntegrityError: insert or update on table \"{table}\" violates foreign key constraint — Key ({column})=({record_id}) is not present in parent table — race with DELETE detected",
+        "[{service}] java.lang.IllegalStateException: Version conflict on entity {record_id}: stored version is {actual_version}, expected {expected_version} — {concurrency} parallel threads confirmed",
+        "[{service}] LockWaitTimeoutException: Lock wait timeout exceeded — transaction {txn_id} waiting on row lock in {table} — {concurrency} transactions queued — rolled back",
+        "[{service}] DATA RACE detected — read without lock held while concurrent write in progress — table={table} column={column} — concurrency={concurrency} goroutines active",
+        "[{service}] UniqueConstraintViolation: UNIQUE constraint failed: {table}.{column} — duplicate {record_id} inserted by {concurrency} concurrent workers within same window — duplicate_count={duplicate_count}",
+        "[{service}] RetryExhaustedException: gave up after maximum attempts — optimistic lock version kept advancing ({expected_version}→{actual_version}) before commit — {concurrency} concurrent updaters on {record_id}",
+        "[{service}] psycopg2.errors.SerializationFailure: could not serialize access due to read/write dependencies among transactions — hint: The transaction might succeed if retried — concurrency={concurrency} table={table}",
+        "[{service}] Data consistency check FAILED: expected value for {column} on {record_id} diverges from audit log — {lost_updates} updates lost in incident window — non-atomic increment at {concurrency} threads",
+        "[{service}] django.db.utils.OperationalError: database is locked — {concurrency} concurrent writers contending on {table} — isolation_level={isolation_level} — lock escalation in progress"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "[{service}] High duplicate-insert attempt rate on {table}: {duplicate_count} collisions in incident window — increases with concurrency — current worker count: {concurrency} — baseline (clean): {baseline_concurrency}",
+        "[{db}] Long-running transaction {txn_id} holding row locks on {table} — {concurrency} dependent transactions queued — lock escalation risk if job does not complete",
+        "[{service}] Optimistic lock retry #{concurrency} for {record_id}: version advanced to {actual_version}, retrying with fresh read — {concurrency} concurrent writers active",
+        "[{service}] Serialization failure rate {error_pct}% exceeds 1% threshold on {db}.{table} — spike correlates with batch import job adding {concurrency} parallel DB connections",
+        "[{service}] Mutex contention: {concurrency} goroutines queued for write lock on shared map — average wait elevated — consider sharding by key hash",
+        "[{service}] Lock acquisition exceeded 500ms in {concurrency}-thread pool — possible lock inversion between cache_lock and db_lock — prior incident involved lost update on {record_id}",
+        "[{db}] Deadlock auto-resolved: victim={txn_id} rolled back — survivor={txn_id} — {deadlock_count} deadlocks this window — lock ordering inconsistency suspected across write paths",
+        "[{service}] Version skew detected on {record_id}: read {expected_version}, committed {actual_version} — delta={lost_updates} missed writes — concurrent_writers={concurrency}",
+        "[{service}] {endpoint} error rate spikes to {error_pct}% when {concurrency} concurrent requests in flight — drops to 0% at {baseline_concurrency} — pattern is strictly concurrency-gated",
+        "[{db}] FK constraint violations in incident window — DELETE racing with INSERT on {table} — application-level operation ordering insufficient without explicit lock or transaction",
+        "[{service}] Cache stampede: {concurrency} threads simultaneously read stale value for key {record_id} and all queued a recompute — thundering herd will amplify {db} load",
+        "[{service}] Audit reconciliation: {lost_updates} records in {table} have {column} values inconsistent with event log — last-write-wins conflict under {concurrency} concurrent updaters"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "[{service}] Race condition reproduced in isolation: {duplicate_count} duplicate inserts at {concurrency} threads, 0 at {baseline_concurrency} threads — thread-count boundary is definitive",
+        "[{service}] Mitigation applied: SELECT FOR UPDATE added to check-then-insert path on {table} — constraint violations dropped to 0 after deploy — monitoring for {concurrency}-minute window",
+        "[{db}] EXPLAIN ANALYZE confirms {txn_id} and concurrent transactions acquire row locks on {table} in opposite orders — lock order standardization commit ready for review",
+        "[{service}] AtomicLong.incrementAndGet() replaces unsynchronized counter for {column} — lost update count was {lost_updates} per window at {concurrency} threads — regression test added",
+        "[{service}] Isolation level upgraded from {isolation_level} to SERIALIZABLE on {db}.{table} write transactions — serialization failures now handled by retry-with-backoff — monitoring {error_pct}% error rate",
+        "[{service}] Stress test at {concurrency} workers confirmed: all three metrics ({duplicate_count} unique violations, {deadlock_count} deadlocks, {lost_updates} lost updates) at 0 under {baseline_concurrency} workers — concurrency is sole variable",
+        "[{service}] Idempotency key now enforced at DB layer via unique index on {table}.{column} — application-level TOCTOU race on {record_id} mitigated — duplicate_count was {duplicate_count} per window",
+        "[{service}] Go race detector run in staging: data race confirmed on {column} map write at goroutine count {concurrency} — fix: sync.Map or per-key mutex sharding — production deploy gated on race-clean binary"
+      ]
+    }
+  ]
+}

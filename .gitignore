@@ -1,0 +1,27 @@
+# Generated artifacts (regenerate with rhyme-generate)
+data/corpus.json
+data/queries.json
+data/query_payloads.json
+data/query_payloads_test*.json
+data/remediation_questions.json
+data/results*/
+
+# Private slice — never publish
+data/queries_private.json
+data/query_payloads_private.json
+
+# Web labeling session data (contains org-specific incidents)
+data/web/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store

@@ -1,0 +1,119 @@
+{
+  "cause_class": "schema_migration_failure",
+  "summaries": [
+    "Between 14:32 and 16:47 UTC on 2024-03-12, customers using {service} experienced elevated error rates when accessing {db}. Approximately {failed_queries} of {total_queries} requests failed with SQL errors referencing {column}. The issue was traced to migration {migration_id}, which ran at {migration_time} and {migration_action}. All services were restored after a rollback was applied at 16:47 UTC.",
+    "On 2023-11-08, starting at 09:15 PST, the {service} API began returning 500 errors for requests involving {table}. Investigation revealed that {migration_id}, deployed during the 08:50 PST maintenance window, had {migration_action}. Application code continued to reference {column}, which no longer existed in the expected form. Full recovery was confirmed at 11:03 PST.",
+    "Tracking ID: INC-20240517-0042. Between 2024-05-17 22:14 UTC and 2024-05-18 00:55 UTC, {service} reported a {error_pct}% query failure rate against {db}. Root cause was a mismatch between {expected_schema} and {actual_schema} introduced by {migration_id} at {migration_time}. The database tier was healthy throughout; all errors originated from the application layer encountering an unexpected schema state.",
+    "The issue affecting {service} has been resolved as of Friday, 2023-09-22 17:30 US/Eastern. For approximately 2 hours and 14 minutes, writes to {table} failed with constraint violations. A forward-fix migration was applied to reconcile the schema state introduced by {migration_id} with the structure expected by the running application.",
+    "07/14/2023 RCA — {service} — US-WEST-2. Summary of Impact: From 03:41 to 05:22 UTC, {service} was unable to process requests requiring {column} in {db}. The column had been removed by {migration_id} running at {migration_time} as part of a scheduled schema consolidation. Application rollback restored service at 05:22 UTC.",
+    "Starting at 18:05 UTC on 2024-01-30, {service} users encountered persistent errors when submitting data through {endpoint}. The failure was isolated to queries against {table} that referenced {column}. Migration {migration_id}, applied at {migration_time}, had {migration_action} without a corresponding application deployment. Incident closed at 19:48 UTC.",
+    "Post-Incident Report: On 2023-06-03, deployment of {migration_id} to the {db} cluster at {migration_time} introduced a structural incompatibility between {schema_version} and the running application tier. Queries containing {query_fragment} began failing immediately, affecting {error_pct}% of traffic to {service} until a hotfix was rolled out at 14:22 UTC.",
+    "2024-08-21 Incident Summary — {service}. At 11:47 AM EDT, an automated pipeline executed {migration_id}, which {migration_action} in {db}. The application expected {expected_schema} but encountered {actual_schema}. Error rate on {table} reached {error_pct}% within 3 minutes of the migration completing. Rollback completed at 12:31 PM EDT.",
+    "Between 2023-12-14 20:00 UTC and 2023-12-14 22:17 UTC, the {service} platform experienced degraded functionality. SQL errors citing {sql_error} were returned for all queries referencing {column} in {table}. The errors began immediately after {migration_id} executed at {migration_time}. No data loss occurred; the issue was resolved by redeploying the prior schema version.",
+    "Incident INC-20230428: {service} write operations to {db} failed for 1 hour 52 minutes beginning at 07:33 UTC. The failure mode was {sql_error} on {table}. The triggering event was {migration_action} by {migration_id} at {migration_time}, which was not reflected in the deployed application layer at the time.",
+    "04/02/2024 RCA — {service} — EU-WEST-1. Tracking ID: MIG-8821. Between 16:10 and 17:55 UTC, approximately {failed_queries} queries to {db} were rejected. The application expected {column} to be present in {table}, but {migration_id} had {migration_action} at {migration_time}. The schema was restored via emergency rollback at 17:55 UTC. Database health metrics remained normal throughout the incident.",
+    "On 2024-06-10, {service} API availability dropped to {error_pct}% for operations touching {table}. The degradation began at 13:22 UTC, 8 minutes after {migration_id} completed at {migration_time}. Root cause analysis confirmed that {migration_action} broke compatibility with {schema_version} of the application. Service was fully restored at 14:40 UTC.",
+    "Tracking ID: DBM-20231101-005. {service} customers in AP-SOUTHEAST-1 experienced query failures starting at 02:18 UTC on 2023-11-01. Investigation identified that {migration_id}, applied at {migration_time}, had {migration_action}. The mismatch between {expected_schema} and {actual_schema} caused {sql_error} for all affected queries. Issue resolved at 03:45 UTC.",
+    "2023-07-19 Post-Mortem — {service}. A migration ({migration_id}) executed at {migration_time} during a low-traffic window introduced a schema incompatibility in {db}. Queries referencing {column} in {table} began returning {sql_error}. Traffic did not stress the failure until peak hours at 09:00 UTC, at which point {error_pct}% of requests failed. Rollback completed at 10:14 UTC.",
+    "The {service} platform experienced elevated error rates between 21:05 and 23:30 UTC on 2024-02-27. All failures were confined to {endpoint} and related to reads from {table} where {column} was expected. Forensic review identified {migration_id} as the change that {migration_action} at {migration_time}. Database health metrics remained normal throughout the incident.",
+    "Incident Report 2024-09-04: At 08:12 UTC, automated smoke tests for {service} began failing against {db}. The failures corresponded to queries that relied on {column} with the structure defined in {expected_schema}. {migration_id} had executed at {migration_time} and {migration_action}, leaving {actual_schema} in place. The deployment pipeline was paused and the schema was rolled back at 09:00 UTC.",
+    "05/29/2023 — {service} US-EAST-1 Incident Summary. Between 15:44 and 17:19 UTC, {service} reported {failed_queries} failed database transactions. All failures shared {sql_error} as the error code and referenced {query_fragment}. The root cause was {migration_id} executing {migration_action} against {db} at {migration_time} without a coordinated application update.",
+    "On 2024-11-13, the scheduled maintenance window for {db} included execution of {migration_id} at {migration_time}. The migration {migration_action}. A gap in the deployment checklist meant the application was not updated concurrently. By 06:15 UTC, {service} error rates on {table} had reached {error_pct}%. A coordinated rollback of both the schema and application was completed at 07:02 UTC.",
+    "2023-08-30. Tracking ID: SCH-20230830-11. {service} users encountered failures on all operations involving {entity} starting at 20:33 UTC. The failures were uniform across regions and took the form of {sql_error}. The unified failure onset correlated precisely with the completion of {migration_id} at {migration_time}, which had {migration_action} in {db}.",
+    "Between 10:15 and 12:04 UTC on 2024-04-22, {service} reported complete unavailability of features dependent on {table}. The database cluster reported healthy throughout the incident; all errors originated in the application tier as {sql_error} when queries referenced {column}. The incompatibility was introduced by {migration_id} at {migration_time}. No customer data was altered. A forward migration resolving the schema discrepancy was deployed at 12:04 UTC."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL [{service}] Query failure rate on {db}.{table} exceeded 95% — {failed_queries}/{total_queries} queries returning {sql_error} — migration {migration_id} applied at {migration_time} is suspected cause",
+        "CRITICAL [{service}] Column '{column}' not found in {table} — {error_pct}% of requests to {endpoint} failing — immediate investigation required",
+        "CRITICAL [DB-COMPAT] Schema version mismatch detected: application expects {expected_schema}, database reports {actual_schema} — {migration_id} is suspect — rollback evaluation in progress",
+        "CRITICAL [{service}] {failed_queries} consecutive write failures on {db}.{table} since {migration_time} — {migration_action} recorded for {migration_id} — DBA and app teams paged",
+        "CRITICAL [SCHEMA-DRIFT] {db} schema does not match expected state for {schema_version} — {migration_action} recorded at {migration_time} — emergency rollback recommended",
+        "CRITICAL [{service}] 100% error rate on {endpoint} — all queries referencing {column} returning {sql_error} — onset matches migration {migration_id} completion timestamp",
+        "CRITICAL [INCIDENT DECLARED] {service} — {db}.{table} read/write path fully degraded — root cause under investigation — last schema change: {migration_id} at {migration_time}",
+        "CRITICAL [{service}] Application/database compatibility check FAILED — expected column '{column}' absent from {table} — forward traffic paused pending schema review",
+        "CRITICAL [DATA-PATH] {service} unable to execute queries containing {query_fragment} — {sql_error} — migration {migration_id} modified {table} at {migration_time}",
+        "CRITICAL [{service}] Automated rollback triggered for {migration_id} — {error_pct}% query failure rate on {db} exceeded SLO threshold — status: IN PROGRESS"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING [{service}] Elevated SQL error rate on {db}.{table}: {error_pct}% of queries returning {sql_error} — monitoring for escalation — last migration: {migration_id} at {migration_time}",
+        "WARNING [DEPLOY-CHECK] Schema version {schema_version} applied to {db} at {migration_time} — application compatibility validation pending — post-migration smoke tests not yet completed",
+        "WARNING [{service}] {failed_queries} query failures detected on {table} since last deployment — investigating correlation with {migration_id}",
+        "WARNING [SCHEMA] Migration {migration_id} completed at {migration_time} — post-migration health checks showing non-zero error rate on {endpoint}",
+        "WARNING [{service}] Column reference errors for '{column}' in {db}.{table} — low volume currently but may indicate schema incompatibility introduced by {migration_id}",
+        "WARNING [DB-HEALTH] {db} query success rate dropped to {error_pct}% — no infrastructure anomalies detected — schema change at {migration_time} under review",
+        "WARNING [{service}] Queries matching pattern {query_fragment} failing at elevated rate — {migration_action} by {migration_id} may be responsible",
+        "WARNING [DEPLOYMENT] Application deployed against {db} without matching schema update — expected {expected_schema}, current state is {actual_schema}",
+        "WARNING [{service}] Error budget burn rate elevated on {table} write path — {failed_queries} failures since {migration_time} — on-call notified",
+        "WARNING [SCHEMA-VALIDATE] Post-migration check for {migration_id}: {expected_schema} does not match observed {actual_schema} in {db} — manual verification required before routing production traffic"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO [{service}] Migration {migration_id} execution started on {db} at {migration_time} — planned action: {migration_action}",
+        "INFO [SCHEMA] {db} schema updated to {schema_version} — {migration_id} applied — post-migration validation in progress",
+        "INFO [{service}] Rollback of {migration_id} completed — {db}.{table} restored to prior schema version — monitoring error rates",
+        "INFO [DEPLOY] Application redeployment initiated to align with {actual_schema} in {db} — estimated completion in 8 minutes",
+        "INFO [{service}] Incident closed — all queries to {db}.{table} succeeding — schema and application now consistent at {schema_version}"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "[{service}] org.postgresql.util.PSQLException: ERROR: column \"{column}\" of relation \"{table}\" does not exist — query: {query_fragment} — migration state: {migration_id}",
+        "[{db}] Query execution failed for {entity}: column '{column}' referenced in statement not found — schema version at time of failure: {actual_schema}",
+        "[{service}] Unhandled database error on {endpoint}: {sql_error} — affected record: {record_id} — table: {table} — column not found in current schema",
+        "[SCHEMA-CHECK] Expected schema {expected_schema} not satisfied by {actual_schema} — {migration_action} introduced incompatibility at {migration_time}",
+        "[{db}] {failed_queries} queries rejected in last 60s — all reference {column} — current schema version: {actual_schema} — expected: {expected_schema}",
+        "[{service}] Application startup validation failed: column '{column}' missing from {table} in {db} — expected by schema version {schema_version}",
+        "[ORM] Mapping error for {entity}: field '{column}' has no corresponding column in {table} — migration {migration_id} may have {migration_action}",
+        "[{service}] Bulk insert to {table} failed: {sql_error} — {corrupted_records} records could not be written — constraint: {constraint}",
+        "[{db}] Migration {migration_id} completed at {migration_time} but post-check reports schema hash mismatch: expected {expected_schema}, got {actual_schema}",
+        "[{service}] Health check FAIL: test query against {db}.{table} returned {sql_error} — column '{column}' not found in current schema",
+        "[ROLLBACK] Emergency rollback of {migration_id} initiated — current error rate {error_pct}% exceeds threshold — target schema: {expected_schema}",
+        "[{service}] Request to {endpoint} aborted: database returned {sql_error} for {query_fragment} — no retry attempted — column absent from schema",
+        "[{db}] DDL audit log: {migration_id} executed {migration_action} on {table} at {migration_time} — triggered by deployment pipeline",
+        "[{service}] com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Unknown column '{column}' in 'field list' — query: {query_fragment}",
+        "[{service}] django.db.utils.ProgrammingError: column \"{column}\" does not exist — migration {migration_id} may have altered schema without corresponding model update"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "[{service}] Slow query detected on {table}: execution plan changed after {migration_id} — query: {query_fragment}",
+        "[SCHEMA-COMPAT] Application schema fingerprint does not match {db} — expected {expected_schema}, observed {actual_schema} — proceeding with caution",
+        "[{db}] Column '{column}' referenced in {failed_queries} queries but marked for removal in migration {migration_id} — application code must be updated prior to migration execution",
+        "[{service}] Retry budget exhausted for {endpoint}: {failed_queries} attempts failed with {sql_error} — circuit breaker opening",
+        "[DEPLOY-PIPELINE] Migration {migration_id} applied to {db} — application tier not yet updated to {schema_version} — compatibility window: 10 minutes",
+        "[{service}] Non-fatal schema discrepancy detected: {column} type differs between {expected_schema} and {actual_schema} in {table} — may escalate under write load",
+        "[{db}] Post-migration row count for {table} differs from pre-migration baseline — {migration_action} may have affected row accessibility",
+        "[{service}] Deprecation warning: queries referencing legacy column '{column}' — will break after {migration_id} is applied to production {db}",
+        "[SCHEMA-DRIFT] {db} reports {actual_schema} but deployment manifest specifies {expected_schema} — drift first detected at {migration_time}",
+        "[{service}] Connection pool showing elevated wait times on {db} — probable cause: query plan invalidation following {migration_action}",
+        "[AUDIT] Migration {migration_id} ran {migration_action} on {db}.{table} — no corresponding application change detected in deployment log — compatibility at risk",
+        "[{service}] Fallback path activated for {entity} reads — primary query against {table} returning {sql_error} — degraded mode active"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "[{service}] Migration {migration_id} scheduled for {migration_time} — planned action: {migration_action} on {db}.{table}",
+        "[SCHEMA] {db} schema version advanced to {schema_version} — {migration_id} applied — affected table: {table}",
+        "[{service}] Post-migration smoke test passed for {db} — {table} queries returning expected results — {schema_version} confirmed",
+        "[ROLLBACK] Schema rollback for {migration_id} completed successfully — {db}.{table} restored — application error rate returning to baseline",
+        "[INCIDENT-MGMT] {service} incident resolved — root cause: {migration_id} {migration_action} at {migration_time} — corrective action: rollback applied",
+        "[{service}] Application restarted with updated configuration referencing {actual_schema} — {table} queries succeeding",
+        "[DEPLOY] Coordinated deploy completed: {migration_id} applied to {db} and application updated to {schema_version} simultaneously — no compatibility gap",
+        "[{service}] Schema compatibility check passed — {expected_schema} matches {actual_schema} — {table} structure including {column} validated"
+      ]
+    }
+  ]
+}
