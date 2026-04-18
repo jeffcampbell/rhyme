@@ -1,0 +1,88 @@
+{
+  "incidents": [
+    {
+      "id": "INC-2024-001",
+      "summary": "Payment service p99 latency jumped from 200ms to 8s at 14:30 UTC. Traced to payment-provider API returning 503 for all requests. Our network was healthy, other dependencies responded normally. Payment-provider status page confirmed ongoing incident. Activated cached payment fallback until they recovered at 16:15 UTC.",
+      "timestamp": "2024-01-15T14:30:00Z",
+      "severity": "SEV1",
+      "service": "payment-service"
+    },
+    {
+      "id": "INC-2024-002",
+      "summary": "Order database connection pool exhausted on orders-db. Active connections at 200/200, zero idle. New queries queueing for 30s+ before timing out. The database itself was responsive for existing connections — bottleneck was in the application-side pool. Traced to a connection leak in the error handling path of the bulk import endpoint.",
+      "timestamp": "2024-01-20T09:15:00Z",
+      "severity": "SEV2",
+      "service": "order-service"
+    },
+    {
+      "id": "INC-2024-003",
+      "summary": "Auth service TLS certificate expired at midnight. All HTTPS connections returning handshake errors. Service was healthy on HTTP but unreachable over HTTPS. cert-manager renewal had silently failed 3 days prior. Renewed certificate manually and redeployed.",
+      "timestamp": "2024-02-01T00:00:00Z",
+      "severity": "SEV1",
+      "service": "auth-service"
+    },
+    {
+      "id": "INC-2024-004",
+      "summary": "Search service OOM killed 4 times in 6 hours. Memory grew from 512MB to 4GB monotonically regardless of traffic level. Heap dump showed unbounded growth in SearchResultCache entries — cache eviction was disabled by a config change last week. Traffic was stable throughout.",
+      "timestamp": "2024-02-10T03:00:00Z",
+      "severity": "SEV2",
+      "service": "search-service"
+    },
+    {
+      "id": "INC-2024-005",
+      "summary": "Cart service error rate jumped to 45% after ConfigMap update at 11:20 UTC. No code deployment occurred — container image unchanged. The config change set max_connections to 0, effectively blocking all database access. Reverting the ConfigMap restored service immediately. Code rollback had no effect.",
+      "timestamp": "2024-02-15T11:20:00Z",
+      "severity": "SEV1",
+      "service": "cart-service"
+    },
+    {
+      "id": "INC-2024-006",
+      "summary": "Inventory service latency degraded gradually over 2 hours. Downstream inventory-db query times rose from 5ms to 2s. The calling service request rate matched inbound — no retry amplification. Root cause was a missing index after the Tuesday migration dropped it inadvertently.",
+      "timestamp": "2024-03-01T09:00:00Z",
+      "severity": "SEV2",
+      "service": "inventory-service"
+    },
+    {
+      "id": "INC-2024-007",
+      "summary": "API gateway returning 502 errors to 60% of requests. Load balancer health check path had been changed to /ready which didn't exist on the current version. All backend pods were healthy and responding to direct requests. Fixing the health check path in the ingress config resolved the issue.",
+      "timestamp": "2024-03-10T13:30:00Z",
+      "severity": "SEV1",
+      "service": "api-gateway"
+    },
+    {
+      "id": "INC-2024-008",
+      "summary": "Notification service hammering email-provider with retries at 12x normal rate. The provider was slightly slow (p99 800ms vs normal 200ms) but the aggressive retry config turned a minor slowdown into a full outage. Disabling retries immediately relieved the provider and restored service.",
+      "timestamp": "2024-03-20T07:15:00Z",
+      "severity": "SEV1",
+      "service": "notification-service"
+    },
+    {
+      "id": "INC-2024-009",
+      "summary": "Shipping service deploy v2.14.3 introduced a NullPointerException in the tracking endpoint. Error rate went from 0.1% to 38% exactly at deploy time. Only shipping-service affected — all dependencies healthy. Rolled back to v2.14.2, errors ceased immediately.",
+      "timestamp": "2024-04-01T15:00:00Z",
+      "severity": "SEV2",
+      "service": "shipping-service"
+    },
+    {
+      "id": "INC-2024-010",
+      "summary": "Recommendation service experiencing intermittent duplicate writes to suggestions table. Errors only appeared under concurrent load — single-threaded tests passed cleanly. At 50 concurrent workers: 5% duplicate key violations. At 10 workers: zero errors. Missing SELECT FOR UPDATE on the upsert path.",
+      "timestamp": "2024-04-10T10:45:00Z",
+      "severity": "SEV3",
+      "service": "recommendation-service"
+    },
+    {
+      "id": "INC-2024-011",
+      "summary": "Services in us-east-1a lost connectivity to catalog-service in us-east-1c. TCP SYN timeouts — not application errors. Services within us-east-1a communicated normally. Traceroute showed blackhole at hop 4. Failover to us-east-1b replica resolved customer impact while networking team investigated.",
+      "timestamp": "2024-04-15T08:00:00Z",
+      "severity": "SEV1",
+      "service": "catalog-service"
+    },
+    {
+      "id": "INC-2024-012",
+      "summary": "Flash sale drove traffic to 8x normal on product-service. Memory usage tracked request rate perfectly — 4GB at peak vs 500MB baseline. OOM kills during peak, HPA scaled from 3 to 12 replicas, errors resolved. Memory returned to 500MB after traffic normalized. No leak pattern.",
+      "timestamp": "2024-04-20T10:00:00Z",
+      "severity": "SEV2",
+      "service": "product-service"
+    }
+  ]
+}
