@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Sifter — Import{% endblock %}
+{% block content %}
+<h1>Import Incidents</h1>
+
+<div class="card">
+    <form method="post" enctype="multipart/form-data">
+        <h3>Session name</h3>
+        <p class="meta" style="margin-bottom: 8px;">Give this labeling session a name so you can find it later.</p>
+        <input type="text" name="session_name" placeholder="e.g. Q1 2024 incidents, Payment team review" style="width: 100%; margin-bottom: 20px;">
+
+        <h3>Upload JSON file</h3>
+        <p class="meta" style="margin-bottom: 12px;">
+            JSON with an <code>"incidents"</code> array, or a bare array of incident objects.<br>
+            Required fields: <code>id</code>, <code>summary</code>, <code>timestamp</code>.<br>
+            Optional: <code>severity</code>, <code>service</code>, <code>url</code> (link to incident tracker), <code>metadata</code>.
+        </p>
+        <input type="file" name="file" accept=".json" style="margin-bottom: 16px;"><br>
+
+        <h3 style="margin-top: 24px;">Or paste JSON</h3>
+        <textarea name="json_text" rows="10" placeholder='[
+  {"id": "INC-001", "summary": "Payment service timeout...", "timestamp": "2024-01-15T10:30:00Z", "severity": "SEV1", "service": "payment-service"},
+  ...
+]'></textarea>
+
+        <div style="margin-top: 16px;">
+            <button type="submit" class="btn btn-primary">Import & Create Session</button>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h3>Example format</h3>
+    <pre style="background: #f8f8f8; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px;">{
+  "incidents": [
+    {
+      "id": "INC-001",
+      "summary": "Payment service experienced elevated latency and 5xx errors after a dependency became unresponsive. Multiple upstream services affected.",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "severity": "SEV1",
+      "service": "payment-service",
+      "url": "https://incidents.example.com/INC-001"
+    },
+    {
+      "id": "INC-002",
+      "summary": "Users reporting slow checkout. Investigation showed database connection pool exhaustion on orders-db.",
+      "timestamp": "2024-01-20T14:15:00Z",
+      "severity": "SEV2",
+      "service": "order-service"
+    }
+  ]
+}</pre>
+</div>
+{% endblock %}

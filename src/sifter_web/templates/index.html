@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Sifter — Sessions{% endblock %}
+{% block content %}
+<h1>Labeling Sessions</h1>
+
+{% if sessions %}
+<div class="card">
+    <table>
+        <thead>
+            <tr><th>Session</th><th>Created</th><th>Progress</th><th></th></tr>
+        </thead>
+        <tbody>
+            {% for s in sessions %}
+            <tr>
+                <td>{% if s.name %}<strong>{{ s.name }}</strong><br><span class="meta">{{ s.id[:12] }}</span>{% else %}<code>{{ s.id[:12] }}</code>{% endif %}</td>
+                <td class="meta">{{ s.created }}</td>
+                <td>
+                    <div class="progress-bar" style="width: 200px; display: inline-block; vertical-align: middle;">
+                        <div class="progress-fill" style="width: {{ s.pct }}%;"></div>
+                    </div>
+                    <span class="meta">{{ s.labeled }}/{{ s.pairs }} ({{ s.pct }}%)</span>
+                </td>
+                <td>
+                    {% if s.labeled < s.pairs %}
+                    <a href="/session/{{ s.id }}" class="btn btn-primary">Continue</a>
+                    {% endif %}
+                    <a href="/dashboard/{{ s.id }}" class="btn btn-outline">Dashboard</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p>No labeling sessions yet. <a href="/import">Import incidents</a> to get started.</p>
+</div>
+{% endif %}
+{% endblock %}
