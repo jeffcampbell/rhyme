@@ -15,7 +15,7 @@ import os
 import sys
 import urllib.request
 
-from parse_utils import extract_json_array, extract_letter, normalize_matches
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); from parse_utils import extract_json_array, extract_letter, normalize_matches
 
 API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 MODEL = os.environ.get("SIFTER_MODEL", "claude-haiku-4-5-20251001")

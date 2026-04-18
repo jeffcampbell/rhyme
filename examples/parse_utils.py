@@ -8,8 +8,14 @@ def extract_json_array(text: str) -> list:
     """Robustly extract a JSON array from LLM output.
 
     Handles: bare arrays, code fences, prose wrapping, trailing commas,
-    nested in objects, reversed key ordering, etc.
+    nested in objects, reversed key ordering, thinking tags, etc.
     """
+    text = text.strip()
+
+    # Strip thinking tags (DeepSeek, Qwen, Gemini thinking mode)
+    text = re.sub(r'<think>[\s\S]*?</think>', '', text)
+    text = re.sub(r'<thinking>[\s\S]*?</thinking>', '', text)
+    text = re.sub(r'<reasoning>[\s\S]*?</reasoning>', '', text)
     text = text.strip()
 
     # Strip code fences
@@ -72,6 +78,10 @@ def normalize_matches(raw_matches: list, k: int) -> list[dict]:
 
 def extract_letter(text: str) -> str:
     """Extract a single letter (A-E) from remediation response."""
+    # Strip thinking tags
+    text = re.sub(r'<think>[\s\S]*?</think>', '', text)
+    text = re.sub(r'<thinking>[\s\S]*?</thinking>', '', text)
+    text = re.sub(r'<reasoning>[\s\S]*?</reasoning>', '', text)
     text = text.strip().upper()
     for char in text:
         if char in "ABCDE":

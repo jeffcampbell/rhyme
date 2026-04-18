@@ -20,7 +20,7 @@ import json
 import os
 import sys
 
-from parse_utils import extract_json_array, extract_letter, normalize_matches
+import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); from parse_utils import extract_json_array, extract_letter, normalize_matches
 
 MODEL = os.environ.get("SIFTER_MODEL", "anthropic.claude-3-haiku-20240307-v1:0")
 REGION = os.environ.get("AWS_REGION", "us-east-1")
