@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Sifter — Dashboard{% endblock %}
+{% block content %}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1>{% if session.name %}{{ session.name }}{% else %}Dashboard{% endif %}</h1>
+    <div>
+        {% if labeled < total %}
+        <a href="/session/{{ session_id }}" class="btn btn-primary">Continue Labeling</a>
+        {% endif %}
+        <a href="/api/export/{{ session_id }}" class="btn btn-outline">Export JSON</a>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Progress</h3>
+    <div class="progress-bar" style="margin: 12px 0;">
+        <div class="progress-fill" style="width: {{ (100 * labeled // total) if total else 0 }}%;"></div>
+    </div>
+    <p>{{ labeled }} of {{ total }} pairs labeled ({{ (100 * labeled // total) if total else 0 }}%)</p>
+</div>
+
+{% if report %}
+<div class="grid-2">
+    <div class="card">
+        <h3>Label Distribution</h3>
+        <table>
+            <tr><td>Pairs labeled</td><td><strong>{{ report.labeled_pairs }}</strong></td></tr>
+            <tr><td>Human "yes" rate</td><td><strong>{{ "%.1f"|format(report.human_yes_rate * 100) }}%</strong></td></tr>
+            <tr><td>Human "maybe" rate</td><td><strong>{{ "%.1f"|format(report.human_maybe_rate * 100) }}%</strong></td></tr>
+            <tr><td>Labelers</td><td>{{ report.labelers|join(", ") }}</td></tr>
+            {% if report.inter_annotator_agreement is not none %}
+            <tr><td>Inter-annotator kappa</td><td><strong>{{ report.inter_annotator_agreement }}</strong></td></tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Red Herring Detection</h3>
+        <table>
+            <tr>
+                <td>Model confident, humans disagree</td>
+                <td><strong style="color: {% if report.high_conf_disagreements > 5 %}#e63946{% else %}#333{% endif %};">{{ report.high_conf_disagreements }}</strong></td>
+            </tr>
+            <tr>
+                <td>Model unsure, humans agree</td>
+                <td><strong>{{ report.low_conf_agreements }}</strong></td>
+            </tr>
+        </table>
+        {% if report.high_conf_disagreements > 5 %}
+        <p style="color: #e63946; margin-top: 8px; font-size: 13px;">
+            High count of confident-but-wrong predictions suggests the model is surfacing red herrings.
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+{% if report.precision_at_50 is not none %}
+<div class="card">
+    <h3>Model Performance vs Human Labels</h3>
+    <table>
+        <thead>
+            <tr><th>Threshold</th><th>Precision</th><th>Recall</th><th>F1</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>0.50</td>
+                <td>{{ "%.1f"|format(report.precision_at_50 * 100) }}%</td>
+                <td>{{ "%.1f"|format(report.recall_at_50 * 100) }}%</td>
+                <td><strong>{{ "%.1f"|format(report.f1_at_50 * 100) }}%</strong></td>
+            </tr>
+            <tr>
+                <td>0.70</td>
+                <td>{{ "%.1f"|format(report.precision_at_70 * 100) }}%</td>
+                <td>{{ "%.1f"|format(report.recall_at_70 * 100) }}%</td>
+                <td><strong>{{ "%.1f"|format(report.f1_at_70 * 100) }}%</strong></td>
+            </tr>
+            <tr>
+                <td>0.90</td>
+                <td>{{ "%.1f"|format(report.precision_at_90 * 100) }}%</td>
+                <td>{{ "%.1f"|format(report.recall_at_90 * 100) }}%</td>
+                <td><strong>{{ "%.1f"|format(report.f1_at_90 * 100) }}%</strong></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if report.calibration_buckets %}
+<div class="card">
+    <h3>Calibration (Model Confidence vs Human Agreement)</h3>
+    <table>
+        <thead>
+            <tr><th>Confidence Range</th><th>Mean Confidence</th><th>Human Agree Rate</th><th>Count</th><th>Gap</th></tr>
+        </thead>
+        <tbody>
+            {% for b in report.calibration_buckets %}
+            <tr>
+                <td>{{ b.conf_range }}</td>
+                <td>{{ "%.1f"|format(b.mean_conf * 100) }}%</td>
+                <td>{{ "%.1f"|format(b.human_agree_rate * 100) }}%</td>
+                <td>{{ b.count }}</td>
+                <td style="color: {% if (b.mean_conf - b.human_agree_rate)|abs > 0.15 %}#e63946{% else %}#333{% endif %};">
+                    {{ "%+.1f"|format((b.mean_conf - b.human_agree_rate) * 100) }}pp
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p class="meta" style="margin-top: 8px;">Gap > 15pp (red) indicates miscalibration. Positive = overconfident, negative = underconfident.</p>
+</div>
+{% endif %}
+
+{% else %}
+<div class="card">
+    <p>No labels yet. <a href="/session/{{ session_id }}">Start labeling</a> to see results.</p>
+</div>
+{% endif %}
+
+{% endblock %}

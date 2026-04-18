@@ -1,0 +1,64 @@
+# IncidentCorr Web — labeling tool with PostgreSQL
+#
+# Usage:
+#   docker compose up -d          # start web + postgres
+#   docker compose logs -f web    # watch logs
+#   docker compose down           # stop
+#   docker compose down -v        # stop and delete data
+#
+# Then visit http://localhost:8080
+#
+# For local dev with SQLite (no PostgreSQL needed):
+#   docker compose up web-dev
+
+services:
+  # --- Production: Flask + Gunicorn + PostgreSQL ---
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgresql://sifter:sifter@postgres:5432/sifter
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=sifter
+      - POSTGRES_USER=sifter
+      - POSTGRES_PASSWORD=sifter
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sifter"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # --- Local dev: Flask dev server + SQLite ---
+
+  web-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=sqlite:////app/data/web/sifter.db
+      - SECRET_KEY=dev-secret-key
+    volumes:
+      - ./data/web:/app/data/web
+    entrypoint: ["sifter-web", "--debug", "--verbose"]
+    profiles:
+      - dev
+
+volumes:
+  pgdata:

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Sifter — Label{% endblock %}
+{% block extra_head %}
+<style>
+    .incident-card { background: #fff; border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px; }
+    .incident-card h3 { color: #4361ee; margin-bottom: 8px; }
+    .incident-summary { font-size: 15px; line-height: 1.7; margin-bottom: 12px; white-space: pre-wrap; }
+    .incident-meta { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+    .incident-meta span { font-size: 13px; color: #666; }
+    .incident-meta a { font-size: 13px; color: #4361ee; text-decoration: none; }
+    .incident-meta a:hover { text-decoration: underline; }
+    .question { text-align: center; margin: 32px 0 24px; }
+    .question h2 { font-size: 20px; color: #333; }
+    .question p { color: #666; margin-top: 4px; }
+    .choices { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .choices .btn { min-width: 120px; font-size: 16px; padding: 14px 28px; }
+    .notes-row { margin-top: 16px; text-align: center; }
+    .notes-row textarea { max-width: 600px; margin: 0 auto; display: block; }
+    .keyboard-hint { color: #999; font-size: 12px; margin-top: 8px; text-align: center; }
+    .show-more { color: #4361ee; cursor: pointer; font-size: 13px; border: none; background: none; padding: 0; font-family: inherit; }
+    .show-more:hover { text-decoration: underline; }
+    .summary-truncated { display: block; }
+    .summary-full { display: none; }
+</style>
+{% endblock %}
+{% block content %}
+
+{% if session_name %}<h2 style="margin-bottom: 12px;">{{ session_name }}</h2>{% endif %}
+
+<div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+    <div class="progress-bar" style="flex: 1;">
+        <div class="progress-fill" style="width: {{ pct }}%;"></div>
+    </div>
+    <span class="meta">{{ labeled }}/{{ total }} labeled ({{ remaining }} remaining)</span>
+    <a href="/dashboard/{{ session_id }}" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;">Dashboard</a>
+</div>
+
+<div class="grid-2">
+    <div class="incident-card">
+        <h3>Incident A: {{ inc_a.incident_id }}</h3>
+        {% if inc_a.summary|length > 500 %}
+        <div class="incident-summary summary-truncated" id="summary-a-short">{{ inc_a.summary[:500] }}...</div>
+        <div class="incident-summary summary-full" id="summary-a-full">{{ inc_a.summary }}</div>
+        <button class="show-more" onclick="toggleSummary('a')">Show more</button>
+        {% else %}
+        <div class="incident-summary">{{ inc_a.summary }}</div>
+        {% endif %}
+        <div class="incident-meta">
+            <span>{{ inc_a.timestamp[:16] }}</span>
+            {% if inc_a.severity %}<span class="badge badge-sev1">{{ inc_a.severity }}</span>{% endif %}
+            {% if inc_a.service %}<span>{{ inc_a.service }}</span>{% endif %}
+            {% if inc_a.url %}<a href="{{ inc_a.url }}" target="_blank" rel="noopener">View in tracker</a>{% endif %}
+        </div>
+    </div>
+
+    <div class="incident-card">
+        <h3>Incident B: {{ inc_b.incident_id }}</h3>
+        {% if inc_b.summary|length > 500 %}
+        <div class="incident-summary summary-truncated" id="summary-b-short">{{ inc_b.summary[:500] }}...</div>
+        <div class="incident-summary summary-full" id="summary-b-full">{{ inc_b.summary }}</div>
+        <button class="show-more" onclick="toggleSummary('b')">Show more</button>
+        {% else %}
+        <div class="incident-summary">{{ inc_b.summary }}</div>
+        {% endif %}
+        <div class="incident-meta">
+            <span>{{ inc_b.timestamp[:16] }}</span>
+            {% if inc_b.severity %}<span class="badge badge-sev1">{{ inc_b.severity }}</span>{% endif %}
+            {% if inc_b.service %}<span>{{ inc_b.service }}</span>{% endif %}
+            {% if inc_b.url %}<a href="{{ inc_b.url }}" target="_blank" rel="noopener">View in tracker</a>{% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="question">
+    <h2>Would knowing about Incident A help you respond to Incident B?</h2>
+    <p>Consider proximal cause similarity, not just symptom overlap.</p>
+</div>
+
+<form method="post" action="/session/{{ session_id }}/label" id="labelForm">
+    <input type="hidden" name="pair_id" value="{{ pair.pair_id }}">
+    <input type="hidden" name="labeler_id" value="default">
+    <input type="hidden" name="judgment" id="judgmentField" value="">
+
+    <div class="choices">
+        <button type="button" class="btn btn-success" onclick="submitJudgment('yes')">Yes</button>
+        <button type="button" class="btn btn-warning" onclick="submitJudgment('maybe')">Maybe</button>
+        <button type="button" class="btn btn-danger" onclick="submitJudgment('no')">No</button>
+    </div>
+
+    <div class="notes-row">
+        <textarea name="notes" rows="2" maxlength="2000" placeholder="Optional notes..."></textarea>
+    </div>
+    <div class="keyboard-hint">Keyboard: Y = Yes, M = Maybe, N = No</div>
+</form>
+
+<script>
+function toggleSummary(side) {
+    var short = document.getElementById('summary-' + side + '-short');
+    var full = document.getElementById('summary-' + side + '-full');
+    var btn = short.parentElement.querySelector('.show-more');
+    if (full.style.display === 'none' || full.style.display === '') {
+        short.style.display = 'none';
+        full.style.display = 'block';
+        btn.textContent = 'Show less';
+    } else {
+        short.style.display = 'block';
+        full.style.display = 'none';
+        btn.textContent = 'Show more';
+    }
+}
+function submitJudgment(judgment) {
+    document.getElementById('judgmentField').value = judgment;
+    document.getElementById('labelForm').submit();
+}
+document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'y' || e.key === 'Y') submitJudgment('yes');
+    if (e.key === 'm' || e.key === 'M') submitJudgment('maybe');
+    if (e.key === 'n' || e.key === 'N') submitJudgment('no');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block title %}Sifter — About{% endblock %}
+{% block content %}
+
+<h1>About Sifter</h1>
+
+<div class="card">
+    <h2>What is this?</h2>
+    <p>
+        Sifter is a tool for evaluating how well AI models correlate microservice incidents by
+        <strong>proximal cause</strong> — not just by symptoms. It answers the question: "When your AI SRE tool
+        surfaces a similar past incident, is it actually helpful, or is it a red herring?"
+    </p>
+    <p>
+        A red herring is an incident that <em>looks</em> similar (same error codes, same affected services, same
+        symptoms) but has a completely different underlying cause. Surfacing red herrings is actively harmful —
+        the on-call engineer wastes time pursuing the wrong fix.
+    </p>
+</div>
+
+<div class="card">
+    <h2>How it works</h2>
+    <ol style="line-height: 2; padding-left: 20px;">
+        <li><strong>Import your incidents</strong> — paste or upload a JSON file with your organization's real incident data.
+            Minimum fields: <code>id</code>, <code>summary</code>, <code>timestamp</code>. No logs or alerts needed.</li>
+        <li><strong>Pairs are generated</strong> — the tool creates incident pairs for you to evaluate.
+            If you've connected a model, pairs are sampled across the model's confidence spectrum (high/medium/low/random)
+            to calibrate both true positives and false positives. Without a model, pairs are sampled randomly.</li>
+        <li><strong>SREs label pairs</strong> — for each pair, an SRE answers: "Would knowing about Incident A help you
+            respond to Incident B?" with Yes, No, or Maybe. This takes about 10 seconds per pair.</li>
+        <li><strong>Results appear on the dashboard</strong> — the tool scores model predictions against your
+            team's labels, showing precision, recall, calibration, and red herring detection.</li>
+    </ol>
+</div>
+
+<div class="card">
+    <h2>Methodology</h2>
+
+    <h3>Pair sampling</h3>
+    <p>
+        If model correlation scores are available, pairs are stratified across four buckets:
+    </p>
+    <ul style="line-height: 1.8; padding-left: 20px;">
+        <li><strong>High confidence (25%)</strong> — pairs the model thinks are related. Verifies true positives.</li>
+        <li><strong>Medium confidence (25%)</strong> — the interesting boundary where the model is uncertain.</li>
+        <li><strong>Low confidence (25%)</strong> — pairs the model thinks are unrelated. Verifies true negatives.</li>
+        <li><strong>Random (25%)</strong> — unbiased calibration anchors, independent of the model's opinion.</li>
+    </ul>
+    <p>Without model scores, all pairs are sampled randomly.</p>
+
+    <h3>Labeling</h3>
+    <p>
+        The question "Would knowing about Incident A help you respond to Incident B?" is intentionally broader
+        than "Do these have the same root cause?" because in practice, SREs benefit from seeing related incidents
+        even when the proximal cause differs slightly. The three-option scale:
+    </p>
+    <ul style="line-height: 1.8; padding-left: 20px;">
+        <li><strong>Yes</strong> — knowing about this incident would meaningfully help respond to the other one.</li>
+        <li><strong>Maybe</strong> — there's some relevance but it's not clear-cut. Excluded from precision/recall calculations.</li>
+        <li><strong>No</strong> — these incidents are unrelated. Surfacing one during the other would be a distraction.</li>
+    </ul>
+
+    <h3>Scoring</h3>
+    <p>The dashboard reports:</p>
+    <ul style="line-height: 1.8; padding-left: 20px;">
+        <li><strong>Precision &amp; Recall at multiple thresholds</strong> (0.5, 0.7, 0.9) — how well the model's
+            confidence scores predict human agreement.</li>
+        <li><strong>Calibration</strong> — is the model overconfident? Bucketed by confidence range, showing the gap
+            between what the model claims and what humans actually agree with.</li>
+        <li><strong>Red herring detection</strong> — counts of cases where the model is confident (>0.7) but
+            humans said "no." These are the dangerous false positives.</li>
+        <li><strong>Inter-annotator agreement</strong> — Cohen's kappa between labelers, if multiple SREs label
+            the same pairs. Low agreement suggests the task is ambiguous or labelers need calibration.</li>
+    </ul>
+
+    <h3>Statistical notes</h3>
+    <p>
+        We recommend labeling at least 100 pairs for statistically meaningful results, ideally 200.
+        With 2+ labelers on overlapping pairs, inter-annotator agreement becomes available.
+        "Maybe" labels are excluded from precision/recall but counted in the label distribution.
+    </p>
+</div>
+
+<div class="card">
+    <h2>FAQ</h2>
+
+    <h3>How many incidents do I need?</h3>
+    <p>
+        Minimum 5, but you'll get more useful results with 50+. With 50 incidents there are 1,225 possible
+        pairs — the tool samples up to 200 for labeling.
+    </p>
+
+    <h3>How long does labeling take?</h3>
+    <p>
+        About 10 seconds per pair for an experienced SRE. 200 pairs takes roughly 30-40 minutes.
+        You can stop and resume at any time — progress is saved after every label.
+    </p>
+
+    <h3>What format should my incident data be in?</h3>
+    <p>JSON, either a bare array or an object with an <code>"incidents"</code> key. Each incident needs:</p>
+    <ul style="padding-left: 20px;">
+        <li><code>id</code> — unique identifier (e.g., "INC-001")</li>
+        <li><code>summary</code> — human-written description of what happened (any length — long summaries are truncated in the UI with a "show more" toggle)</li>
+        <li><code>timestamp</code> — ISO 8601 timestamp</li>
+    </ul>
+    <p>Optional fields: <code>severity</code>, <code>service</code>, <code>url</code> (link to your incident tracker — shown as "View in tracker" during labeling), <code>metadata</code> (arbitrary key-value pairs).</p>
+
+    <h3>Can multiple people label at the same time?</h3>
+    <p>
+        Yes. The tool uses a database backend (PostgreSQL in production) that handles concurrent access safely.
+        Each label records the labeler's ID. When multiple labelers label the same pair, their responses are
+        aggregated by majority vote for scoring, and inter-annotator agreement is computed.
+    </p>
+
+    <h3>What does the "Maybe" option mean for scoring?</h3>
+    <p>
+        "Maybe" labels are excluded from precision and recall calculations — they don't count as positive or
+        negative. They are tracked separately in the label distribution so you can see how often labelers
+        are uncertain. A high "maybe" rate may indicate that your incidents need more detail in their summaries.
+    </p>
+
+    <h3>What are "red herrings" in the dashboard?</h3>
+    <p>
+        Red herrings are incident pairs where the model is confident they're related (confidence >0.7) but
+        your SREs said "no." These are the most dangerous failure mode — a model that confidently surfaces
+        unrelated incidents can actively harm incident response by sending the on-call down the wrong path.
+    </p>
+
+    <h3>How do I connect my model?</h3>
+    <p>
+        Currently, the model's correlation scores can be provided during pair sampling via the API. The tool
+        will then stratify pairs across the model's confidence spectrum. If no model scores are provided,
+        pairs are sampled randomly and the dashboard shows label distribution without model-vs-human comparison.
+    </p>
+
+    <h3>Is my incident data stored securely?</h3>
+    <p>
+        All data stays on your infrastructure — this tool runs entirely within your environment (Docker container
+        + PostgreSQL database). No data is sent to external services. For production deployments, we recommend
+        running behind your corporate VPN or SSO.
+    </p>
+
+    <h3>How is this different from the synthetic benchmark?</h3>
+    <p>
+        Sifter includes two complementary evaluation tools. This web labeling tool is one of them.
+        The other is a synthetic benchmark — see below.
+    </p>
+</div>
+
+<div class="card">
+    <h2>The synthetic benchmark</h2>
+    <p>
+        The synthetic benchmark evaluates models against a controlled corpus of 1,000 generated incidents
+        with known ground-truth labels. It runs from the command line and produces deterministic scores —
+        useful for model selection, prompt engineering, and comparing approaches.
+    </p>
+
+    <h3>Corpus</h3>
+    <p>
+        1,000 synthetic incidents across 20 proximal cause classes organized into 8 families:
+    </p>
+    <table>
+        <thead><tr><th>Family</th><th>Cause classes</th></tr></thead>
+        <tbody>
+            <tr><td>Dependency</td><td>retry_storm, downstream_slowdown, dependency_outage, dns_resolution_failure, certificate_expiry, connection_pool_exhaustion</td></tr>
+            <tr><td>Resource</td><td>memory_leak, traffic_allocation, cpu_throttling, disk_pressure</td></tr>
+            <tr><td>Deploy</td><td>code_regression, config_regression</td></tr>
+            <tr><td>Network</td><td>network_partition, load_balancer_misconfiguration</td></tr>
+            <tr><td>Traffic</td><td>traffic_spike</td></tr>
+            <tr><td>Amplification</td><td>cascading_timeout</td></tr>
+            <tr><td>Data/Schema</td><td>schema_migration_failure, data_corruption</td></tr>
+            <tr><td>Timing</td><td>clock_skew, race_condition</td></tr>
+        </tbody>
+    </table>
+    <p style="margin-top: 12px;">
+        Each class has defined <strong>confusable partners</strong> — cause classes that share symptoms but require
+        different remediation. These pairs are assigned difficulty tiers (easy, medium, hard) and scored separately,
+        so strong performance on easy cases can't mask failure on the hard ones.
+    </p>
+    <p>
+        Incident prose is generated using LLM-produced text pools styled after real AWS, Azure, and GCP
+        status page reports. An adversarial style probe verifies that a classifier cannot predict cause class
+        from writing style alone — ensuring models must reason about the incident content, not exploit
+        stylistic patterns.
+    </p>
+
+    <h3>Three evaluation tasks</h3>
+    <table>
+        <thead><tr><th>Task</th><th>What it measures</th><th>Token cost</th></tr></thead>
+        <tbody>
+            <tr>
+                <td><strong>Task 1: Full-corpus retrieval</strong></td>
+                <td>Model sees all 1,000 incidents and must rank the most cause-similar ones. Tests both retrieval and reasoning.</td>
+                <td>~75,000 tokens/query</td>
+            </tr>
+            <tr>
+                <td><strong>Task 2: Reasoning-only</strong></td>
+                <td>A BM25 keyword retriever pre-filters to the top 20 candidates. The model re-ranks from this smaller set. Isolates reasoning quality from retrieval quality.</td>
+                <td>~2,000 tokens/query</td>
+            </tr>
+            <tr>
+                <td><strong>Task 3: Remediation</strong></td>
+                <td>Given an incident and 5 multiple-choice remediation options, the model picks the best fix. Options include the correct fix, a symptom-masking fix, a harmful fix, and distractors.</td>
+                <td>~500 tokens/query</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Metrics</h3>
+    <p>All core metrics are deterministic — no LLM-judge in the scoring.</p>
+    <ul style="line-height: 1.8; padding-left: 20px;">
+        <li><strong>Retrieval@k</strong> — does the top-k contain any correct match? Reported per difficulty tier.</li>
+        <li><strong>Cause-match precision@k</strong> — fraction of top-k sharing the same proximal cause, reported as
+            <em>lift over class base rate</em> to normalize for class-frequency imbalance.</li>
+        <li><strong>Confusion matrix</strong> — which wrong classes dominate predictions? Shows exactly where a model fails.</li>
+        <li><strong>Calibration ECE</strong> — are the model's confidence scores trustworthy? Bucketed by confidence range.</li>
+        <li><strong>Remediation grades</strong> — distribution over {fixed, no-op, masks-symptom, would-worsen}.
+            The <em>would-worsen</em> rate is safety-critical and always reported separately.</li>
+        <li><strong>Efficiency</strong> — tokens/query, tokens/correct-match, precision-per-1k-tokens.
+            Enables quality-vs-cost comparison across prompting strategies.</li>
+    </ul>
+
+    <h3>Reference results</h3>
+    <p>Shipped baselines (1,000 incidents, 200 queries):</p>
+    <table>
+        <thead><tr><th>Baseline</th><th>Retrieval@10</th><th>Precision@10</th><th>ECE</th></tr></thead>
+        <tbody>
+            <tr><td>Random</td><td>0.340</td><td>0.037</td><td>0.461</td></tr>
+            <tr><td>TF-IDF cosine</td><td>0.955</td><td>0.554</td><td>0.059</td></tr>
+            <tr><td>BM25</td><td>1.000</td><td>0.805</td><td>0.127</td></tr>
+        </tbody>
+    </table>
+    <p style="margin-top: 12px;">LLM results (Claude, 20-query sample):</p>
+    <table>
+        <thead><tr><th>Model</th><th>Task</th><th>Precision@10</th><th>Tokens/query</th></tr></thead>
+        <tbody>
+            <tr><td>Haiku</td><td>Task 2 (reasoning-only)</td><td>0.825</td><td>2,093</td></tr>
+            <tr><td>Sonnet</td><td>Task 2 (reasoning-only)</td><td>0.835</td><td>2,183</td></tr>
+            <tr><td>Sonnet</td><td>Task 3 (remediation)</td><td>90% correct, 0% harmful</td><td>~500</td></tr>
+        </tbody>
+    </table>
+    <p style="margin-top: 12px;">
+        BM25 is the critical reference — it shows what keyword matching alone achieves. LLMs beat BM25 on
+        reasoning-only re-ranking (Task 2) at 30x lower cost than full-corpus retrieval (Task 1).
+    </p>
+
+    <h3>How to use this alongside the web tool</h3>
+    <p>
+        Use the synthetic benchmark for <strong>model selection</strong> — comparing models, prompting strategies,
+        and approaches in a controlled setting. Use the web labeling tool for <strong>validation</strong> —
+        confirming the selected model works well on your organization's specific incident patterns.
+    </p>
+    <p>
+        A model that scores well on the benchmark but poorly on your real incidents likely has a domain mismatch.
+        A model that scores well on your incidents but poorly on the benchmark may be overfitting to your
+        specific vocabulary.
+    </p>
+</div>
+
+{% endblock %}
