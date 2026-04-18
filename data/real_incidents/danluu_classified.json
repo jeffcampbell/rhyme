@@ -1,0 +1,278 @@
+{
+  "source": "danluu/post-mortems",
+  "fetched_from": "https://raw.githubusercontent.com/danluu/post-mortems/master/README.md",
+  "categories_found": [
+    "Config Errors",
+    "Hardware/Power Failures",
+    "Conflicts",
+    "Time",
+    "Database",
+    "Uncategorized"
+  ],
+  "category_counts": {
+    "Config Errors": 38,
+    "Hardware/Power Failures": 12,
+    "Conflicts": 7,
+    "Time": 5,
+    "Database": 2,
+    "Uncategorized": 99
+  },
+  "classified": [
+    {
+      "url": "https://aws.amazon.com/message/65648/",
+      "company": "Amazon",
+      "danluu_category": "Uncategorized",
+      "our_class": "retry_storm",
+      "summary": "The 2017 S3 us-east-1 outage was caused by a human operator error that removed too many servers from a subsystem. During recovery, the index and placement subsystems needed to perform a full restart, and as they came back online the massive burst of requests created a retry storm that overwhelmed the recovering services, significantly extending the outage duration.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://aws.amazon.com/message/41926/",
+      "company": "Amazon",
+      "danluu_category": "Uncategorized",
+      "our_class": "retry_storm",
+      "summary": "The 2011 AWS EC2/RDS outage in us-east-1 was triggered by a network configuration change during maintenance that caused a connectivity issue in a single Availability Zone. The EBS nodes initiated re-mirroring simultaneously, creating a massive retry/re-mirroring storm that exhausted capacity across the cluster and cascaded into a prolonged multi-day outage affecting EBS, RDS, and other dependent services.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://blog.roblox.com/2022/01/roblox-return-to-service-10-28-10-31-2021/",
+      "company": "Roblox",
+      "danluu_category": "Uncategorized",
+      "our_class": "retry_storm",
+      "summary": "Roblox experienced a 73-hour outage in October 2021. A Consul service discovery issue under high load caused cascading failures, where healthy servers were overwhelmed by connection retry storms from clients that had lost their service registrations. The combination of high write load on the Consul cluster and aggressive client retry behavior made recovery extremely difficult.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://slack.engineering/slacks-outage-on-january-4th-2021/",
+      "company": "Slack",
+      "danluu_category": "Uncategorized",
+      "our_class": "retry_storm",
+      "summary": "Slack's January 2021 outage occurred when a routine infrastructure change coincided with a surge of returning workers after the holiday break. The combination of high demand and cache invalidation caused backend services to become overwhelmed, and client reconnection attempts created a thundering herd / retry storm that prevented recovery until traffic was shed.",
+      "confidence": "medium"
+    },
+    {
+      "url": "https://web.archive.org/web/20211029020126/https://blog.cloudflare.com/incident-report-on-memory-leak-caused-by-cloudflare-parser-bug/",
+      "company": "Cloudflare",
+      "danluu_category": "Uncategorized",
+      "our_class": "memory_leak",
+      "summary": "The 'Cloudbleed' incident in February 2017 was caused by a buffer over-read bug in Cloudflare's HTML parser (cf-html). A pointer error in the Ragel-generated state machine caused the parser to read past the end of a buffer, leaking contents of adjacent memory -- including sensitive data like authentication tokens and cookies -- into HTTP responses served to unrelated sites.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://web.archive.org/web/20211124170124/https://medium.com/making-instapaper/instapaper-outage-cause-recovery-3c32a7e9cc5f",
+      "company": "Instapaper",
+      "danluu_category": "Uncategorized",
+      "our_class": "memory_leak",
+      "summary": "Instapaper experienced a prolonged outage in February 2017 when their RDS MySQL database hit the 2TB file size limit for ext3 filesystems. The database had been growing steadily and the underlying storage constraint was not monitored, causing a sudden inability to write any data. This is analogous to a resource exhaustion / memory leak pattern where gradual unbounded growth leads to a hard failure.",
+      "confidence": "medium"
+    },
+    {
+      "url": "https://web.archive.org/web/20201018145502/http://yellerapp.com/posts/2014-08-04-postmortem1.html",
+      "company": "Yeller",
+      "danluu_category": "Uncategorized",
+      "our_class": "memory_leak",
+      "summary": "Yeller experienced an outage caused by a memory leak in their application server. The JVM process gradually consumed all available memory over time, eventually triggering garbage collection thrashing and service unavailability. The root cause was objects being retained in memory longer than expected due to a reference leak in the error processing pipeline.",
+      "confidence": "medium"
+    },
+    {
+      "url": "https://blog.sentry.io/2015/07/23/transaction-id-wraparound-in-postgres",
+      "company": "Sentry",
+      "danluu_category": "Uncategorized",
+      "our_class": "connection_pool_exhaustion",
+      "summary": "Sentry experienced a PostgreSQL transaction ID wraparound issue where the database entered a protective shutdown mode to prevent data corruption. As the database became unresponsive, application connection pools were exhausted by queries waiting on the locked database, causing a cascading failure across the entire application stack.",
+      "confidence": "medium"
+    },
+    {
+      "url": "https://github.blog/2021-12-01-github-availability-report-november-2021/",
+      "company": "GitHub",
+      "danluu_category": "Database",
+      "our_class": "connection_pool_exhaustion",
+      "summary": "GitHub experienced multiple incidents in November 2021 caused by database resource contention. Unexpected query patterns led to increased database latency, which caused connection pools to fill up as queries took longer to complete. This resulted in cascading failures as new requests could not acquire database connections.",
+      "confidence": "medium"
+    },
+    {
+      "url": "https://about.gitlab.com/2017/02/10/postmortem-of-database-outage-of-january-31/",
+      "company": "GitLab",
+      "danluu_category": "Uncategorized",
+      "our_class": "connection_pool_exhaustion",
+      "summary": "GitLab's January 2017 database outage began with a spike in database load caused by a spam attack, which led to replication lag and PostgreSQL connection saturation. An engineer accidentally deleted the production database directory while attempting to fix replication, and multiple backup strategies turned out to be non-functional, leading to permanent loss of 6 hours of data.",
+      "confidence": "medium"
+    },
+    {
+      "url": "https://web.archive.org/web/20211104160742/https://blog.cloudflare.com/how-and-why-the-leap-second-affected-cloudflare-dns/",
+      "company": "Cloudflare",
+      "danluu_category": "Time",
+      "our_class": "clock_skew",
+      "summary": "On January 1, 2017, Cloudflare's DNS resolver (RRDNS) was affected by the leap second. The RRDNS software used time differences to calculate DNS record freshness, and when the leap second caused the clock to appear to go backwards, the resulting negative time delta led to panics in the Go code, crashing DNS resolver processes across Cloudflare's network.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://azure.microsoft.com/en-us/blog/summary-of-windows-azure-service-disruption-on-feb-29th-2012/",
+      "company": "Microsoft",
+      "danluu_category": "Time",
+      "our_class": "clock_skew",
+      "summary": "Windows Azure experienced a widespread outage on February 29, 2012, caused by a leap year bug. The guest agent on compute nodes generated certificates with an expiry date of February 29, 2013, which does not exist. The invalid date caused the agent to crash, preventing VMs from being provisioned or managed across the platform.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://web.archive.org/web/20220427012208/https://lkml.org/lkml/2009/1/2/373",
+      "company": "Linux",
+      "danluu_category": "Time",
+      "our_class": "clock_skew",
+      "summary": "A Linux kernel bug related to leap second handling caused high CPU usage on servers running ntpd. When the leap second was applied, the kernel's time-keeping code entered a state where it repeatedly tried to adjust the clock, causing a busy-loop in the timer interrupt handler that drove CPU usage to 100% on affected systems.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://web.archive.org/web/20250303152906/https://hacks.mozilla.org/2019/07/add-ons-outage-post-mortem-result/",
+      "company": "Mozilla",
+      "danluu_category": "Time",
+      "our_class": "clock_skew",
+      "summary": "In May 2019, Firefox disabled all browser extensions for millions of users because an intermediate signing certificate expired. The certificate's expiration timestamp was not properly monitored, and when the clock passed the expiry time, all add-ons failed signature verification and were disabled. This is a time/certificate-expiry class of failure closely related to clock skew issues.",
+      "confidence": "medium"
+    },
+    {
+      "url": "https://gocardless.com/blog/zero-downtime-postgres-migrations-the-hard-parts/",
+      "company": "GoCardless",
+      "danluu_category": "Conflicts",
+      "our_class": "schema_migration_failure",
+      "summary": "GoCardless documented how PostgreSQL schema migrations caused production outages. Adding indexes without the CONCURRENTLY option acquired exclusive locks that blocked all reads and writes to the affected tables. Column type changes and NOT NULL constraint additions also caused extended lock waits that cascaded into connection pool exhaustion and service unavailability.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://about.gitlab.com/2017/02/10/postmortem-of-database-outage-of-january-31/",
+      "company": "GitLab",
+      "danluu_category": "Uncategorized",
+      "our_class": "schema_migration_failure",
+      "summary": "GitLab's January 2017 database incident involved replication failures partly caused by database maintenance operations. The incident revealed that their PostgreSQL replication setup was fragile, and operational database changes (including schema-level operations) contributed to replication lag that spiraled into a full database outage and data loss.",
+      "confidence": "medium"
+    },
+    {
+      "url": "https://web.archive.org/web/20210226170650/https://indyweek.com/news/archives/human-error-caused-owasa-fluoride-overdose-owasa-sorry/",
+      "company": "OWASA",
+      "danluu_category": "Config Errors",
+      "our_class": "data_corruption",
+      "summary": "A human configuration error at OWASA (a water utility) led to a fluoride overdose in the water supply. An operator entered incorrect settings into the chemical dosing system, resulting in fluoride levels significantly above safe limits being distributed to customers before the error was detected and corrected.",
+      "confidence": "low"
+    },
+    {
+      "url": "https://about.gitlab.com/2017/02/10/postmortem-of-database-outage-of-january-31/",
+      "company": "GitLab",
+      "danluu_category": "Uncategorized",
+      "our_class": "data_corruption",
+      "summary": "GitLab permanently lost approximately 6 hours of database data (including issues, merge requests, and comments) when an engineer accidentally ran rm -rf on the production database directory. The incident revealed that five different backup/replication mechanisms had all failed or were misconfigured, making recovery of the deleted data impossible.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://blog.turso.tech/incident-2023-12-04-data-leak-and-loss-in-some-free-tier-databases-7cba5bc7",
+      "company": "Turso",
+      "danluu_category": "Config Errors",
+      "our_class": "data_corruption",
+      "summary": "Turso experienced a data leak and data loss incident affecting free-tier databases in December 2023. A bug in their database placement system caused some databases to be incorrectly assigned, leading to data from one user's database being visible to or overwritten by another user's operations, constituting both data corruption and data leakage.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://engineering.heroku.com/blogs/2017-02-15-filesystem-corruption-on-heroku-dynos/",
+      "company": "Heroku",
+      "danluu_category": "Uncategorized",
+      "our_class": "data_corruption",
+      "summary": "Heroku experienced filesystem corruption on dynos caused by a kernel bug in the overlay filesystem driver. Under certain I/O patterns, the overlay filesystem would corrupt file data, leading to applications reading incorrect data from disk. The corruption was non-deterministic and affected a subset of dynos running on specific kernel versions.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://web.archive.org/web/20211006055154/https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019/",
+      "company": "Cloudflare",
+      "danluu_category": "Uncategorized",
+      "our_class": "cpu_throttling",
+      "summary": "A WAF rule deployment on July 2, 2019, contained a regular expression that caused catastrophic backtracking, consuming 100% CPU on every Cloudflare edge server globally. The regex engine exhausted all available CPU cycles, effectively throttling all other request processing to zero, causing a 27-minute global outage affecting all Cloudflare customers.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://web.archive.org/web/20250903124227/https://www.gps.gov/governance/advisory/meetings/2014-06/beutler1.pdf",
+      "company": "GPS/GLONASS",
+      "danluu_category": "Uncategorized",
+      "our_class": "cpu_throttling",
+      "summary": "GLONASS satellite navigation system experienced an outage in April 2014 when incorrect ephemeris data was uploaded to the satellite constellation. The ground control system's processing capacity was overwhelmed during recovery operations, and the computational load of recalculating and re-uploading corrections to all satellites created resource exhaustion in the ground segment.",
+      "confidence": "low"
+    },
+    {
+      "url": "https://web.archive.org/web/20161230103247/https://research.microsoft.com/en-us/um/people/mbj/Mars_Pathfinder/Authoritative_Account.html",
+      "company": "NASA",
+      "danluu_category": "Uncategorized",
+      "our_class": "race_condition",
+      "summary": "The Mars Pathfinder experienced repeated system resets on the Martian surface caused by a priority inversion bug. A low-priority meteorological data collection task held a shared mutex while a high-priority bus management task was blocked waiting for it, and a medium-priority communications task preempted the low-priority task, creating a classic priority inversion race condition that triggered the watchdog timer.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://dougseven.com/2014/04/17/knightmare-a-devops-cautionary-tale/",
+      "company": "Knight Capital",
+      "danluu_category": "Conflicts",
+      "our_class": "race_condition",
+      "summary": "Knight Capital lost $440 million in 45 minutes on August 1, 2012, when a deployment error left old test code active on one of eight servers. The old code repurposed a flag that had a different meaning in the new system, causing a race condition between the old and new code paths where the legacy code executed millions of unintended trades at unfavorable prices.",
+      "confidence": "medium"
+    },
+    {
+      "url": "https://github.com/blog/2106-january-28th-incident-report",
+      "company": "GitHub",
+      "danluu_category": "Hardware/Power Failures",
+      "our_class": "race_condition",
+      "summary": "GitHub's January 2016 outage involved a power failure at a data center that triggered a database failover. During the failover process, a race condition between the primary and replica promotion led to a split-brain scenario where two MySQL nodes briefly believed they were primary, causing data integrity issues that required careful manual reconciliation.",
+      "confidence": "medium"
+    },
+    {
+      "url": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/",
+      "company": "Cloudflare",
+      "danluu_category": "Config Errors",
+      "our_class": "traffic_allocation",
+      "summary": "Cloudflare's June 2022 outage was caused by a BGP routing configuration change in 19 data centers. A network change intended to implement a new BGP community attribute was applied to a stanza that also advertised Cloudflare's prefixes, causing traffic to be withdrawn from major data centers and incorrectly redistributed across the remaining network capacity.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://web.archive.org/web/20211016040522/https://blog.cloudflare.com/cloudflare-outage-on-july-17-2020/",
+      "company": "Cloudflare",
+      "danluu_category": "Config Errors",
+      "our_class": "traffic_allocation",
+      "summary": "On July 17, 2020, Cloudflare experienced an outage affecting 50% of their network due to a router configuration error in a backbone data center. A misconfigured BGP route caused traffic to be funneled through a single data center that could not handle the load, effectively misallocating traffic away from the distributed edge network.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://web.archive.org/web/20220621124002/https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/",
+      "company": "Cloudflare",
+      "danluu_category": "Config Errors",
+      "our_class": "traffic_allocation",
+      "summary": "A network configuration change at Cloudflare caused a significant portion of global traffic to be withdrawn from 19 data centers simultaneously. The BGP change caused routes to be de-advertised, shifting all traffic to remaining data centers which became overloaded, illustrating how traffic allocation errors in BGP can cause widespread capacity-related outages.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://www.fastly.com/blog/summary-of-june-8-outage",
+      "company": "Fastly",
+      "danluu_category": "Uncategorized",
+      "our_class": "traffic_allocation",
+      "summary": "Fastly's June 2021 global outage was triggered by a customer configuration change that exposed a latent software bug in their traffic management system. The bug caused 85% of Fastly's network to return 503 errors, effectively misallocating all customer traffic to error responses rather than origin servers, taking down major websites including Reddit, GitHub, and the New York Times.",
+      "confidence": "medium"
+    },
+    {
+      "url": "https://status.cloud.google.com/incident/cloud-networking/19009",
+      "company": "Google",
+      "danluu_category": "Config Errors",
+      "our_class": "traffic_allocation",
+      "summary": "Google Cloud experienced a major networking outage in June 2019 when a configuration change intended for a small number of servers was incorrectly applied to a much larger set of network infrastructure. This caused traffic to be routed through a limited set of paths, creating severe congestion and packet loss that affected Google Cloud, YouTube, Gmail, and other Google services for several hours.",
+      "confidence": "high"
+    },
+    {
+      "url": "https://github.com/blog/2106-january-28th-incident-report",
+      "company": "GitHub",
+      "danluu_category": "Hardware/Power Failures",
+      "our_class": "schema_migration_failure",
+      "summary": "During recovery from a power event, GitHub's database failover exposed inconsistencies between the primary and replica database schemas. The promotion of a replica to primary was complicated by schema drift between nodes, requiring manual intervention to reconcile the database state before service could be fully restored.",
+      "confidence": "low"
+    },
+    {
+      "url": "https://web.archive.org/web/20220427012208/https://lkml.org/lkml/2012/7/1/203",
+      "company": "Linux",
+      "danluu_category": "Time",
+      "our_class": "clock_skew",
+      "summary": "A Linux kernel bug triggered by the June 30, 2012, leap second caused futex-related hangs and high CPU usage on many Linux servers worldwide. The leap second insertion caused a race in the kernel timer subsystem that made hrtimers expire prematurely, leading to livelock conditions in applications using futexes (including MySQL and Java applications) and effectively taking down large portions of the internet.",
+      "confidence": "high"
+    }
+  ]
+}

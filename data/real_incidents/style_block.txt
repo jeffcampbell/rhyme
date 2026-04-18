@@ -1,0 +1,20 @@
+[AWS] 1:06 PM PST We’re investigating longer than usual propagation times for changes to CloudFront configurations. End-user requests for content from our edge locations are not affected by this issue and are being served normally. 1:30 PM PST Between 10:09 AM and 1:23 PM PST customers may have experienced longer than usual propagation times while making changes to CloudFront configurations. End-user re
+
+[AWS] 12:57 PM PDT Between 11:47 AM and 12:33 PM PDT we experienced degraded performance for some EBS volumes in the US-EAST-2 Region. During this time, some customers also experienced insufficient-data in the results from EC2 instance status checks. CloudWatch alarms may have transitioned into "INSUFFICIENT_DATA" state if set on the delayed metrics. EC2 instances operated normally during this time; onl
+
+[AWS] 1:58 PM PDT We are investigating delays in propagating changes to CloudFront distributions to our edge locations. This is related to the ACM issue in the US-EAST-1 Region that we have posted to the Service Health Dashboard. Existing distributions continue to operate normally and there is no impact to serving content from our edge locations. 4:08 PM PDT CloudFront distribution changes continue to b
+
+[AZURE] Between 09:21 and 17:32 UTC on 03 Sep 2020, a subset of customers may have experienced intermittent latency or issues connecting to resources hosted in West Europe. Retries may have worked during this timeframe.
+
+[AZURE] Between 09:00 UTC on 13 Jan 2022 and 20:00 UTC on 14 Jan 2022, a subset of customers using Azure Resource Manager (ARM) to deploy, modify, or remove Azure resources experienced delays, timeouts, and failures which were visible for long running operations executed on the platform. Impact was most severe for a period of 5 hours starting at 15:30 UTC on Jan 13 and another period of 8 hours starting a
+
+[AZURE] 07/29/2022 Post Incident Review (PIR) – Network Connectivity Issues Tracking ID: 7SHM-P88 What happened?Between 08:00 UTC and until 13:20 UTC on 29 July 2022, customers may have experienced connectivity issues such as network drops, latency, and/or degradation when attempting to access or manage Azure resources in multiple regions.The most significant impact would have been experienced in the foll
+
+[AZURE] 02/24/2020 503 errors accessing the Azure Portal - Mitigated Tracking ID: 8_K4-TD0 Summary of impact: Between approximately 19:45 and 22:15 UTC on 24 Feb 2020, a limited subset of customers may have encountered HTTP 503 error codes when attempting to access the Azure Portal. The availability of individual resources (Virtual Machines, Web Apps, databases, etc.) was not impacted.Preliminary root cau
+
+[GCP] Intermittent failures (ERROR: PERMISSION_DENIED: The caller does not have permission) when trying to list/describe the OAuth client via gCloud or Terraform
+
+[GCP] This issue is believed to be affecting a very small number of projects and our Engineering Team is working on it. If you have questions or are impacted, please open a case with the Support Team and we will work with you until this issue is resolved. No further updates will be provided here. We thank you for your patience while we are working on resolving the issue.
+
+[GCP] We believe the issue of connectivity loss affecting Cloud Networking in us-central1 has been resolved for all affected customers as of 13:35 US/Pacific and we are still monitoring the situation for a potential recurrence.
+

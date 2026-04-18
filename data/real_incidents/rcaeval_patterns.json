@@ -1,0 +1,100 @@
+{
+  "source": "RCAEval",
+  "source_url": "https://github.com/phamquiluan/RCAEval",
+  "dataset_url": "https://zenodo.org/records/14590730",
+  "methodology": {
+    "injection_tool": "stress-ng for resource faults (CPU, MEM, DISK); tc (traffic control) for network faults (DELAY, LOSS, SOCKET)",
+    "monitoring_tools": "Prometheus + cAdvisor for metrics; Fluent Bit / Loki for logs; Jaeger for traces",
+    "sampling_rate": "1-second intervals for metrics, 15-second aggregation for logs and traces",
+    "load_profile": "100-200 concurrent users with custom load generators",
+    "infrastructure": "AWS Kubernetes clusters running microservice benchmarks (Online Boutique, Sock Shop, Train Ticket)",
+    "data_format": "Each fault case is a directory: {system}/{service}_{fault_type}/{repetition}/ containing metrics.json (or data.csv), inject_time.txt, and optionally logs.csv and traces.csv",
+    "metric_naming": "Columns follow {service}_{metric_suffix} pattern, e.g., carts_cpu, carts_mem, frontend_latency",
+    "total_cases": 735,
+    "fault_types_defined": ["cpu", "mem", "disk", "delay", "loss", "socket", "f1", "f2", "f3", "f4", "f5"]
+  },
+  "fault_types": {
+    "memory_leak": {
+      "rcaeval_name": "mem",
+      "description": "Memory exhaustion fault injected via stress-ng into a target microservice container. Simulates progressive memory consumption that overwhelms the service's available memory, causing container resource pressure, potential OOM kills, and cascading latency increases in dependent services.",
+      "injection_method": "stress-ng memory stress applied to a specific service's container/pod in the Kubernetes cluster, causing the container's resident set size (RSS) to grow until resource limits are hit.",
+      "metrics_affected": [
+        "{service}_mem - container memory usage in bytes (primary indicator, divided by 1e6 for MB in preprocessing)",
+        "{service}_cpu - secondary CPU increase due to memory management overhead, garbage collection pressure",
+        "{service}_latency - increased response latency as memory pressure causes slowdowns",
+        "{downstream_service}_latency - cascading latency in services that depend on the affected service",
+        "container_memory_working_set_bytes - Kubernetes/cAdvisor metric showing working set growth",
+        "container_memory_rss - resident set size showing actual physical memory consumption"
+      ],
+      "typical_logs": [
+        "OOMKilled events in Kubernetes pod logs when memory limit is exceeded",
+        "Container restart events following OOM kills",
+        "Application-level error logs from failed memory allocations",
+        "Increased error rate logs from downstream services due to timeouts",
+        "Garbage collection pressure warnings (language-dependent)"
+      ],
+      "timeline_pattern": "Gradual onset: memory usage ({service}_mem) begins rising at inject_time, climbs steadily over seconds to minutes. Latency degradation follows with a delay as memory pressure builds. If memory limit is reached, OOM kill triggers a sharp discontinuity (service restart). The z-score anomaly detection in RCAEval identifies the affected service's _mem metric as having the maximum deviation from the normal (pre-injection) baseline distribution.",
+      "distinguishing_features": [
+        "Primary indicator is the _mem metric suffix - RCAEval maps 'mem' fault type to _mem metric columns",
+        "Monotonically increasing memory consumption pattern (ramp, not spike)",
+        "Memory growth persists throughout the anomaly window (not transient)",
+        "CPU may show secondary increase but _mem has the dominant z-score",
+        "Latency impact is gradual and progressive, not sudden",
+        "Unlike CPU faults, the memory metric shows sustained directional change rather than oscillation",
+        "convert_mem_mb() preprocessing divides _mem columns by 1e6 to normalize to megabytes"
+      ]
+    },
+    "cpu_throttling": {
+      "rcaeval_name": "cpu",
+      "description": "CPU exhaustion fault injected via stress-ng into a target microservice container. Simulates CPU hogging that consumes all available CPU cycles for the container, causing request processing delays, increased queue depths, and cascading failures across the service dependency graph.",
+      "injection_method": "stress-ng CPU stress applied to a specific service's container/pod in the Kubernetes cluster, consuming CPU cycles and triggering Kubernetes CPU throttling when the container exceeds its CPU limit.",
+      "metrics_affected": [
+        "{service}_cpu - container CPU usage rate (primary indicator, highest z-score deviation)",
+        "{service}_latency - increased response latency due to CPU starvation for request processing",
+        "{downstream_service}_latency - cascading latency in dependent services",
+        "container_cpu_usage_seconds_total - cAdvisor metric showing CPU consumption rate",
+        "container_cpu_cfs_throttled_periods_total - Kubernetes CFS throttling counter",
+        "container_cpu_cfs_throttled_seconds_total - total time spent throttled",
+        "{service}_mem - possible secondary memory increase from request queuing"
+      ],
+      "typical_logs": [
+        "Request timeout errors in upstream services calling the CPU-stressed service",
+        "HTTP 503/504 gateway timeout responses",
+        "Connection timeout and circuit breaker activation logs",
+        "Increased error rate logs from the affected service and its dependents",
+        "Kubernetes resource pressure / throttling events"
+      ],
+      "timeline_pattern": "Abrupt onset: CPU usage ({service}_cpu) spikes sharply at inject_time and remains elevated (plateau pattern). Latency impact is near-immediate as pending requests queue up. Unlike memory faults, the transition from normal to anomalous is rapid. The z-score anomaly detection identifies the affected service's _cpu metric as having the maximum deviation from the normal baseline.",
+      "distinguishing_features": [
+        "Primary indicator is the _cpu metric suffix - RCAEval maps 'cpu' fault type to _cpu metric columns",
+        "Sharp step-function increase in CPU usage at injection time (not gradual like memory)",
+        "CPU usage hits a ceiling determined by stress-ng intensity and container CPU limits",
+        "Latency impact is immediate (within seconds of injection), unlike memory's gradual degradation",
+        "The CPU metric shows a plateau pattern rather than the monotonic ramp of memory faults",
+        "Memory may show minor secondary effects, but _cpu has the dominant z-score",
+        "Affects request processing capacity immediately, causing rapid latency spikes"
+      ]
+    }
+  },
+  "evaluation_methodology": {
+    "anomaly_detection": "RCAEval splits data into normal (pre-inject_time) and anomalous (post-inject_time) windows. For each metric column, it computes z-scores comparing the anomalous window against the normal baseline distribution (mean, std from StandardScaler). The metric with the maximum absolute z-score is identified as the root cause indicator.",
+    "root_cause_labeling": "Each fault case directory name encodes the answer: {service}_{fault_type}, e.g., 'carts_cpu' means the carts service with CPU fault. The evaluation creates Node(entity=service, metric=fault_type) as the ground truth answer.",
+    "fault_to_metric_mapping": {
+      "cpu": "_cpu metric columns",
+      "mem": "_mem metric columns",
+      "disk": "_diskio metric columns",
+      "delay": "_latency metric columns",
+      "loss": "_latency metric columns",
+      "socket": "_socket metric columns"
+    },
+    "accuracy_metric": "AC@k measures whether the true root cause service appears in the top-k ranked results"
+  },
+  "key_differences_mem_vs_cpu": {
+    "onset_pattern": "CPU faults show abrupt step-change; memory faults show gradual ramp-up",
+    "primary_metric": "CPU -> _cpu suffix columns; Memory -> _mem suffix columns",
+    "latency_impact_delay": "CPU causes near-immediate latency; memory causes delayed/progressive latency",
+    "signal_shape": "CPU shows plateau/step-function; memory shows monotonic increase",
+    "recovery": "CPU recovers immediately when stress stops; memory may require restart/GC",
+    "resource_limit_behavior": "CPU triggers CFS throttling; memory triggers OOM kills"
+  }
+}
