@@ -1,0 +1,119 @@
+{
+  "cause_class": "clock_skew",
+  "summaries": [
+    "Between 11:14 and 12:53 UTC on 2024-04-08, {service} users routed to {pod} experienced intermittent authentication failures. Tokens with a valid TTL were being rejected as expired. Investigation confirmed that {node} had drifted {clock_offset} {clock_direction} of NTP consensus; the JWT library enforces a hard {tolerance} skew limit with no grace period. Pods on all other nodes authenticated successfully throughout the incident. NTP was restored at 12:53 UTC and error rate dropped to zero within 90 seconds.",
+    "On 2023-09-21, etcd leader election instability was observed across the production cluster. Raft heartbeats from {node} were being rejected by followers because the embedded timestamps fell outside the ±{tolerance} drift window. Root cause was identified as {node} clock running {clock_offset} {clock_direction} of cluster consensus following loss of NTP contact with {ntp_server} approximately {jitter} minutes prior. The cluster stabilized after a manual chrony step correction.",
+    "Tracking ID: SKW-20240119-003. Starting at 07:45 PST, approximately {error_pct}% of {service} API requests failed with HTTP 401. Analysis of access logs showed the failures were entirely confined to {pod}, while sibling pods on other nodes returned HTTP 200 for identical requests. The per-pod failure pattern indicated a node-local issue. Chrony on {node} reported an offset of {clock_offset} {clock_direction} with last NTP sync {jitter} minutes prior to alert.",
+    "The authentication issue affecting {service} has been resolved as of Tuesday, 2023-11-14 15:22 US/Pacific. For approximately 38 minutes, {pod} on {node} was rejecting JWT tokens with expiry {token_exp} because the local clock read {current_time} — a skew of {clock_offset} beyond the configured {tolerance} tolerance. All other pods validated the same tokens successfully. A chrony step correction resolved the offset and restored normal authentication.",
+    "09/07/2023 RCA — {service} — Distributed Auth. Summary of Impact: From 22:10 to 23:41 UTC, token validation errors affected {error_pct}% of requests to {service}. The failures were limited to a single pod ({pod}) running on {node}. Chrony reported {node} clock was {clock_offset} {clock_direction} of {ntp_server}. The NTP daemon had been OOM-killed and not automatically restarted, allowing drift to accumulate silently. Daemon was restarted at 23:41 UTC.",
+    "2024-07-03 Incident Summary — {service}. Starting at 04:22 UTC, distributed rate-limit enforcement became inconsistent. Clients routed to {node} were permitted to exceed configured thresholds while other nodes throttled the same clients correctly. Forensic review showed {node} clock was {clock_offset} {clock_direction}, causing rate-limit window resets to occur at the wrong intervals. Chrony offset corrected at 05:14 UTC; consistent enforcement resumed within one polling cycle.",
+    "Intermittent etcd lease expiry failures were observed on 2023-06-15 beginning at 17:30 UTC. Leases granted with a {token_exp}-second TTL appeared to expire before holders could renew them. The root cause was {node} running {clock_offset} {clock_direction}, which caused lease expiry timestamps — computed from local time — to be reached earlier than expected by the rest of the cluster. Manual clock correction at 18:05 UTC resolved the lease failures.",
+    "Post-Incident Report 2024-02-28 — {service}. A liveness probe masked the impact of an NTP failure on {node}. The pod ({pod}) responded 200 to all health checks while simultaneously rejecting {error_pct}% of business traffic with JWT validation errors. The health check does not exercise the token validation path. {node} had accumulated {clock_offset} {clock_direction} of drift; the JWT library's {tolerance} tolerance was exceeded. Chrony resync resolved the issue at 09:17 UTC.",
+    "Tracking ID: NTP-20230802-011. {service} observed a split-brain symptom in its authentication tier: roughly half of API requests succeeded while the other half returned 401, with the outcome determined entirely by which pod handled the request. Debugging confirmed {node} clock was {clock_offset} {clock_direction} of consensus. Tokens issued with expiry {token_exp} were valid on all other nodes but appeared expired on {pod}. NTP sync restored normal behavior at 14:44 UTC.",
+    "On 2024-10-17, {service} cache tier on {node} began generating elevated origin load due to premature cache entry eviction. Objects set with a standard TTL were expiring {clock_offset} early because {node} clock was running {clock_direction}. This increased origin fetch rate by approximately 4x for traffic routed to {node}. No data loss occurred. NTP resync corrected the drift and cache hit rates normalized over the subsequent TTL cycle.",
+    "2023-05-30 — {service}. Distributed tracing showed span timestamps from {node} were {clock_offset} out of sequence with all peer nodes, making trace reconstruction unreliable. Concurrently, {pod} was producing elevated JWT validation errors. Both symptoms had the same root cause: chrony on {node} had lost contact with {ntp_server} {jitter} minutes earlier, and drift had accumulated to {clock_offset} {clock_direction} of wall time. A scheduled NTP health check had not been configured for this node.",
+    "Incident INC-20240614: {service} distributed lock acquisitions began failing intermittently for operations coordinated through {node}. Lock expiry timestamps computed on {node} — {clock_offset} {clock_direction} of peers — caused locks to appear expired on the coordinator before the holder could renew. Other nodes participated in locking normally. Chrony makestep on {node} resolved the offset; lock failures dropped to zero within one polling interval.",
+    "08/19/2023 RCA — {service} — AP-NORTHEAST-1. Between 01:05 and 02:17 UTC, {error_pct}% of authentication requests to {service} returned HTTP 401. All failures were isolated to {pod} on {node}. Tokens with expiry {token_exp} were being validated against {node} local time {current_time}, a skew of {clock_offset} {clock_direction} beyond the {tolerance} tolerance window. Chrony reported stratum {stratum} with last sync {jitter} minutes prior. Manual step correction at 02:17 UTC resolved the incident.",
+    "On 2024-01-22, {service} engineering was paged for elevated Raft RPC rejection rates on the production etcd cluster. One follower ({node}) was dropping all inbound heartbeats because peer message timestamps predated its local clock by {clock_offset}. The {node} clock was running {clock_direction} while other nodes were NTP-synchronized. Leader election was unstable for 22 minutes until {node} clock was corrected.",
+    "2023-10-11 Post-Mortem — {service}. NTP daemon on {node} crashed at an unknown time. Clock drift accumulated to {clock_offset} {clock_direction} before the monitoring system detected the anomaly via JWT error rate alerts. By the time the alert fired, {pod} had been failing {error_pct}% of authentication requests for approximately 40 minutes. The NTP daemon was restarted and chrony resynced to {ntp_server}; no errors recurred during the subsequent 2-hour observation window.",
+    "Tracking ID: CLK-20240509-02. {service} token replay detection misfired on {node}: tokens issued at {token_issued} were flagged as originating from the future by all other nodes, causing them to be rejected as potentially replayed. The root cause was {node} clock running {clock_offset} {clock_direction} of peers — tokens timestamped by {node} appeared ahead of wall time on every other node in the cluster. Clock correction at 11:33 UTC resolved all replay rejections.",
+    "On 2023-12-07, {service} engineering identified that chrony on {node} had accumulated {clock_offset} of drift since its last successful poll of {ntp_server} ({jitter} minutes prior). The drift caused JWT tokens — validated against node-local time — to be rejected on {pod} while identical tokens validated successfully on all other nodes. The node-specific failure pattern was the key diagnostic signal. Chrony step correction and NTP daemon restart resolved the incident at 16:48 UTC.",
+    "2024-08-14 Incident Report — {service}. Audit log event timestamps from {node} were {clock_offset} out of sequence with the rest of the cluster. The out-of-order timestamps were first noticed during a post-incident trace review. Further investigation revealed the same {node} clock drift was causing JWT validation failures on {pod}: {error_pct}% error rate for traffic routed to that pod versus 0% for all other pods. The dual symptom set — audit log ordering errors and auth failures — both resolved after NTP resync.",
+    "Starting at 20:33 UTC on 2023-07-26, {service} users began receiving intermittent 401 errors. The failures were not associated with any deployment event. Error rate analysis showed a clear node-specific pattern: {pod} on {node} was failing {error_pct}% of authentication requests while all other pods succeeded. Chrony on {node} showed jitter of {jitter}ms and offset of {clock_offset} {clock_direction} with last NTP sync to {ntp_server} approximately 55 minutes prior. Manual resync resolved the incident at 21:09 UTC.",
+    "Full chronology of clock drift event on 2024-03-25: NTP sync on {node} last succeeded at approximately 08:00 UTC. Drift accumulated to {clock_offset} {clock_direction} by 09:45 UTC. {service} JWT validation errors began at 09:47 UTC when accumulated drift exceeded the {tolerance} tolerance. Monitoring detected the elevated 401 rate at 09:51 UTC. On-call identified the node-specific failure pattern at 10:08 UTC. Chrony step correction applied at 10:14 UTC. Error rate returned to zero within 90 seconds of correction."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL clock_skew_detected node={node} offset={clock_offset} direction={clock_direction} tolerance={tolerance} last_ntp_sync={jitter}m_ago ntp_server={ntp_server} — JWT validation failures active on {pod}",
+        "CRITICAL etcd_leader_election_instability cluster=prod node={node} clock_offset={clock_offset} direction={clock_direction} — Raft heartbeats being rejected by followers — quorum at risk",
+        "CRITICAL jwt_validation_failure_rate service={service} pod={pod} node={node} error_pct={error_pct}% — sibling pods healthy — node-specific clock skew confirmed offset={clock_offset}",
+        "CRITICAL ntp_sync_lost node={node} last_successful_sync={jitter}m_ago current_offset={clock_offset} stratum={stratum} — {service} authentication failures in progress on {pod}",
+        "CRITICAL distributed_consensus_degraded node={node} clock_{clock_direction}={clock_offset} peers_rejecting_heartbeats=true — etcd lease stability at risk",
+        "CRITICAL clock_step_required node={node} offset={clock_offset} direction={clock_direction} chrony_jitter={jitter}ms — {service} auth failure rate {error_pct}% on {pod} — manual intervention required",
+        "CRITICAL token_validation_failure service={service} pod={pod} node={node} skew={clock_offset} direction={clock_direction} token_exp={token_exp} current_time={current_time} — tolerance={tolerance} exceeded",
+        "CRITICAL raft_heartbeat_rejection_rate node={node} clock_skew={clock_offset} — timestamps predating local clock by {clock_offset} — split-brain risk if not corrected",
+        "CRITICAL chrony_stratum_degraded node={node} stratum={stratum} offset={clock_offset} direction={clock_direction} ntp_server={ntp_server} — authentication errors active on {pod}",
+        "CRITICAL cache_ttl_integrity_failure node={node} clock_{clock_direction}={clock_offset} — premature eviction rate elevated — {service} origin load elevated for traffic on {node}"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING clock_offset_approaching_threshold node={node} offset={clock_offset} direction={clock_direction} threshold={tolerance} ntp_server={ntp_server} — monitor for JWT validation errors on {pod}",
+        "WARNING jwt_error_rate_elevated service={service} pod={pod} node={node} error_pct={error_pct}% — sibling pods unaffected — suspected single-node clock skew",
+        "WARNING ntp_jitter_high node={node} jitter={jitter}ms server={ntp_server} last_sync_ago={jitter}m — offset trending {clock_direction}, currently {clock_offset}",
+        "WARNING etcd_heartbeat_latency_anomaly node={node} suspected_clock_skew={clock_offset} direction={clock_direction} — leader election count elevated",
+        "WARNING chrony_tracking_degraded node={node} stratum={stratum} offset={clock_offset} reference={ntp_server} — last sync {jitter}m ago — poll interval extended",
+        "WARNING intermittent_auth_failures service={service} node={node} clock_skew={clock_offset} direction={clock_direction} requests_affected={error_pct}% — other pods healthy",
+        "WARNING distributed_lock_premature_expiry service={service} node={node} clock_{clock_direction}={clock_offset} — lock TTLs expiring before holders can renew",
+        "WARNING cache_miss_rate_elevated node={node} attributed_to=clock_{clock_direction} offset={clock_offset} — TTL expiry occurring early — origin load elevated for {node} traffic",
+        "WARNING token_expiry_window_tight service={service} pod={pod} token_exp={token_exp} node_time={current_time} skew={clock_offset} — approaching tolerance threshold={tolerance}",
+        "WARNING ntp_server_unreachable node={node} server={ntp_server} last_sync_ago={jitter}m current_drift={clock_offset} — clock accuracy degrading — monitor closely"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO clock_correction_applied node={node} step_offset={clock_offset} direction={clock_direction} method=chrony_makestep new_stratum={stratum} — {service} error rate dropping",
+        "INFO ntp_resync_successful node={node} server={ntp_server} offset_after_sync=0.003s jitter={jitter}ms stratum={stratum} — {pod} JWT validation returning to normal",
+        "INFO clock_skew_incident_resolved service={service} node={node} duration=approx_38m — error_rate_returned_to_baseline — chrony resync confirmed",
+        "INFO scheduled_clock_audit initiated nodes=all_prod method=chrony_tracking_check triggered_by=prior_skew_incident_on_{node}",
+        "INFO jwt_tolerance_config reviewed service={service} current_tolerance={tolerance} — recommendation to increase to 30s pending approval — temporary mitigation while NTP stability confirmed"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "JWT validation failed: token expiry {token_exp} is in the past — server time is {current_time} — skew={clock_offset} exceeds configured tolerance={tolerance} [service={service} pod={pod} node={node}]",
+        "clock skew detected on {node}: local time {current_time} diverges {clock_offset} {clock_direction} from NTP consensus — refusing to issue etcd leases [component=etcd cluster=prod]",
+        "Raft RPC rejected: message timestamp predates local clock by {clock_offset} — peer may have stale time — dropping heartbeat [node={node} leader_term=14]",
+        "token replay check failed: issued_at={token_issued} appears to be in the future relative to {node} local clock {current_time} — offset={clock_offset} {clock_direction} [service={service} pod={pod}]",
+        "etcd lease expired before renewal: suspected clock skew on {node} caused premature expiry — re-election triggered [cluster=prod lease_ttl={token_exp}s]",
+        "cache.get: entry TTL exhausted {clock_offset} early — {node} clock is {clock_direction} — key evicted before intended expiry — downstream cache miss [service={service}]",
+        "distributed lock acquisition failed: lock holder timestamp from {node} rejected by coordinator — clock offset={clock_offset} outside tolerance={tolerance} [service={service}]",
+        "chrony: clock offset {clock_offset} exceeds maximum allowed step — refusing automatic correction — manual intervention required [node={node} stratum={stratum}]",
+        "auth middleware: request timestamp {token_issued} differs from server clock {current_time} by {clock_offset} — request rejected as potentially replayed [pod={pod} service={service}]",
+        "etcd: follower {node} clock is {clock_offset} {clock_direction} of leader — applying election timeout penalty to prevent stale-clock node winning leadership [cluster=prod]",
+        "NTP unreachable: all configured servers including {ntp_server} failed to respond — last successful sync {jitter}m ago — current estimated drift={clock_offset} [node={node}]",
+        "consensus write rejected: proposed timestamp {current_time} from {node} falls outside cluster time window ±{tolerance} — rejecting to preserve log ordering [component=raft]",
+        "JWT decode error: nbf claim {token_issued} is {clock_offset} in the future according to {node} local clock — skew tolerance={tolerance} [service={service} pod={pod}]",
+        "rate limiter: counter reset timestamp mismatch between {node} (offset={clock_offset} {clock_direction}) and coordinator — window enforcement inconsistent across nodes [service={service}]",
+        "session store: token {token_exp} reported expired on {pod} but valid on all sibling pods — clock skew on {node} confirmed as root cause — offset={clock_offset} [service={service}]"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "clock offset {clock_offset} {clock_direction} approaching JWT tolerance threshold {tolerance} — authentication errors may begin if drift continues [node={node} service={service} pod={pod}]",
+        "chrony tracking: offset={clock_offset} jitter={jitter}ms stratum={stratum} last_update={jitter}m_ago — recommend investigating NTP reachability [node={node} server={ntp_server}]",
+        "etcd heartbeat interval variance elevated on {node} — suspected local clock instability — last NTP sync {jitter}m ago [cluster=prod]",
+        "token validation: skew between issuer and validator is {clock_offset} — within tolerance={tolerance} but trending {clock_direction} — watch {pod} closely [service={service}]",
+        "cache TTL: eviction timestamp on {node} is {clock_offset} {clock_direction} of wall clock — early evictions possible if drift continues [service={service}]",
+        "NTP poll to {ntp_server} returned high jitter={jitter}ms — possible network path degradation or upstream stratum instability [node={node}]",
+        "Raft: leader {node} heartbeat timestamp drifting — followers reporting increasing clock delta — current max delta={clock_offset} [cluster=prod]",
+        "intermittent 401 errors on {service}: {error_pct}% of requests failing on {pod} only — pattern consistent with single-node clock skew [node={node}]",
+        "distributed tracing: span timestamps from {node} are {clock_offset} {clock_direction} of peer spans — trace reconstruction may show false event ordering [service={service}]",
+        "chrony: stratum increased to {stratum} after losing contact with {ntp_server} {jitter}m ago — accuracy degrading — current offset estimate {clock_offset} [node={node}]",
+        "lease renewal warning: {service} lease on {node} renewed with {clock_offset} {clock_direction} clock — effective lease duration may deviate from configured TTL",
+        "audit log: event timestamps from {node} are {clock_offset} out of sequence with cluster wall time — log correlation tools may misorder events involving this node [service={service}]"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "chrony: clock step completed on {node} — corrected {clock_offset} {clock_direction} drift — new stratum={stratum} — synced to {ntp_server} [jitter={jitter}ms]",
+        "NTP sync restored on {node}: last sync was {jitter}m ago — offset after correction=0.002s — {service} JWT error rate dropping on {pod}",
+        "etcd cluster stabilized: {node} rejoined consensus after clock correction — leader election count returning to baseline [cluster=prod]",
+        "clock skew alert auto-resolved: {node} offset now within {tolerance} tolerance — {service} auth failure rate at pre-incident baseline on {pod}",
+        "scheduled NTP health check: {node} offset={clock_offset} jitter={jitter}ms stratum={stratum} server={ntp_server} — status=WARN — on-call notified",
+        "token validation config: tolerance window updated from {tolerance} to 30s on {service} as temporary mitigation while {node} NTP stability is confirmed [pod={pod}]",
+        "runbook executed: clock_skew_remediation step 3 — chrony makestep triggered on {node} — monitoring {service} error rate on {pod} for 5 minutes",
+        "post-incident: root cause confirmed as NTP daemon OOM-killed on {node} — daemon restarted — chrony resynced to {ntp_server} — no recurrence in 2h observation window [service={service}]"
+      ]
+    }
+  ]
+}

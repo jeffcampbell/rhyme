@@ -1,0 +1,5 @@
+LLM-generated prose pools (one per cause class). These are checked into git
+because they require ~20 LLM calls to regenerate. The generator samples from
+these pools to produce varied incident prose.
+
+To regenerate: see prose_pools.py build_agent_prompt() for the prompts used.

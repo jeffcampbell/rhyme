@@ -1,0 +1,119 @@
+{
+  "cause_class": "certificate_expiry",
+  "summaries": [
+    "3:00 AM UTC We are investigating HTTPS connectivity failures affecting {service} in us-east-1. All TLS handshakes to {downstream} are failing with x509 certificate expired errors. The certificate {cert_name} issued by {cert_issuer} reached its notAfter timestamp at {cert_expiry}. The underlying service is healthy; plain HTTP connections succeed. Certificate rotation is in progress.",
+    "Between {cert_expiry} and 11:45 UTC on 18 Mar 2026, customers using {service} in eu-west-1 were unable to establish HTTPS connections to {downstream}. The TLS certificate {cert_name} had expired. No deployment or configuration change preceded the failure; onset correlated precisely with the certificate's expiry timestamp. An emergency certificate rotation resolved the issue.",
+    "Post Incident Review – TLS Certificate Expiry, us-east-1. Tracking ID: CERT-6612. What happened? At {cert_expiry}, the certificate {cert_name} issued by {cert_issuer} expired. All clients performing TLS verification began receiving handshake failures. The service behind the certificate was fully operational throughout. Automated renewal had been disabled during a migration six months prior and not re-enabled.",
+    "The HTTPS connectivity issue affecting {service} has been resolved as of 2:15 PM US/Pacific. An expired TLS certificate on {downstream} has been replaced. The new certificate issued by {cert_issuer} is valid and clients are establishing connections successfully. We apologize for the disruption.",
+    "7:00 AM PST We are seeing 100% HTTPS handshake failures on {service} connections to {downstream} in us-west-2. Certificate {cert_name} expired at {cert_expiry}. Internal plain-text health checks confirm the application is running normally. We are expediting certificate issuance from {cert_issuer}.",
+    "Between 00:00 and 02:30 UTC, customers in ap-southeast-1 experienced complete HTTPS unavailability on {endpoint}. The failure onset was calendar-driven — the TLS certificate {cert_name} passed its notAfter timestamp at midnight UTC. Services consuming {downstream} via HTTP (port 80) were unaffected throughout the incident window.",
+    "10:15 AM CET {service} in eu-central-1 is returning TLS handshake errors to all clients attempting HTTPS connections to {downstream}. Diagnostics confirm certificate {cert_name} expired at {cert_expiry}. The certificate was issued by {cert_issuer} with a 12-month validity period and was not enrolled in ACM auto-renewal. An emergency rotation is underway.",
+    "PIR – HTTPS Unavailability, ap-northeast-1. Tracking ID: CERT-8840. On 30 Nov 2025 at {cert_expiry}, the wildcard certificate {cert_name} issued by {cert_issuer} expired. HTTPS traffic to {downstream} failed completely while the application itself remained healthy. The certificate had been manually managed and not tracked in the certificate lifecycle system. Total impact duration: {hours} hours.",
+    "11:00 PM UTC We have confirmed the cause of {service} HTTPS failures in us-east-1. Certificate {cert_name} on {downstream} expired at {cert_expiry}. The certificate was not in our automated renewal inventory. A new certificate from {cert_issuer} has been issued and is being deployed. Estimated restoration: 30 minutes.",
+    "The TLS issue affecting {service} in us-central1 has been resolved for all affected projects as of 05:00 US/Pacific. The expired certificate {cert_name} has been replaced with a new 12-month certificate from {cert_issuer}. All HTTPS connections are now completing successfully.",
+    "Between {cert_expiry} and 14:55 UTC, {service} in West Europe returned SSL_ERROR_BAD_CERT_DOMAIN errors to clients. The certificate {cert_name} on {downstream} had passed its validity window. Plain HTTP endpoints and gRPC connections using custom CA bundles were unaffected. The issue was remediated by deploying a renewed certificate and reloading the TLS listener.",
+    "1:45 PM PST We are aware that HTTPS requests to {endpoint} in us-west-2 are failing. The TLS certificate {cert_name} on {downstream} expired at {cert_expiry}. Clients receive x509 certificate has expired or is not yet valid errors. The application is running normally; the issue is limited to the TLS termination layer. Certificate replacement is in progress.",
+    "Tracking ID: CERT-3309. On 14 Feb 2026 starting at {cert_expiry}, all HTTPS clients connecting to {downstream} in us-east-1 received TLS handshake failures. The certificate {cert_name}, issued by {cert_issuer}, had expired. The automated renewal process had failed silently 30 days prior due to a DNS validation error that went undetected. The certificate was manually renewed and reissued.",
+    "4:00 AM UTC RESOLVED – The HTTPS connectivity issue on {downstream} in eu-west-1 has been remediated. The expired certificate {cert_name} has been replaced. All clients are now completing TLS handshakes successfully. A post-incident review will examine why certificate expiry monitoring did not alert before impact.",
+    "We are aware that {service} in us-east-2 cannot reach {downstream} over HTTPS. The TLS certificate {cert_name} issued by {cert_issuer} expired at {cert_expiry}. The server-side application is operational and serving requests on all non-TLS listeners. A certificate rotation is in progress and we expect to restore HTTPS connectivity within 45 minutes.",
+    "8:00 AM JST {service} in ap-northeast-1 began receiving TLS handshake failures at exactly {cert_expiry} when the certificate {cert_name} for {downstream} expired. No service code changes occurred. All {affected_count} clients verify TLS, so all are affected. A small number of internal clients configured with certificate pinning that had already cached the old cert are failing differently.",
+    "Post Incident Summary – Certificate Lifecycle Gap. On 12 Dec 2025, the certificate {cert_name} issued by {cert_issuer} for {downstream} expired, causing {hours} hours of HTTPS unavailability on {service}. The cert had been issued before the organization adopted centralized certificate management. All legacy manually-managed certificates have since been inventoried and enrolled in automated renewal.",
+    "2:00 PM EST Customers in us-east-1 connecting to {service} over HTTPS are receiving certificate expiry errors. The TLS certificate {cert_name} on {downstream} expired at {cert_expiry}. The service is healthy and reachable on plain HTTP. We are coordinating with {cert_issuer} to issue a replacement certificate on an accelerated timeline.",
+    "Between {cert_expiry} and 09:20 UTC, {service} in eu-west-2 was completely unreachable over HTTPS. The certificate {cert_name} had expired; the automated renewal job had been paused during infrastructure maintenance and not resumed. All TLS-verifying clients failed. The certificate has been renewed and the auto-renewal job re-enabled with monitoring.",
+    "RESOLVED 06:45 UTC – The expired TLS certificate on {downstream} in us-east-1 has been replaced. Certificate {cert_name} issued by {cert_issuer} is now valid and all HTTPS connections are succeeding. We have updated our certificate expiry alerting to trigger 30 days before expiration. Customers do not need to take any action."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL: TLS certificate {cert_name} on {downstream} expired at {cert_expiry}. 100% of HTTPS connections from {service} failing with x509 expired certificate error.",
+        "CRITICAL: {service} -> {downstream} HTTPS handshake failure rate 100% in us-east-1. Certificate {cert_name} issued by {cert_issuer} is past notAfter timestamp {cert_expiry}.",
+        "CRITICAL: All TLS connections to {downstream} in eu-west-1 failing. Certificate {cert_name} expired. Application is healthy on plain HTTP. HTTPS path completely unavailable.",
+        "CRITICAL: {affected_count} clients receiving SSL handshake errors connecting to {downstream}. Certificate {cert_name} (issuer: {cert_issuer}) expired at {cert_expiry}. Immediate rotation required.",
+        "CRITICAL: {service} endpoint {endpoint} unreachable over HTTPS. x509: certificate has expired or is not yet valid: current time is after {cert_expiry}. App healthy on non-TLS path.",
+        "CRITICAL: Certificate expiry event at {cert_expiry} has caused complete HTTPS outage on {downstream} in us-west-2. {service} error rate 100% on all TLS connections.",
+        "CRITICAL: TLS listener on {downstream}:{port} presenting expired certificate {cert_name}. All clients enforcing certificate validation are rejecting the handshake.",
+        "CRITICAL: {service} SLO breach: 100% of HTTPS requests to {downstream} failing since {cert_expiry}. Underlying service operational. Certificate rotation is the only mitigation.",
+        "CRITICAL: Expired certificate {cert_name} on {downstream} in {namespace}. Cert issued by {cert_issuer}. notAfter: {cert_expiry}. No automated renewal configured.",
+        "CRITICAL: {service} in ap-northeast-1 returning 503 to all HTTPS callers. Root cause: TLS handshake failure — certificate {cert_name} expired {hours} hours ago at {cert_expiry}."
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING: TLS certificate {cert_name} on {downstream} expires in {hours} hours at {cert_expiry}. Automated renewal has not been confirmed. Manual verification required.",
+        "WARNING: Certificate {cert_name} issued by {cert_issuer} for {downstream} will expire at {cert_expiry}. If not renewed, all HTTPS connections from {service} will fail at that time.",
+        "WARNING: Certificate renewal for {cert_name} on {downstream} is overdue. Expected renewal window was 30 days before expiry. Current time is within {hours} hours of {cert_expiry}.",
+        "WARNING: {cert_name} certificate expiry approaching: {cert_expiry}. ACME renewal job has not run successfully in the last 7 days. Check {cert_issuer} API connectivity.",
+        "WARNING: {downstream} TLS certificate {cert_name} expires at {cert_expiry}. {service} will begin returning handshake failures to all clients at that exact time.",
+        "WARNING: ACM certificate auto-renewal for {cert_name} failed validation. Certificate expires at {cert_expiry}. Manual rotation may be required for {downstream} in us-east-1.",
+        "WARNING: {cert_name} for {downstream} in {namespace} has {hours} hours until expiry. No renewal record found in certificate management system. Issuer: {cert_issuer}.",
+        "WARNING: Certificate expiry monitor: {cert_name} valid until {cert_expiry}. This is within the 72-hour critical window. Confirm renewal is in progress.",
+        "WARNING: {downstream} is presenting certificate {cert_name} with {hours} hours remaining validity. If {service} restarts, it will not accept a new cert without a TLS reload.",
+        "WARNING: Certificate chain for {cert_name} on {downstream}: leaf expiry {cert_expiry}, issuer {cert_issuer}. Intermediate certificate also approaching renewal window."
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO: TLS certificate {cert_name} on {downstream} has been renewed. New certificate from {cert_issuer} is valid. {service} HTTPS connections succeeding.",
+        "INFO: Certificate rotation complete for {downstream} in us-east-1. Old certificate {cert_name} (expired {cert_expiry}) replaced. TLS listener reloaded.",
+        "INFO: {service} HTTPS connectivity to {downstream} fully restored following certificate replacement. All clients completing handshakes successfully.",
+        "INFO: Certificate expiry alerting updated: {cert_name} and all certs in {namespace} now monitored with 30-day and 7-day pre-expiry alerts.",
+        "INFO: Post-incident: {cert_name} enrolled in automated renewal via ACM. Issuer {cert_issuer} DNS validation record created. Manual management discontinued."
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "[ERROR] {trace_id} x509: certificate has expired or is not yet valid: current time {cert_expiry} is after {cert_name} notAfter. host={downstream}.",
+        "[ERROR] {trace_id} TLS handshake error from {downstream}:{port}: remote error: tls: certificate expired. Connection refused by client certificate validation.",
+        "[ERROR] {trace_id} SSL: CERTIFICATE_VERIFY_FAILED — certificate {cert_name} has expired (notAfter={cert_expiry}). Issuer: {cert_issuer}. Endpoint: {endpoint}.",
+        "[ERROR] {trace_id} javax.net.ssl.SSLHandshakeException: PKIX path validation failed: validity check failed for certificate {cert_name} issued by {cert_issuer}.",
+        "[ERROR] {trace_id} curl: (60) SSL certificate problem: certificate has expired. More details at: {endpoint}. Certificate subject: {cert_name}.",
+        "[ERROR] {trace_id} grpc: failed to create credentials: x509: certificate signed by unknown authority — cert {cert_name} notAfter {cert_expiry} is in the past.",
+        "[ERROR] {trace_id} {service} TLS dial to {downstream}:{port} failed: x509 certificate expired at {cert_expiry}. Application health check (HTTP) passing.",
+        "[ERROR] {trace_id} Certificate expiry event: {cert_name} expired. All {affected_count} HTTPS clients now failing. Plain HTTP connections unaffected. Trace: {trace_id}.",
+        "[ERROR] {trace_id} requests.exceptions.SSLError: HTTPSConnectionPool(host='{downstream}', port={port}): Max retries exceeded. Caused by: SSLCertVerificationError: certificate has expired.",
+        "[ERROR] {trace_id} {service} cannot connect to {endpoint}: TLS certificate validation failed. Certificate {cert_name} from {cert_issuer} expired at {cert_expiry}.",
+        "[ERROR] {trace_id} Nginx upstream SSL: certificate verification failed (SSL_CTX_set_verify_depth, certificate has expired) for {downstream}:{port}.",
+        "[ERROR] {trace_id} AWS SDK: RequestError: send request failed caused by: Post {endpoint}: x509: certificate has expired or is not yet valid.",
+        "[ERROR] {trace_id} Istio mTLS handshake failed to {downstream}: CERTIFICATE_EXPIRED. Certificate {cert_name} notAfter={cert_expiry}. Sidecar proxy rejecting connection.",
+        "[ERROR] {trace_id} health_check FAILED for {downstream}: TLS error — certificate expired {hours}h ago at {cert_expiry}. Application process: running normally.",
+        "[ERROR] {trace_id} {service} -> {downstream} connection failure count: {affected_count}. All share root cause: expired certificate {cert_name}. First failure at {cert_expiry}."
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "[WARN] {trace_id} TLS certificate {cert_name} on {downstream} expires in {hours} hours ({cert_expiry}). Renew before expiry to avoid service disruption.",
+        "[WARN] {trace_id} Certificate renewal job for {cert_name} (issuer: {cert_issuer}) has not reported success in 7 days. Expiry at {cert_expiry}.",
+        "[WARN] {trace_id} {downstream} presenting certificate with {hours}h remaining validity. Certificate: {cert_name}. Consider proactive rotation.",
+        "[WARN] {trace_id} ACME challenge for {cert_name} failed DNS validation. Certificate expires {cert_expiry}. Manual rotation may be required.",
+        "[WARN] {trace_id} Certificate pin for {cert_name} on {downstream} will become invalid at {cert_expiry}. Update pinned certificate before expiry.",
+        "[WARN] {trace_id} {service} connection to {downstream}:{port} — certificate {cert_name} expiry {cert_expiry} is within monitoring threshold. Verify renewal.",
+        "[WARN] {trace_id} ACM certificate {cert_name} in {namespace} approaching expiry {cert_expiry}. Auto-renewal requires DNS record at {dns_server} to be present.",
+        "[WARN] {trace_id} {cert_name} certificate chain: leaf valid, intermediate issued by {cert_issuer} expires {cert_expiry}. Intermediate renewal also required.",
+        "[WARN] {trace_id} Canary TLS check to {downstream} succeeded but certificate {cert_name} has {hours}h remaining. Schedule rotation to avoid {cert_expiry} deadline.",
+        "[WARN] {trace_id} Certificate store audit: {cert_name} for {downstream} not enrolled in auto-renewal. Expiry {cert_expiry}. Manual tracking only.",
+        "[WARN] {trace_id} Pre-expiry alert: {cert_name} on {downstream} expires at {cert_expiry}. Notify on-call if not renewed within 24 hours.",
+        "[WARN] {trace_id} {service} detected certificate change on {downstream}: old cert {cert_name} being replaced. Verify new cert from {cert_issuer} before finalizing rotation."
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "[INFO] {trace_id} Certificate rotation complete: {cert_name} on {downstream} replaced. New cert from {cert_issuer} valid for 12 months. TLS listener reloaded.",
+        "[INFO] {trace_id} {service} TLS handshake to {downstream}:{port} succeeded. New certificate verified. Previous cert {cert_name} expired at {cert_expiry}.",
+        "[INFO] {trace_id} ACME renewal successful: {cert_name} renewed via {cert_issuer}. New notAfter is one year from today. Certificate deployed to {downstream}.",
+        "[INFO] {trace_id} {service} HTTPS connectivity restored after certificate rotation on {downstream}. All {affected_count} clients connecting successfully.",
+        "[INFO] {trace_id} Certificate expiry monitoring updated: {cert_name} and all certs in {namespace} now alert at 30 days and 7 days before expiry.",
+        "[INFO] {trace_id} TLS handshake metrics normalized. Error rate returned to zero following certificate {cert_name} replacement on {downstream}.",
+        "[INFO] {trace_id} Post-incident: certificate {cert_name} enrolled in automated renewal. DNS validation record created at {dns_server}. No manual renewal required going forward.",
+        "[INFO] {trace_id} Certificate inventory updated: {cert_name} issued by {cert_issuer} added to centralized lifecycle tracking system for {namespace}."
+      ]
+    }
+  ]
+}

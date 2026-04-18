@@ -1,0 +1,119 @@
+{
+  "cause_class": "code_regression",
+  "summaries": [
+    "2:14 PM UTC We are investigating elevated error rates for {service} in the us-east-1 Region. The issue began at {deploy_time} and appears to correlate with a recent software release. Other services and Regions are not affected at this time.",
+    "Between {deploy_time} and the time of mitigation, customers using {service} may have experienced {error_type} errors on the {endpoint} path. A regression in {class_name}.{method_name}, introduced by {deploy_id}, was identified as root cause. Reverting to {prev_deploy_id} restored normal operation.",
+    "Post-Incident Review – {service} – Elevated {error_type} Error Rate Following Release {version}. At {deploy_time} a new artifact was promoted to production. Error rate climbed to {error_pct}% within ninety seconds. All other services in the dependency chain remained healthy. The defect was confined to logic introduced in {deploy_id}.",
+    "{deploy_id} was rolled out to {service} at {deploy_time}. Within two minutes, synthetic monitors detected {error_type} on {endpoint}. Stack traces implicate {class_name}.{method_name}, a code path that did not exist in {prev_deploy_id}. The release was rolled back and error rates returned to baseline.",
+    "3:47 AM PST We are investigating a spike in 5xx responses from {service} that began at {deploy_time}. Early indicators suggest a software defect in the current release. No infrastructure events or dependency changes are associated with the degradation window.",
+    "3:47 AM PST Investigation continues into elevated {error_type} errors for {service}. We have identified a regression introduced by {deploy_id} in the {class_name} component. Traffic is being routed back to {prev_deploy_id} while a patch is prepared. 4:09 AM PST The rollback to {prev_deploy_id} is complete. Error rates have returned to pre-incident levels. A postmortem is scheduled.",
+    "PIR – {service} – Release {version} Regression – Tracking ID {deploy_id}. A logic error in {method_name} caused {error_pct}% of requests to {endpoint} to fail with {error_type}. The defect was not caught by pre-production testing because the triggering payload pattern was absent from the test suite. Code rollback resolved the incident in under ten minutes.",
+    "The issue with {service} elevated error rates has been resolved for all affected customers as of {deploy_time} plus eighteen minutes. The root cause was a code regression in {deploy_id} affecting the {class_name}.{method_name} execution path. No configuration or infrastructure changes were involved.",
+    "Canary analysis for {service} tag {tag} detected a statistically significant divergence at {deploy_time}: {error_pct}% error rate on the canary versus 0.2% on the stable fleet. The canary was automatically failed. Engineers identified an unguarded null dereference introduced by {deploy_id} in {class_name}.",
+    "10:22 AM PDT We have identified the cause of elevated errors for {service}. A defect in {class_name}.{method_name}, shipped as part of {deploy_id} at {deploy_time}, is producing {error_type} for a subset of request shapes. Rollback to {prev_deploy_id} is in progress. 10:31 AM PDT The rollback has completed. {service} is operating normally.",
+    "SLO burn for {service} accelerated to approximately 30x normal immediately following the Helm chart upgrade for {deploy_id} at {deploy_time}. Latency on {endpoint} reached {latency_mult}x the pre-deploy baseline. All upstream and downstream services are unaffected. {prev_deploy_id} has been re-pinned.",
+    "A subset of customers using {service} may have experienced {error_type} and elevated latency between {deploy_time} and the completion of the rollback. The incident was caused by a change in {deploy_id} that introduced an O(n²) code path in {method_name}, only observable under production traffic volumes.",
+    "Spinnaker pipeline {deploy_id} promoted {service} version {version} at {deploy_time}. Automated health gate failed: {error_pct}% of instances returned {error_type} within sixty seconds. The pipeline was halted at 25% rollout and traffic drained back to {prev_deploy_id}.",
+    "7:55 PM CET We are investigating reports of intermittent failures for {service} in the eu-west-1 Region. The degradation began at {deploy_time} and corresponds to a deployment event. We will provide an update within 30 minutes.",
+    "7:55 PM CET – Update: We can confirm a software regression in {service} version {version} is causing {error_type} on {endpoint} at a rate of {error_pct}%. Rollback to {prev_deploy_id} is under way. 8:11 PM CET – The rollback has completed and the service is operating normally. Affected customers have been notified.",
+    "Incident summary: {deploy_id} shipped a refactored {class_name} that regressed {service} from 0.2% baseline error rate to {error_pct}%. New stack frames containing {error_type} from {class_name}.{method_name} appeared exclusively in logs after {deploy_time}. These frames were absent in {prev_deploy_id}. No infrastructure changes accompanied the release.",
+    "PIR – {service} – {error_type} regression in release {version}. Approximately {affected_pct}% of users experienced failures for {duration} until rollback to {prev_deploy_id} completed. Root cause: incorrect input validation introduced in {class_name}.{method_name} by {deploy_id}. The affected payload shape was not represented in integration tests.",
+    "{service} version {version} was deployed via ArgoCD sync {deploy_id} at {deploy_time}. Anomaly detection fired 80 seconds later. All errors trace to {class_name}.{method_name}, confirming the fault is contained within the deployed artifact. Dependencies are green. Rollback is the recommended immediate action.",
+    "Between {deploy_time} and rollback completion, {affected_pct}% of {service} users saw {error_type} errors. No coincident infrastructure events were detected. A type coercion bug in {method_name}, present only in {deploy_id}, did not reproduce in staging due to differing input distributions.",
+    "The {deploy_id} release of {service} has been rolled back to {prev_deploy_id} following a {error_pct}% error rate on {endpoint}. The regression in {class_name}.{method_name} produced unhandled {error_type} exceptions under real-world load. All peer services remained healthy throughout the incident."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL [{service}] Error rate {error_pct}% — step-change at {deploy_time} aligns with {deploy_id}; {error_type} is a new exception type not present in {prev_deploy_id}; rollback recommended",
+        "CRITICAL [{service}] SLO burn 30x post-deploy — ArgoCD sync {deploy_id} at {deploy_time} is the sole change event; all dependencies healthy; initiating rollback to {prev_deploy_id}",
+        "CRITICAL [{service}] Canary gate FAILED — tag {tag} error rate {error_pct}% vs stable 0.2%; regression in {class_name}.{method_name} confirmed; draining canary traffic",
+        "CRITICAL [{service}/{endpoint}] 5xx rate {error_pct}% — {error_type} first seen at {deploy_time}; stack traces originate exclusively in {class_name} introduced by {deploy_id}",
+        "CRITICAL [{service}] Post-deploy smoke test FAILED — {endpoint} returning {error_type} on every probe; {deploy_id} version {version} is suspect; {prev_deploy_id} was stable",
+        "CRITICAL [{service}] Spinnaker health gate FAILED for {deploy_id} — {affected_pct}% of instances unhealthy; deploy halted at 25% rollout; error type {error_type} is new",
+        "CRITICAL [{service}] kubectl rollout {deploy_id} triggered {error_pct}% {error_type} errors on {endpoint}; automated rollback to {prev_deploy_id} initiated",
+        "CRITICAL [{service}] Error budget exhausted 4 min post-deploy — {deploy_id} promoted at {deploy_time}; all upstream and downstream services nominal; code rollback required",
+        "CRITICAL [{service}] Panic '{error_type}' first observed at {deploy_time} in version {version}; not present in {prev_deploy_id}; {endpoint} fully degraded",
+        "CRITICAL [{service}] Latency {latency_mult}x baseline following Helm release {deploy_id} — P99 breach on {endpoint}; all dependencies healthy; performance regression in {method_name} suspected"
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING [{service}] Error rate rising post-deploy — {deploy_id} landed at {deploy_time}; {error_pct}% errors on {endpoint}; threshold is 1%; monitoring closely before triggering rollback",
+        "WARNING [{service}] Canary latency elevated — tag {tag} showing {latency_mult}x P99 versus stable fleet on {endpoint}; canary pods only; rollout of {deploy_id} paused",
+        "WARNING [{service}] Deployment {deploy_id} health score degraded — {affected_pct}% of pods failing readiness probes; rollback not yet triggered; watching trend",
+        "WARNING [{service}] New exception class {error_type} first observed since {deploy_time} in {class_name}.{method_name}; rate below critical threshold but count is rising; correlates with {deploy_id}",
+        "WARNING [{service}] ArgoCD sync {deploy_id} complete but error rate elevated — {error_pct}% vs pre-sync 0.3%; no dependency anomalies; observing before acting",
+        "WARNING [{service}] Canary analysis score 62 (threshold 75) — {deploy_id} tag {tag} error ratio exceeds acceptable delta; auto-promote blocked; {prev_deploy_id} still serving stable traffic",
+        "WARNING [{service}] Post-deploy CPU spike — version {version} consuming {latency_mult}x CPU versus {prev_deploy_id}; SLO not yet breached but trend is upward",
+        "WARNING [{service}] Deployment {deploy_id} flagged by anomaly detector — error rate deviated {error_pct}% from predicted baseline at {deploy_time}; investigate {method_name}",
+        "WARNING [{service}/{endpoint}] P99 latency {latency_mult}x normal since {deploy_time} — matches {deploy_id} rollout window; no dependency changes observed",
+        "WARNING [{service}] Retry budget 55% consumed — upstream retries amplifying impact of {error_pct}% error rate introduced by {deploy_id}; circuit breaker threshold not yet reached"
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO [{service}] ArgoCD sync started — promoting {deploy_id} (version {version}) to production at {deploy_time}; previous revision {prev_deploy_id}",
+        "INFO [{service}] Rollback initiated — reverting {service} from {deploy_id} to {prev_deploy_id} via Spinnaker; estimated completion 3 minutes",
+        "INFO [{service}] Canary deployment {deploy_id} tag {tag} at 10% traffic split — baseline comparison active on {endpoint}; success criteria: error_rate < 0.5%, P99 < 400ms",
+        "INFO [{service}] Helm upgrade {deploy_id} to version {version} complete — all pods healthy; post-deploy error rate monitoring window open for 600s",
+        "INFO [{service}] Rollback to {prev_deploy_id} confirmed stable — error rate returned to 0.2% within 90 seconds; {error_type} no longer appearing in logs; postmortem scheduled"
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "{deploy_time} ERROR [{service}] Unhandled exception in {class_name}.{method_name}\njava.lang.NullPointerException: Cannot invoke method getId() on null reference\n\tat com.example.{class_name}.{method_name}({class_name}.java:142)\n\tat com.example.RequestDispatcher.dispatch(RequestDispatcher.java:87)\nThis stack frame was not present in {prev_deploy_id}",
+        "{deploy_time} ERROR [{service}] panic: runtime error: index out of range [3] with length 3\ngoroutine 47 [running]:\nmain.{method_name}(0xc0003a2000, 0x3, 0x3)\n\t/app/handlers/{class_name}.go:88 +0x1a4\nIntroduced in {deploy_id}; not present in prior release",
+        "{deploy_time} ERROR [{service}] TypeError: Cannot read properties of undefined (reading 'userId')\n    at {method_name} ({class_name}.js:203:18)\n    at Layer.handle (/app/node_modules/express/lib/router/layer.js:95:5)\nDeploy: {deploy_id} Version: {version}",
+        "{deploy_time} ERROR [{service}] KeyError: 'account'\n  File \"/app/{class_name}.py\", line 77, in {method_name}\n    result = payload['account']['id']\nRegression introduced in {deploy_id}; field contract changed silently",
+        "{deploy_time} ERROR [{service}] {error_type} on {endpoint}: version={version} deploy={deploy_id} — exception rate {error_pct}% over last 60s; threshold 0.5%; all dependencies healthy",
+        "{deploy_time} ERROR [{service}] {class_name}.{method_name} raised {error_type} for request_id=a3f9c02d — input validation regression in {deploy_id}; customerId field may be null under new schema",
+        "{deploy_time} ERROR [{service}] FATAL: uncaught {error_type} in worker thread pool — 12/16 workers terminated; service degraded to {error_pct}% capacity; deploy={deploy_id}",
+        "{deploy_time} ERROR [{service}] [Canary:{tag}] error_rate={error_pct}% baseline_error_rate=0.2% delta=EXCEEDS_THRESHOLD — {class_name} change in {deploy_id} fails on production traffic patterns absent from staging",
+        "{deploy_time} ERROR [{service}] NullPointerException in {class_name}.{method_name}\n\tat {class_name}.buildResponse({class_name}.java:211): userContext.getSession() returned null\n\tat RequestDispatcher.dispatch(RequestDispatcher.java:63)\nCode path did not exist in {prev_deploy_id}",
+        "{deploy_time} ERROR [{service}] go panic recovered — {error_type} in {method_name}: unexpected nil for field 'Metadata' after schema change in {deploy_id}; request dropped, client received 500",
+        "{deploy_time} ERROR [{service}] [rollback] ArgoCD detected unhealthy rollout {deploy_id} — {error_pct}% pods in CrashLoopBackOff; initiating automated rollback to {prev_deploy_id}",
+        "{deploy_time} ERROR [{service}] Assertion failed in {class_name}.{method_name}: expected envelope key 'data' — contract changed silently in {deploy_id}; downstream callers unaffected, internal handler broken",
+        "{deploy_time} ERROR [{service}] OOMKilled: container {service} exceeded memory limit — {latency_mult}x memory regression introduced by {class_name} change in {deploy_id}; all dependencies healthy",
+        "{deploy_time} ERROR [{service}] Spinnaker health check FAILED — {endpoint} returned HTTP 500 on 9/10 synthetic probes post-deploy {deploy_id}; error body contains {error_type}; rolling back to {prev_deploy_id}",
+        "{deploy_time} ERROR [{service}] {error_type}: division by zero in {class_name}.{method_name} — pricing logic in {deploy_id} does not guard zero-quantity line items; {affected_pct}% of orders affected"
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "{deploy_time} WARN [{service}] Error rate {error_pct}% exceeds soft threshold 0.5% — step-change at {deploy_time} aligns with {deploy_id}; no dependency anomalies detected",
+        "{deploy_time} WARN [{service}] Canary [{tag}] P99 latency {latency_mult}x vs control P99 1.0x on {endpoint} — {deploy_id} version {version} may have introduced performance regression in {method_name}",
+        "{deploy_time} WARN [{service}] Slow response on {endpoint}: 2340ms (baseline 310ms) — profiling suggests hot path added in {class_name}.{method_name} by {deploy_id} executes redundant database lookups",
+        "{deploy_time} WARN [{service}] New exception class {error_type} first observed post-deploy {deploy_id} — not in error catalog for {prev_deploy_id}; 47 occurrences in last 2 minutes",
+        "{deploy_time} WARN [{service}] kubectl rollout {deploy_id} — 3/10 pods not passing liveness probe; {error_type} suspected in startup path; no infrastructure events in window",
+        "{deploy_time} WARN [{service}] Helm diff for {deploy_id} modified {class_name} — runtime warning: deprecated API called in {method_name}; may surface errors under request shapes only seen in production",
+        "{deploy_time} WARN [{service}] Retry budget 55% consumed in 3 minutes — upstream retries amplifying {error_pct}% error rate from {deploy_id}; circuit breaker threshold not yet reached",
+        "{deploy_time} WARN [{service}] Memory usage 78% (+{latency_mult}x vs {prev_deploy_id}) — object retention change in {class_name} shipped in {deploy_id}; GC pressure increasing",
+        "{deploy_time} WARN [{service}] {affected_pct}% of requests returning non-standard error envelope — {class_name}.{method_name} changed response schema in {deploy_id}; clients falling back to error handler",
+        "{deploy_time} WARN [{service}] Post-deploy latency spike on {endpoint} — P95 climbed from 220ms to {latency_mult}x in first 5 minutes; watching for SLO breach before triggering rollback of {deploy_id}",
+        "{deploy_time} WARN [{service}] ArgoCD sync {deploy_id} complete with warnings — image {version} introduces new dependency; functional regression also suspected given rising {error_type} count",
+        "{deploy_time} WARN [{service}] [deploy-tracker] {deploy_id} promoted to production — pre-promote checks passed but canary window was shortened due to deploy freeze; monitoring {error_type} closely"
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "{deploy_time} INFO [{service}] ArgoCD application sync started — target revision {deploy_id} (image tag {version}); previous revision {prev_deploy_id}; operator=ci-bot",
+        "{deploy_time} INFO [{service}] Spinnaker pipeline 'deploy-to-prod' stage 'Canary Analysis' started — comparing {deploy_id} tag {tag} against stable fleet on {endpoint}",
+        "{deploy_time} INFO [{service}] kubectl rollout history: revision {deploy_id} deployed at {deploy_time}; change-cause: 'release {version} — {class_name} refactor'",
+        "{deploy_time} INFO [{service}] Rollback complete — ArgoCD reverted {service} from {deploy_id} to {prev_deploy_id}; all pods healthy; error rate nominal at 0.18%",
+        "{deploy_time} INFO [{service}] Helm upgrade {deploy_id} succeeded — {service} version {version} running on 8/8 replicas; post-deploy monitoring window active for 600s",
+        "{deploy_time} INFO [{service}] Canary deployment {deploy_id} tag {tag} receiving 10% of {endpoint} traffic — baseline comparison initiated; success criteria: error_rate < 0.5%, P99 < 400ms",
+        "{deploy_time} INFO [{service}] Deploy event recorded — deploy_id={deploy_id} version={version} prev={prev_deploy_id} deployer=github-actions strategy=rolling-update",
+        "{deploy_time} INFO [{service}] Incident resolved — rollback to {prev_deploy_id} confirmed stable; postmortem scheduled; {error_type} regression to be addressed in next sprint"
+      ]
+    }
+  ]
+}

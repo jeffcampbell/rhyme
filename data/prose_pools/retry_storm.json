@@ -1,0 +1,119 @@
+{
+  "cause_class": "retry_storm",
+  "summaries": [
+    "3:14 PM UTC We are investigating elevated error rates and request amplification affecting {service} in us-east-1. Inbound customer request rate is {normal_rate} RPS but outbound calls to {downstream} are measuring {amp_ratio}x higher at {rps} RPS. Engineering is actively investigating.",
+    "Between 14:22 and 16:45 UTC on 17 Apr 2026, customers using {service} in eu-west-1 may have experienced elevated latency and intermittent 503 errors. The event originated from request amplification against {downstream} and has since been mitigated. No data loss occurred.",
+    "Post Incident Review – Request Amplification Event in us-east-1. Tracking ID: RS-4471. What happened? Starting at 09:15 UTC, {service} began generating {amp_ratio}x the expected outbound call volume to {downstream}. Circuit breakers tripped at 09:34 UTC. Full recovery was confirmed by 11:02 UTC.",
+    "The issue affecting {service} request throughput has been resolved as of 2:30 PM US/Pacific. A retry amplification loop caused {downstream} to receive {amp_ratio}x its normal load during the event window. All circuit breakers have reset and latency has returned to {baseline}ms.",
+    "5:51 AM PST We are seeing a {amp_ratio}x amplification of calls from {service} to {downstream} in us-west-2. Error rates at {error_pct}% are triggering aggressive client-side retry logic. We are working to apply backoff configuration changes and expect to restore normal traffic ratios within 45 minutes.",
+    "Between 22:10 UTC and 23:58 UTC, a subset of customers in ap-southeast-1 experienced intermittent failures on {endpoint}. A configuration change had disabled exponential backoff, causing retry fan-out against {downstream} at {amp_ratio}x normal volume. The configuration has been reverted.",
+    "10:02 AM CET Elevated latency on {service} in eu-central-1 is under investigation. P99 latency has reached {p99}ms against a baseline of {baseline}ms. {downstream} is reporting healthy response times for existing connections; amplified retry load is the suspected driver of the degradation.",
+    "PIR – {service} Availability Degradation. Tracking ID: RS-7103. Between 06:00 and 08:47 UTC, customers in us-east-1 observed bimodal response times: fast responses clustered at {p50}ms and a slow tail pinned at {p99}ms. Root cause was client retry storms against {downstream} triggered by a brief {timeout}ms timeout spike.",
+    "11:27 PM UTC We have identified the cause of elevated call volume to {downstream} in us-east-1. A code deployment to {service} at 23:05 UTC introduced retry logic without jitter, producing {amp_ratio}x amplification under error conditions. A rollback is in progress and expected to complete within 15 minutes.",
+    "The issue affecting {service} in us-central1 has been resolved for all affected projects as of 08:15 US/Pacific. Retry amplification peaked at {amp_ratio}x and produced {error_pct}% error rates before circuit isolation took effect. A permanent fix to the backoff policy has been deployed.",
+    "Between 13:45 and 15:30 UTC, {service} in West Europe experienced cascading 429 responses from {downstream}. Retry-After headers were not being respected by the client library version in use, causing sustained amplification at {amp_ratio}x. The affected client version has been patched and redeployed across all regions.",
+    "2:18 PM PST We are investigating why {service} is generating higher than expected traffic toward {downstream} in us-west-2. Current outbound RPS is {rps}, approximately {amp_ratio}x the inbound customer request rate of {normal_rate}. No data loss is expected. A mitigation is being staged.",
+    "Tracking ID: RS-8820. On 14 Mar 2026 between 07:12 and 09:55 UTC, {service} in us-east-1 entered a retry amplification state following a brief network disruption to {downstream}. Peak amplification reached {amp_ratio}x. SLO impact: {slo}% availability recorded against a 99.9% target during the incident window.",
+    "4:33 AM UTC RESOLVED – The amplification event affecting {downstream} in eu-west-1 has ended. {service} retry logic has been updated with exponential backoff and full jitter. Traffic has normalized to {normal_rate} RPS. We will publish a full PIR within five business days.",
+    "We are aware of elevated {error_pct}% error rates on {service} in us-east-2. Diagnostic traces confirm retry bursts of {amp_ratio}x against {downstream} occurring every {timeout}ms, consistent with a fixed-interval retry loop. A hotfix targeting the retry policy is being staged for emergency deployment.",
+    "8:05 PM JST {service} in ap-northeast-1 is generating retry-driven load against {downstream} at {amp_ratio}x the normal rate. {downstream} itself is healthy; queue depth is growing due to the amplified inbound volume. Rate limiting has been applied at the {service} egress layer as a temporary mitigation while a code fix is prepared.",
+    "Post Incident Summary – {service} Client Library. On 02 Feb 2026, a {service} client library release shipped without circuit breaker configuration. For {hours} hours, failed requests to {downstream} were retried up to 10 times each, driving {amp_ratio}x amplification. The library has been updated and the prior version has been sunset in all environments.",
+    "1:50 PM EST Customers in us-east-1 may notice elevated latency on {endpoint}. Retry amplification from {service} is placing {amp_ratio}x normal load on {downstream}. Our on-call network engineering team has been engaged and we expect to apply a mitigation within 30 minutes.",
+    "Between 18:30 and 20:15 UTC, {service} in eu-west-2 experienced a self-reinforcing retry loop: timeouts caused retries, which increased {downstream} latency, which in turn triggered further timeouts. Peak retry traffic reached {retry_pct}% of all outbound calls. The loop was broken by temporarily reducing the per-request retry limit to one attempt.",
+    "RESOLVED 09:40 UTC – Request amplification against {downstream} in us-east-1 has fully cleared. Circuit breakers have reset across all availability zones. Retry rates have returned from {retry_pct}% to normal levels. A permanent fix to the backoff algorithm is scheduled for the next maintenance window."
+  ],
+  "alerts": [
+    {
+      "severity": "critical",
+      "messages": [
+        "CRITICAL: {service} outbound RPS to {downstream} is {rps}, {amp_ratio}x above inbound rate {normal_rate}. Circuit breaker threshold exceeded in us-east-1.",
+        "CRITICAL: Retry amplification loop active. {service} retry rate {retry_pct}% in eu-west-1. {downstream} receiving {amp_ratio}x expected load. Immediate intervention required.",
+        "CRITICAL: Circuit breaker OPEN on {service} -> {downstream} in us-east-1. {error_pct}% of requests failing. P99 latency {p99}ms. SLO breach in progress.",
+        "CRITICAL: {service} generating {rps} RPS against {downstream} ({amp_ratio}x amplification). {downstream} queue depth critical. Risk of cascading failure to dependent services.",
+        "CRITICAL: Bimodal latency detected on {service}. P50={p50}ms, P99={p99}ms. Retry storm to {downstream} in us-west-2 is bifurcating the response time distribution.",
+        "CRITICAL: SLO BREACH – {service} availability {slo}% (target 99.9%) over last 30 minutes. Retry-driven {error_pct}% error rate against {downstream} in eu-west-1.",
+        "CRITICAL: {service} retry budget exhausted. {retry_pct}% of all outbound calls to {downstream} are retries. Backoff jitter absent. Amplification ratio {amp_ratio}x.",
+        "CRITICAL: {downstream} returning 429 Too Many Requests at scale. {service} client is not honoring Retry-After headers. Amplification event escalating in us-east-1.",
+        "CRITICAL: Cascading timeout storm active: {service} timeout {timeout}ms triggering retries that raise {downstream} latency beyond {timeout}ms, reinforcing the loop. Manual circuit break required.",
+        "CRITICAL: {service} circuit breaker has tripped {conn_count} times in the last 5 minutes on {downstream} endpoint {endpoint}. Amplification ratio {amp_ratio}x. Escalate to on-call lead immediately."
+      ]
+    },
+    {
+      "severity": "warning",
+      "messages": [
+        "WARNING: {service} retry rate elevated to {retry_pct}% on calls to {downstream} in us-east-1. Normal rate is under 2%. Monitor closely for amplification.",
+        "WARNING: Outbound call rate from {service} to {downstream} is {rps} RPS, {amp_ratio}x the inbound rate. Possible retry amplification building in eu-west-1.",
+        "WARNING: Circuit breaker on {service} -> {downstream} is HALF-OPEN. {error_pct}% probe failures. Risk of returning to full OPEN state.",
+        "WARNING: P99 latency on {service} spiked to {p99}ms (baseline {baseline}ms). Retry fan-out to {downstream} suspected. Trace ID: {trace_id}.",
+        "WARNING: {service} is issuing fixed-interval retries to {downstream} every {timeout}ms with no jitter. Under increased error rates this configuration will cause synchronized retry bursts.",
+        "WARNING: {downstream} request queue depth growing due to elevated inbound from {service}. Current: {rps} RPS vs normal {normal_rate} RPS.",
+        "WARNING: {service} error budget consumption rate is {rate}x normal. Retry amplification to {downstream} in us-west-2 may cause SLO breach within {hours} hours at current trajectory.",
+        "WARNING: Bimodal latency pattern emerging on {service} in eu-central-1. P50={p50}ms stable but P99={p99}ms rising. Consistent with partial retry storm conditions.",
+        "WARNING: {service} circuit breaker to {downstream} has flapped open and closed {conn_count} times in 10 minutes. Flapping indicates an unresolved upstream error condition.",
+        "WARNING: Retry amplification ratio for {service} -> {downstream} reached {amp_ratio}x. Automatic rate limiting threshold is 3x. Current value is approaching that limit."
+      ]
+    },
+    {
+      "severity": "info",
+      "messages": [
+        "INFO: {service} retry amplification event resolved. Outbound call rate to {downstream} normalized to {normal_rate} RPS as of 14:30 UTC.",
+        "INFO: Circuit breaker on {service} -> {downstream} reset to CLOSED state. Retry rate returned to baseline below 2%.",
+        "INFO: Retry policy update deployed to {service} fleet. Exponential backoff with full jitter now active for all calls to {downstream}.",
+        "INFO: {service} amplification peaked at {amp_ratio}x at 11:45 UTC. Traffic has been declining for 20 minutes. No further intervention needed at this time.",
+        "INFO: Post-incident review for amplification event scheduled. Trace ID {trace_id} preserved for analysis. {downstream} confirmed healthy throughout the event window."
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "level": "ERROR",
+      "messages": [
+        "[ERROR] {trace_id} RetryableException calling {downstream} at {endpoint}: upstream timeout after {timeout}ms. Retry attempt 4 of 5.",
+        "[ERROR] {trace_id} Circuit breaker OPEN: {service} -> {downstream}:{port}. Failing fast. Last {conn_count} calls failed. Last failure duration: {duration}ms.",
+        "[ERROR] {trace_id} HTTP 503 from {downstream} {endpoint} after {timeout}ms. Scheduling retry in {timeout}ms (no jitter configured). Attempt {conn_count}/10.",
+        "[ERROR] {trace_id} MaxRetriesExceededException: {downstream} did not recover after {conn_count} attempts. Total elapsed {duration}ms. Propagating failure to caller.",
+        "[ERROR] {trace_id} Retry storm detected by egress rate limiter. Outbound RPS to {downstream} is {rps}, {amp_ratio}x above expected {normal_rate}. Emergency throttle applied.",
+        "[ERROR] {trace_id} HTTP 429 TooManyRequests from {downstream} {endpoint}. Retry-After: 60s. Client retry config ignoring header. Retrying in {timeout}ms.",
+        "[ERROR] {trace_id} Connection pool wait timeout acquiring slot to {downstream}. All {conn_max} connections occupied by in-flight retry attempts. Pool exhausted.",
+        "[ERROR] {trace_id} CircuitBreakerStateTransition: CLOSED -> OPEN for {downstream}:{port}. Failure rate {error_pct}% exceeds 50% threshold over rolling 10s window.",
+        "[ERROR] {trace_id} Timeout on {endpoint} after {timeout}ms. Retry attempt {conn_count}. Bimodal latency observed: fast path {p50}ms, slow path {p99}ms.",
+        "[ERROR] {trace_id} Amplification alert: {service} issued {rps} outbound requests against {normal_rate} inbound in the last 60s. Ratio={amp_ratio}x.",
+        "[ERROR] {trace_id} DeadlineExceeded: accumulated retry delay {duration}ms exceeds caller deadline. Original error: {downstream} returned HTTP 502.",
+        "[ERROR] {trace_id} Retry policy misconfiguration: fixed delay {timeout}ms, no jitter, max_attempts=10. Amplification risk is high under partial outage conditions.",
+        "[ERROR] {trace_id} {downstream} health probes degraded: {error_pct}% returning 5xx. Retry budget consumed. Circuit breaker trip imminent if failure rate holds.",
+        "[ERROR] {trace_id} Request to {endpoint} failed after {conn_count} retries totalling {duration}ms. {downstream} p99 latency at time of failure: {p99}ms.",
+        "[ERROR] {trace_id} SLO breach: {service} availability {slo}% over sliding 30-minute window. Source: retry amplification event in {namespace}."
+      ]
+    },
+    {
+      "level": "WARN",
+      "messages": [
+        "[WARN] {trace_id} High retry rate observed: {retry_pct}% of calls to {downstream} are retries. Alert threshold is 10%. Possible amplification building.",
+        "[WARN] {trace_id} Circuit breaker HALF-OPEN: sending probe to {downstream}:{port}. {conn_count} consecutive failures preceded the OPEN transition.",
+        "[WARN] {trace_id} Retry attempt {conn_count}/5 to {downstream} {endpoint}. Elapsed {duration}ms. P99 latency trending upward: {p99}ms.",
+        "[WARN] {trace_id} Outbound request rate {rps} RPS exceeds inbound rate {normal_rate} RPS by {amp_ratio}x. Verify retry configuration for {service}.",
+        "[WARN] {trace_id} Backoff jitter disabled in retry config for {downstream}. Under elevated error rates this will produce synchronized retry bursts.",
+        "[WARN] {trace_id} {downstream} returned HTTP 503 with empty Retry-After header. Defaulting to fixed retry interval of {timeout}ms.",
+        "[WARN] {trace_id} Error rate {error_pct}% approaching circuit breaker trip threshold of 50%. {downstream} at {endpoint} responding slowly.",
+        "[WARN] {trace_id} Retry amplification ratio reached {amp_ratio}x in the last 30 seconds. Circuit breaker auto-trip threshold is 3x sustained for 60s.",
+        "[WARN] {trace_id} Duplicate request detected on {downstream} {endpoint}: same idempotency key submitted {conn_count} times. Retry deduplication not enabled.",
+        "[WARN] {trace_id} P99 latency {p99}ms is {amp_ratio}x baseline {baseline}ms. Bimodal distribution indicates some retries completing fast while others time out.",
+        "[WARN] {trace_id} {service} retry budget 80% consumed in {namespace}. {retry_pct}% of current outbound traffic to {downstream} is retry traffic.",
+        "[WARN] {trace_id} Max retry jitter cap {timeout}ms is less than downstream p99 response time {p99}ms. Synchronized retry waves are likely."
+      ]
+    },
+    {
+      "level": "INFO",
+      "messages": [
+        "[INFO] {trace_id} Circuit breaker CLOSED: {service} -> {downstream}:{port} recovering. Probe success rate 95% over last 30s.",
+        "[INFO] {trace_id} Retry amplification event ended. Outbound call rate normalized to {normal_rate} RPS. Total amplified window: {hours} hours.",
+        "[INFO] {trace_id} Emergency retry throttle applied to {service} -> {downstream}. Max outbound RPS capped at {normal_rate} pending config fix.",
+        "[INFO] {trace_id} Retry policy updated: exponential backoff with full jitter enabled for {downstream}. Max delay 30s. Max attempts reduced to 3.",
+        "[INFO] {trace_id} {service} request rate returning to normal. Inbound: {normal_rate} RPS. Outbound to {downstream}: {rps} RPS. Ratio approaching 1x.",
+        "[INFO] {trace_id} Circuit breaker telemetry: {conn_count} trips recorded in last {hours}h. Peak amplification ratio {amp_ratio}x observed at 11:45 UTC.",
+        "[INFO] {trace_id} Retry-fix config rolled out to all {service} instances in {namespace}. No further amplification expected.",
+        "[INFO] {trace_id} Post-incident note: {retry_pct}% retry rate peak recorded during storm. {downstream} confirmed healthy throughout. Issue was client-side only."
+      ]
+    }
+  ]
+}
