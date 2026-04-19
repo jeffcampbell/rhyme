@@ -260,6 +260,16 @@ These limitations are fundamental, not bugs to be fixed:
 - **Taxonomy disagreement.** If a model's understanding of what constitutes a "proximal cause" differs from the taxonomy's, the model is graded as wrong whether or not it actually is. The taxonomy is the benchmark's ground truth, not objective truth.
 - **Distribution shift.** Models trained on the published corpus will overfit. The private query slice helps detect this, but the benchmark has a finite useful life before training-set contamination makes scores meaningless.
 
+### Why we use a minimal prompt
+
+The shipped adapters use a deliberately simple prompt: *"Find the most similar incidents based on proximal cause similarity (not just symptom overlap)."* We tested whether more sophisticated prompts — adding heuristics, worked examples, and a full diagnostic framework — would improve results.
+
+**Retrieval (Task 2): prompt sophistication makes no difference.** Precision@10 was 0.805 with a bare prompt and 0.806 with an expert prompt containing cause-family descriptions, red-herring warnings, and worked examples. The prompt is a small fraction of the context when the model is processing 20 incident summaries — the signal is in the data, not the instructions.
+
+**Remediation (Task 3): better prompts help significantly — but that's the problem.** An expert prompt improved correct-fix rate from 72.5% to 88.8% on Haiku and eliminated all would-worsen answers. However, a benchmark that bakes in optimized prompts measures *model + our prompt engineering* rather than the model alone. The expert prompt teaches exactly the distinction (fixes-cause vs masks-symptom vs would-worsen) that the remediation questions test — it's tuned to the test. This compresses the gap between models: a 13pp difference between models under a bare prompt shrinks to 2pp under an expert prompt, hiding the signal the benchmark exists to measure.
+
+For benchmarking, a minimal prompt maximizes the distance between models of different capability levels. For production use, optimizing the prompt for your specific task is absolutely worthwhile — our results show it can dramatically improve remediation safety.
+
 ## Design rationale
 
 The full design document is in [`rhyme-v1-spec.md`](rhyme-v1-spec.md), including:
