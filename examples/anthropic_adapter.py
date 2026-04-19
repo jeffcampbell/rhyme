@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Anthropic Claude adapter for IncidentCorr-Bench.
+Anthropic Claude adapter for Rhyme.
 
 Uses the Anthropic API directly. Supports Claude Haiku, Sonnet, and Opus.
 
 Usage:
   export ANTHROPIC_API_KEY=sk-...
-  export SIFTER_MODEL=claude-haiku-4-5-20251001  # or claude-sonnet-4-6
-  sifter-run --adapter "python examples/anthropic_adapter.py" ...
+  export RHYME_MODEL=claude-haiku-4-5-20251001  # or claude-sonnet-4-6
+  rhyme-run --adapter "python examples/anthropic_adapter.py" ...
 """
 
 import json
@@ -18,7 +18,7 @@ import urllib.request
 import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); from parse_utils import extract_json_array, extract_letter, normalize_matches
 
 API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
-MODEL = os.environ.get("SIFTER_MODEL", "claude-haiku-4-5-20251001")
+MODEL = os.environ.get("RHYME_MODEL", "claude-haiku-4-5-20251001")
 
 
 def call_claude(prompt: str, max_tokens: int = 2000) -> tuple[str, dict]:

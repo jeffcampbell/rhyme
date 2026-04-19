@@ -10,8 +10,8 @@ RUN pip install --no-cache-dir -e ".[dev,web]"
 COPY . .
 
 # Default entrypoint — override with --entrypoint for specific commands:
-#   sifter-generate  Generate corpus + query set
-#   sifter-run       Run baselines or custom adapter
-#   sifter-score     Score results
-#   sifter-probe     Run adversarial style probe
+#   rhyme-generate  Generate corpus + query set
+#   rhyme-run       Run baselines or custom adapter
+#   rhyme-score     Score results
+#   rhyme-probe     Run adversarial style probe
 ENTRYPOINT ["python", "-m"]

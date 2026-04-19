@@ -1,11 +1,11 @@
-"""Shared fixtures for Sifter tests."""
+"""Shared fixtures for Rhyme tests."""
 
 import pytest
 from pathlib import Path
 
-from sifter_bench.generator import generate_corpus
-from sifter_bench.queries import build_query_set, build_remediation_questions
-from sifter_bench.taxonomy import CauseClass
+from rhyme_bench.generator import generate_corpus
+from rhyme_bench.queries import build_query_set, build_remediation_questions
+from rhyme_bench.taxonomy import CauseClass
 
 
 @pytest.fixture(scope="session")

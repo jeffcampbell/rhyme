@@ -1,14 +1,14 @@
 """Tests for the evaluation harness."""
 
-from sifter_bench.baselines import BM25Baseline, RandomBaseline, TfidfBaseline
-from sifter_bench.harness import (
+from rhyme_bench.baselines import BM25Baseline, RandomBaseline, TfidfBaseline
+from rhyme_bench.harness import (
     Adapter,
     RetrieveOutput,
     run_reasoning_only,
     run_remediation,
     run_retrieval,
 )
-from sifter_bench.models import (
+from rhyme_bench.models import (
     IncidentPayload,
     RankedMatch,
     RemediationChoice,

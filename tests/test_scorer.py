@@ -1,14 +1,14 @@
 """Tests for the scorer."""
 
-from sifter_bench.baselines import BM25Baseline, RandomBaseline
-from sifter_bench.harness import run_retrieval
-from sifter_bench.models import (
+from rhyme_bench.baselines import BM25Baseline, RandomBaseline
+from rhyme_bench.harness import run_retrieval
+from rhyme_bench.models import (
     RankedMatch,
     RemediationResult,
     RetrievalResult,
 )
-from sifter_bench.scorer import score, EfficiencyMetrics
-from sifter_bench.taxonomy import ConfusabilityTier
+from rhyme_bench.scorer import score, EfficiencyMetrics
+from rhyme_bench.taxonomy import ConfusabilityTier
 
 
 def test_score_produces_all_tiers(small_corpus, query_set_and_incidents):
@@ -69,7 +69,7 @@ def test_remediation_grading(small_corpus, query_set_and_incidents, remediation_
     results = run_retrieval(adapter, payloads, small_corpus, k=10)
 
     # Simulate random remediation answers
-    from sifter_bench.harness import run_remediation
+    from rhyme_bench.harness import run_remediation
     rem_results = run_remediation(adapter, payloads, results, small_corpus, remediation_questions)
 
     report = score(
@@ -109,7 +109,7 @@ def test_score_report_summary_string(small_corpus, query_set_and_incidents):
     results = run_retrieval(adapter, payloads, small_corpus, k=10)
     report = score(results, qs, small_corpus, k=10)
     summary = report.summary()
-    assert "Sifter Score Report" in summary
+    assert "Rhyme Score Report" in summary
     assert "Per-tier" in summary
     assert "Macro-average" in summary
 

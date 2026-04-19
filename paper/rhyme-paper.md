@@ -1,10 +1,10 @@
-# Sifter: Evaluating LLM-Based Incident Correlation in Microservice Architectures
+# Rhyme: Evaluating LLM-Based Incident Correlation in Microservice Architectures
 
 ---
 
 ## Abstract
 
-AI-assisted incident response tools increasingly surface "similar past incidents" to help on-call engineers. These tools risk producing red herrings — incidents that share symptoms but have different proximal causes, leading engineers to pursue wrong remediations. We present Sifter, a benchmark for evaluating how well language models distinguish cause-similar from symptom-similar incidents across 20 cause classes in cloud-native microservice environments. We evaluate 9 models from OpenAI, Anthropic, Google, and DeepSeek against BM25 and TF-IDF baselines across three tasks: full-corpus retrieval, reasoning-only re-ranking, and remediation selection. Our key finding is that LLMs do not meaningfully outperform BM25 keyword matching on incident retrieval (all models score 0.78–0.82 precision@10 vs BM25's 0.81), but dramatically outperform it on remediation selection (72–96% correct vs 16% random), with significant safety-relevant variation across models. We propose that incident correlation systems should use keyword retrieval for candidate selection and reserve LLM reasoning for re-ranking and remediation — a hybrid architecture that achieves better results at 30x lower cost. We also introduce an adversarial style probe methodology for validating synthetic benchmark corpora and a web-based labeling tool for evaluating models against organization-specific incident data.
+AI-assisted incident response tools increasingly surface "similar past incidents" to help on-call engineers. These tools risk producing red herrings — incidents that share symptoms but have different proximal causes, leading engineers to pursue wrong remediations. We present Rhyme, a benchmark for evaluating how well language models distinguish cause-similar from symptom-similar incidents across 20 cause classes in cloud-native microservice environments. We evaluate 9 models from OpenAI, Anthropic, Google, and DeepSeek against BM25 and TF-IDF baselines across three tasks: full-corpus retrieval, reasoning-only re-ranking, and remediation selection. Our key finding is that LLMs do not meaningfully outperform BM25 keyword matching on incident retrieval (all models score 0.78–0.82 precision@10 vs BM25's 0.81), but dramatically outperform it on remediation selection (72–96% correct vs 16% random), with significant safety-relevant variation across models. We propose that incident correlation systems should use keyword retrieval for candidate selection and reserve LLM reasoning for re-ranking and remediation — a hybrid architecture that achieves better results at 30x lower cost. We also introduce an adversarial style probe methodology for validating synthetic benchmark corpora and a web-based labeling tool for evaluating models against organization-specific incident data.
 
 ---
 
@@ -20,7 +20,7 @@ Despite the proliferation of AI-assisted incident tools, no existing benchmark s
 
 This paper makes three contributions:
 
-1. **Sifter**, a benchmark with 1,000 synthetic incidents across 20 cause classes, 200 queries stratified by confusability tier, and deterministic scoring that explicitly measures the red-herring failure mode
+1. **Rhyme**, a benchmark with 1,000 synthetic incidents across 20 cause classes, 200 queries stratified by confusability tier, and deterministic scoring that explicitly measures the red-herring failure mode
 2. **Empirical results** from 9 models across 4 providers showing that LLMs do not outperform keyword matching on retrieval but dramatically outperform it on remediation, with safety-relevant variation across models
 3. **A methodology** for validating synthetic benchmark quality using adversarial style probes and real-incident style transfer
 
@@ -58,7 +58,7 @@ We address this risk through three mechanisms: (1) the fingerprint schema used f
 
 ### 3.1 Taxonomy
 
-Sifter defines 20 cause classes across 8 families:
+Rhyme defines 20 cause classes across 8 families:
 
 | Family | Classes | Count |
 |--------|---------|-------|
@@ -151,7 +151,7 @@ All LLM evaluations used Task 2 (reasoning-only, 80 queries) and Task 3 (remedia
 
 ### 4.2 Adapter design
 
-Models were connected via a subprocess protocol: the harness writes JSON to the adapter's stdin, the adapter returns JSON on stdout. Each adapter converts the Sifter query format into the provider's API format and parses the response. A shared parsing library handles output format variations across models (code fences, thinking tags, prose wrapping, key ordering).
+Models were connected via a subprocess protocol: the harness writes JSON to the adapter's stdin, the adapter returns JSON on stdout. Each adapter converts the Rhyme query format into the provider's API format and parses the response. A shared parsing library handles output format variations across models (code fences, thinking tags, prose wrapping, key ordering).
 
 All LLM adapters used zero-shot prompting with the instruction: *"Find the most similar incidents based on PROXIMAL CAUSE similarity (not just symptom overlap). Two incidents share a proximal cause if the same fix would apply to both."*
 
@@ -301,13 +301,13 @@ The narrow precision band (0.782–0.818) means the ranking of models is likely 
 
 ### 7.6 Finite useful life
 
-Published benchmarks are vulnerable to training-set contamination. As models are trained on more web data, scores on Sifter will inflate without corresponding capability gains. The private query slice provides some protection, but the benchmark should be versioned and refreshed periodically with new corpus generations.
+Published benchmarks are vulnerable to training-set contamination. As models are trained on more web data, scores on Rhyme will inflate without corresponding capability gains. The private query slice provides some protection, but the benchmark should be versioned and refreshed periodically with new corpus generations.
 
 ---
 
 ## 8. Evaluating on your own data
 
-Synthetic benchmarks answer "how does model A compare to model B in a controlled setting?" but not "does this model work well on *our* incidents?" To address the second question, Sifter includes a web-based labeling tool.
+Synthetic benchmarks answer "how does model A compare to model B in a controlled setting?" but not "does this model work well on *our* incidents?" To address the second question, Rhyme includes a web-based labeling tool.
 
 Organizations import their real incidents (as JSON with id, summary, and timestamp — no logs or alerts needed), and the tool generates incident pairs for human evaluation. SREs answer "Would knowing about Incident A help you respond to Incident B?" for each pair, and the tool scores model predictions against human labels with precision, recall, calibration, and red-herring detection.
 
@@ -317,7 +317,7 @@ This two-tool approach — synthetic benchmark for model selection, human labeli
 
 ## 9. Conclusion
 
-We presented Sifter, a benchmark for evaluating LLM-based incident correlation with explicit treatment of the red-herring problem. Testing 9 models from 4 providers revealed three findings with practical implications:
+We presented Rhyme, a benchmark for evaluating LLM-based incident correlation with explicit treatment of the red-herring problem. Testing 9 models from 4 providers revealed three findings with practical implications:
 
 1. **LLMs do not outperform keyword matching on incident retrieval.** All models scored 0.78–0.82 precision@10, clustering around BM25's 0.81. The lexical signal in incident text is strong enough that keyword matching captures most of the retrievable information.
 

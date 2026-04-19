@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "sifter"
+name = "rhyme"
 version = "1.0.0"
 description = "Benchmark and evaluation tool for LLM-based incident correlation"
 requires-python = ">=3.11"
@@ -31,11 +31,11 @@ dev = [
 ]
 
 [project.scripts]
-sifter-generate = "sifter_bench.cli:generate"
-sifter-run = "sifter_bench.cli:run"
-sifter-score = "sifter_bench.cli:score"
-sifter-probe = "sifter_bench.cli:probe"
-sifter-web = "sifter_web.cli:main"
+rhyme-generate = "rhyme_bench.cli:generate"
+rhyme-run = "rhyme_bench.cli:run"
+rhyme-score = "rhyme_bench.cli:score"
+rhyme-probe = "rhyme_bench.cli:probe"
+rhyme-web = "rhyme_web.cli:main"
 
 [tool.ruff]
 line-length = 100

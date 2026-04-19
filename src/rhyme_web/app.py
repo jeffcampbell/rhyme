@@ -34,7 +34,7 @@ from .models import (
 from .pair_sampler import sample_pairs
 from .scorer_human import score_against_humans
 
-logger = logging.getLogger("sifter_web")
+logger = logging.getLogger("rhyme_web")
 
 
 def create_app(data_dir: str | None = None, verbose: bool = False) -> Flask:
@@ -55,7 +55,7 @@ def create_app(data_dir: str | None = None, verbose: bool = False) -> Flask:
         from pathlib import Path
         db_dir = Path(data_dir)
         db_dir.mkdir(parents=True, exist_ok=True)
-        os.environ.setdefault("DATABASE_URL", f"sqlite:///{db_dir.resolve()}/sifter.db")
+        os.environ.setdefault("DATABASE_URL", f"sqlite:///{db_dir.resolve()}/rhyme.db")
 
     init_db(app)
     logger.info(f"Database: {app.config['SQLALCHEMY_DATABASE_URI']}")

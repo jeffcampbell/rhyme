@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Run Sifter benchmark across multiple models and produce a comparison table.
+Run Rhyme benchmark across multiple models and produce a comparison table.
 
 Uses OpenRouter (openrouter.ai) by default — one API key for access to
 OpenAI, Anthropic, Google, Mistral, Qwen, Meta, and more.
 
 Usage:
   export OPENROUTER_API_KEY=sk-or-...
-  docker build -t sifter .
-  docker run --rm -v $(pwd)/data:/app/data --entrypoint python sifter \
+  docker build -t rhyme .
+  docker run --rm -v $(pwd)/data:/app/data --entrypoint python rhyme \
     scripts/benchmark_models.py --tasks 2,3
 """
 
@@ -71,23 +71,23 @@ def run_model(model_config: dict, data_dir: str, tasks: str) -> dict | None:
         os.environ["OPENAI_API_KEY"] = api_key
         os.environ["OPENAI_BASE_URL"] = base_url
         adapter_script = "examples/openai_compat_adapter.py"
-    os.environ["SIFTER_MODEL"] = model_id
+    os.environ["RHYME_MODEL"] = model_id
 
     # Find the project root (where examples/ lives)
     script_dir = Path(__file__).resolve().parent
     project_root = script_dir.parent
 
-    # Run sifter via subprocess (calls the installed CLI)
+    # Run rhyme via subprocess (calls the installed CLI)
     cmd = [
-        sys.executable, "-m", "sifter_bench.cli",
+        sys.executable, "-m", "rhyme_bench.cli",
     ]
     # Actually, call the run function directly to avoid CLI discovery issues
     print(f"  Running {name} ({model_id})...")
 
     try:
-        from sifter_bench.baselines import BM25Baseline
-        from sifter_bench.harness import run_retrieval, run_reasoning_only, run_remediation
-        from sifter_bench.models import Corpus, IncidentPayload, RemediationQuestionSet
+        from rhyme_bench.baselines import BM25Baseline
+        from rhyme_bench.harness import run_retrieval, run_reasoning_only, run_remediation
+        from rhyme_bench.models import Corpus, IncidentPayload, RemediationQuestionSet
 
         corpus = Corpus.load(Path(data_dir) / "corpus.json")
         raw_payloads = json.loads((Path(data_dir) / "query_payloads.json").read_text())
@@ -99,7 +99,7 @@ def run_model(model_config: dict, data_dir: str, tasks: str) -> dict | None:
             rem_questions = RemediationQuestionSet.load(rem_path)
 
         # Create adapter via subprocess
-        from sifter_bench.subprocess_adapter import SubprocessAdapter
+        from rhyme_bench.subprocess_adapter import SubprocessAdapter
         import shlex
         adapter_path = str(project_root / adapter_script)
         adapter = SubprocessAdapter([sys.executable, adapter_path])
@@ -135,8 +135,8 @@ def run_model(model_config: dict, data_dir: str, tasks: str) -> dict | None:
         adapter.close()
 
         # Score
-        from sifter_bench.scorer import score
-        from sifter_bench.models import QuerySet
+        from rhyme_bench.scorer import score
+        from rhyme_bench.models import QuerySet
 
         qs = QuerySet.load(Path(data_dir) / "queries.json")
 
@@ -162,7 +162,7 @@ def run_model(model_config: dict, data_dir: str, tasks: str) -> dict | None:
 
         rem_path = output_dir / "custom_remediation_results.json"
         if rem_path.exists() and (t1_results or t2_results):
-            from sifter_bench.models import RemediationResult
+            from rhyme_bench.models import RemediationResult
             rem_raw = json.loads(rem_path.read_text())
             rem = [RemediationResult.model_validate(r) for r in rem_raw]
             context = t2_results or t1_results
@@ -190,7 +190,7 @@ def print_table(all_results: list[dict], tasks: str):
     task_list = [t.strip() for t in tasks.split(",")]
 
     print()
-    print("## Sifter Scores")
+    print("## Rhyme Scores")
     print()
 
     if "2" in task_list:
@@ -231,7 +231,7 @@ def print_table(all_results: list[dict], tasks: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Benchmark multiple models with Sifter")
+    parser = argparse.ArgumentParser(description="Benchmark multiple models with Rhyme")
     parser.add_argument("--data-dir", default="data", help="Data directory with corpus and queries")
     parser.add_argument("--tasks", default="2,3", help="Tasks to run (default: 2,3)")
     parser.add_argument("--config", default=None, help="Model config JSON file")

@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from sifter_bench.subprocess_adapter import SubprocessAdapter
-from sifter_bench.models import IncidentPayload, RankedMatch, TokenUsage
-from sifter_bench.harness import RetrieveOutput
+from rhyme_bench.subprocess_adapter import SubprocessAdapter
+from rhyme_bench.models import IncidentPayload, RankedMatch, TokenUsage
+from rhyme_bench.harness import RetrieveOutput
 
 
 @pytest.fixture
@@ -49,7 +49,7 @@ def test_subprocess_retrieve(echo_script, small_corpus):
 
 def test_subprocess_remediate(echo_script, small_corpus):
     adapter = SubprocessAdapter([sys.executable, echo_script])
-    from sifter_bench.models import RemediationChoice
+    from rhyme_bench.models import RemediationChoice
     choices = [
         RemediationChoice(label="A", text="Fix", grade="fixed"),
         RemediationChoice(label="B", text="Mask", grade="masks_symptom"),

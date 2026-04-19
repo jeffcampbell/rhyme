@@ -11,16 +11,16 @@ OPENAI_API_KEY to your API key — Azure's OpenAI endpoint is compatible.
 
 Usage:
   # OpenAI
-  export OPENAI_API_KEY=sk-... SIFTER_MODEL=gpt-4o-mini
-  sifter-run --adapter "python examples/openai_compat_adapter.py" ...
+  export OPENAI_API_KEY=sk-... RHYME_MODEL=gpt-4o-mini
+  rhyme-run --adapter "python examples/openai_compat_adapter.py" ...
 
   # Ollama (local)
-  export OPENAI_BASE_URL=http://localhost:11434/v1 OPENAI_API_KEY=unused SIFTER_MODEL=llama3
-  sifter-run --adapter "python examples/openai_compat_adapter.py" ...
+  export OPENAI_BASE_URL=http://localhost:11434/v1 OPENAI_API_KEY=unused RHYME_MODEL=llama3
+  rhyme-run --adapter "python examples/openai_compat_adapter.py" ...
 
   # Together AI
-  export OPENAI_BASE_URL=https://api.together.xyz/v1 OPENAI_API_KEY=... SIFTER_MODEL=meta-llama/Llama-3-70b-chat-hf
-  sifter-run --adapter "python examples/openai_compat_adapter.py" ...
+  export OPENAI_BASE_URL=https://api.together.xyz/v1 OPENAI_API_KEY=... RHYME_MODEL=meta-llama/Llama-3-70b-chat-hf
+  rhyme-run --adapter "python examples/openai_compat_adapter.py" ...
 """
 
 import json
@@ -32,7 +32,7 @@ import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abs
 
 API_KEY = os.environ.get("OPENAI_API_KEY", "")
 BASE_URL = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
-MODEL = os.environ.get("SIFTER_MODEL", "gpt-4o-mini")
+MODEL = os.environ.get("RHYME_MODEL", "gpt-4o-mini")
 
 
 def call_llm(prompt: str, max_tokens: int = 2000) -> tuple[str, dict]:

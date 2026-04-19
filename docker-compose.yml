@@ -1,4 +1,4 @@
-# IncidentCorr Web — labeling tool with PostgreSQL
+# Rhyme Web — labeling tool with PostgreSQL
 #
 # Usage:
 #   docker compose up -d          # start web + postgres
@@ -21,7 +21,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DATABASE_URL=postgresql://sifter:sifter@postgres:5432/sifter
+      - DATABASE_URL=postgresql://rhyme:rhyme@postgres:5432/rhyme
       - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
     depends_on:
       postgres:
@@ -31,13 +31,13 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      - POSTGRES_DB=sifter
-      - POSTGRES_USER=sifter
-      - POSTGRES_PASSWORD=sifter
+      - POSTGRES_DB=rhyme
+      - POSTGRES_USER=rhyme
+      - POSTGRES_PASSWORD=rhyme
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sifter"]
+      test: ["CMD-SHELL", "pg_isready -U rhyme"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -52,11 +52,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DATABASE_URL=sqlite:////app/data/web/sifter.db
+      - DATABASE_URL=sqlite:////app/data/web/rhyme.db
       - SECRET_KEY=dev-secret-key
     volumes:
       - ./data/web:/app/data/web
-    entrypoint: ["sifter-web", "--debug", "--verbose"]
+    entrypoint: ["rhyme-web", "--debug", "--verbose"]
     profiles:
       - dev
 
