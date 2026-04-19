@@ -1,3 +1,5 @@
+![Rhyme](img/rhyme_header.jpg)
+
 # Rhyme
 
 **A benchmark for evaluating how well LLMs correlate microservice incidents by proximal cause — not just by symptoms.**
@@ -271,3 +273,10 @@ The full design document is in [`rhyme-v1-spec.md`](rhyme-v1-spec.md), including
 ## License
 
 MIT
+
+---
+
+This project was built with assistance from Claude Opus 4.6 (Anthropic).
+
+Header Image Attribution:
+Created using Google Gemini's Nano Banana 2 model.
