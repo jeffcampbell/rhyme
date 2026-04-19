@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from sifter_bench.models import (
+from rhyme_bench.models import (
     Alert,
     Corpus,
     Fingerprint,
@@ -22,7 +22,7 @@ from sifter_bench.models import (
     TopologyFragment,
     TopologyNode,
 )
-from sifter_bench.taxonomy import CauseClass, ConfusabilityTier
+from rhyme_bench.taxonomy import CauseClass, ConfusabilityTier
 
 
 def test_token_usage_total():

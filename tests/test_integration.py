@@ -1,11 +1,11 @@
 """Integration test: full generate → run → score pipeline."""
 
-from sifter_bench.baselines import BM25Baseline, RandomBaseline
-from sifter_bench.generator import generate_corpus
-from sifter_bench.harness import run_reasoning_only, run_remediation, run_retrieval
-from sifter_bench.queries import build_query_set, build_remediation_questions
-from sifter_bench.scorer import score
-from sifter_bench.taxonomy import CauseClass, ConfusabilityTier
+from rhyme_bench.baselines import BM25Baseline, RandomBaseline
+from rhyme_bench.generator import generate_corpus
+from rhyme_bench.harness import run_reasoning_only, run_remediation, run_retrieval
+from rhyme_bench.queries import build_query_set, build_remediation_questions
+from rhyme_bench.scorer import score
+from rhyme_bench.taxonomy import CauseClass, ConfusabilityTier
 
 
 def test_full_pipeline():
@@ -72,7 +72,7 @@ def test_full_pipeline():
 
     # Summary string should be well-formed
     summary = bm25_report.summary()
-    assert "Sifter" in summary
+    assert "Rhyme" in summary
     assert "Per-tier" in summary
 
 

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Google Gemini adapter for IncidentCorr-Bench.
+Google Gemini adapter for Rhyme.
 
 Works with Google AI Studio (API key auth). For Vertex AI, use the
 OpenAI-compatible endpoint instead (Vertex now supports it).
 
 Usage:
-  export GEMINI_API_KEY=... SIFTER_MODEL=gemini-2.0-flash
-  sifter-run --adapter "python examples/gemini_adapter.py" ...
+  export GEMINI_API_KEY=... RHYME_MODEL=gemini-2.0-flash
+  rhyme-run --adapter "python examples/gemini_adapter.py" ...
 """
 
 import json
@@ -18,7 +18,7 @@ import urllib.request
 import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); from parse_utils import extract_json_array, extract_letter, normalize_matches
 
 API_KEY = os.environ.get("GEMINI_API_KEY", "")
-MODEL = os.environ.get("SIFTER_MODEL", "gemini-2.0-flash")
+MODEL = os.environ.get("RHYME_MODEL", "gemini-2.0-flash")
 
 
 def call_gemini(prompt: str, max_tokens: int = 2000) -> tuple[str, dict]:

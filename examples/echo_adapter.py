@@ -6,7 +6,7 @@ This is a minimal reference implementation of the subprocess protocol.
 Replace the logic in handle_retrieve() with your model's actual retrieval.
 
 Usage:
-  sifter-run --corpus data/corpus.json --queries data/query_payloads.json \
+  rhyme-run --corpus data/corpus.json --queries data/query_payloads.json \
           --adapter "python examples/echo_adapter.py"
 """
 

@@ -5,7 +5,7 @@ import os
 
 import pytest
 
-from sifter_web.app import create_app
+from rhyme_web.app import create_app
 
 
 @pytest.fixture

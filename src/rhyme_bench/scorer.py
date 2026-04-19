@@ -95,7 +95,7 @@ class ScoreReport:
 
     def summary(self) -> str:
         lines = [
-            f"=== Sifter Score Report (k={self.k}) ===",
+            f"=== Rhyme Score Report (k={self.k}) ===",
             "",
             "Per-tier results (primary — no composite score; see spec §13 Q1):",
         ]

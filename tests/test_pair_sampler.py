@@ -1,7 +1,7 @@
 """Tests for pair sampling."""
 
-from sifter_web.models import CorrelationScore, OrgCorpus, OrgIncident
-from sifter_web.pair_sampler import sample_pairs
+from rhyme_web.models import CorrelationScore, OrgCorpus, OrgIncident
+from rhyme_web.pair_sampler import sample_pairs
 
 
 def _make_corpus(n: int) -> OrgCorpus:

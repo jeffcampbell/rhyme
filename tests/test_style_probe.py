@@ -1,6 +1,6 @@
 """Tests for the adversarial style probe."""
 
-from sifter_bench.style_probe import (
+from rhyme_bench.style_probe import (
     StyleFeatureExtractor,
     _incident_to_text,
     _strip_content_tokens,

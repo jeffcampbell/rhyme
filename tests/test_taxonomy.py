@@ -1,6 +1,6 @@
 """Tests for taxonomy integrity."""
 
-from sifter_bench.taxonomy import (
+from rhyme_bench.taxonomy import (
     CAUSE_FAMILY_MAP,
     CONFUSABLE_PAIRS,
     REMEDIATIONS,

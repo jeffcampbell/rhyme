@@ -9,7 +9,7 @@ from pathlib import Path
 
 def generate():
     """Generate corpus, query set, and remediation questions."""
-    parser = argparse.ArgumentParser(description="Generate Sifter corpus")
+    parser = argparse.ArgumentParser(description="Generate Rhyme corpus")
     parser.add_argument(
         "--incidents-per-class", type=int, default=10,
         help="Number of incidents per cause class (default: 10)",
@@ -87,7 +87,7 @@ def generate():
 def run():
     """Run baselines or a custom adapter against the corpus."""
     parser = argparse.ArgumentParser(
-        description="Run Sifter baselines or custom adapter",
+        description="Run Rhyme baselines or custom adapter",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 tasks:
@@ -99,9 +99,9 @@ tasks:
      Cost: ~500 tokens/query. Cheapest.
 
 examples:
-  sifter-run --tasks 2,3                   # skip expensive full-corpus retrieval
-  sifter-run --tasks 1,2,3 --baseline bm25 # run everything with BM25
-  sifter-run --tasks 2 --adapter "python examples/anthropic_adapter.py"
+  rhyme-run --tasks 2,3                   # skip expensive full-corpus retrieval
+  rhyme-run --tasks 1,2,3 --baseline bm25 # run everything with BM25
+  rhyme-run --tasks 2 --adapter "python examples/anthropic_adapter.py"
 """,
     )
     parser.add_argument(
@@ -236,7 +236,7 @@ examples:
 
 def score():
     """Score baseline results."""
-    parser = argparse.ArgumentParser(description="Score Sifter results")
+    parser = argparse.ArgumentParser(description="Score Rhyme results")
     parser.add_argument(
         "--corpus", type=str, default="data/corpus.json",
         help="Path to corpus JSON",

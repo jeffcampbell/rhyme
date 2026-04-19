@@ -1,4 +1,4 @@
-# Sifter v1 — Spec & Pressure-Test
+# Rhyme v1 — Spec & Pressure-Test
 
 *A benchmark for evaluating LLM-based correlation of microservice incidents, with explicit treatment of the red-herring problem.*
 
@@ -12,7 +12,7 @@ This document specifies a reproducible benchmark for measuring how well models c
 
 **Scope split.** This work is one of two products identified during planning:
 
-1. **Sifter (this document).** A generic, model-agnostic benchmark using synthetic data. Compares models in a vacuum.
+1. **Rhyme (this document).** A generic, model-agnostic benchmark using synthetic data. Compares models in a vacuum.
 2. **Org-specific refinement tool (tabled).** A tool that ingests an organization's real incident corpus, generates synthetic incidents from it, and lets internal SREs vote on correlation quality to refine model performance on their specific domain. Not specified here.
 
 ---
@@ -136,7 +136,7 @@ Baseline 4 is the critical reference point — it shows whether LLM reasoning be
 
 ## 9. Reproducibility contract
 
-- Corpus, taxonomy, query set, baselines, and scoring code are versioned and published together as `sifter-v1.0`.
+- Corpus, taxonomy, query set, baselines, and scoring code are versioned and published together as `rhyme-v1.0`.
 - Scoring is deterministic given model outputs. Two people scoring the same output file must get the same number.
 - Model outputs for any submission are retained (not just scores) so they can be re-verified or re-scored under a future metric version.
 - Benchmark version bumps (v1.1, v2.0) are additive. Historical v1.0 scores remain valid forever.
@@ -144,7 +144,7 @@ Baseline 4 is the critical reference point — it shows whether LLM reasoning be
 
 ### User workflow
 
-1. Download `sifter-v1.0.tar`.
+1. Download `rhyme-v1.0.tar`.
 2. Implement the adapter interface: `retrieve(query_payload, corpus) -> ranked_list_with_scores`; optionally `remediate(query, top_matches) -> string`.
 3. Run the provided harness, which issues queries and collects outputs.
 4. Run the provided scorer, which produces a report: headline (if kept), per-tier breakdown, confusion matrix, calibration chart, baseline comparison.
@@ -368,7 +368,7 @@ Resolve each of these and document the decision + rationale in this spec (edit �
 
 ### 14.5 Phase 5 — Packaging and release (Product 1: Synthetic Benchmark)
 
-**Goal:** Ship `sifter-v1.0` as a reproducible, self-contained benchmark with a generic model connector.
+**Goal:** Ship `rhyme-v1.0` as a reproducible, self-contained benchmark with a generic model connector.
 
 **Tasks:**
 

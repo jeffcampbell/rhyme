@@ -1,7 +1,7 @@
 """Tests for corpus generation."""
 
-from sifter_bench.generator import generate_corpus, generate_incident
-from sifter_bench.taxonomy import CauseClass, ConfusabilityTier
+from rhyme_bench.generator import generate_corpus, generate_incident
+from rhyme_bench.taxonomy import CauseClass, ConfusabilityTier
 import random
 
 

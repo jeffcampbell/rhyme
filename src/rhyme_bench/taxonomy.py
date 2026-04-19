@@ -1,5 +1,5 @@
 """
-Cause-class taxonomy for IncidentCorr-Bench v1.
+Cause-class taxonomy for Rhyme v1.
 
 20 cause classes across 8 families. Confusable pairs are explicitly mapped
 with tier assignments. Every class has controlled remediation vocabulary.

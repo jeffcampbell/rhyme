@@ -1,12 +1,12 @@
 """Tests for baseline adapters."""
 
-from sifter_bench.baselines import (
+from rhyme_bench.baselines import (
     BM25Baseline,
     RandomBaseline,
     TfidfBaseline,
     _payload_to_text,
 )
-from sifter_bench.models import RemediationChoice
+from rhyme_bench.models import RemediationChoice
 
 
 def test_random_baseline_returns_k(small_corpus):

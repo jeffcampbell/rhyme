@@ -1,12 +1,12 @@
-# Sifter
+# Rhyme
 
 **A benchmark for evaluating how well LLMs correlate microservice incidents by proximal cause — not just by symptoms.**
 
 When an "AI SRE" tool surfaces a similar past incident, is it actually helpful — or is it a red herring? Incidents often share symptoms (same error codes, same affected services) while having completely different underlying causes. Surfacing the wrong one sends the on-call engineer down the wrong path.
 
-Sifter measures whether a model can tell the difference.
+Rhyme measures whether a model can tell the difference.
 
-## Sifter Scores
+## Rhyme Scores
 
 | Model | Precision@10 | ECE | Tokens/query | Correct fix | Would worsen |
 |-------|-------------|-----|-------------|------------|-------------|
@@ -29,22 +29,22 @@ Sifter measures whether a model can tell the difference.
 ## Quick start
 
 ```sh
-docker build -t sifter .
+docker build -t rhyme .
 
 # Generate corpus + run baselines
-docker run --rm -v $(pwd)/data:/app/data --entrypoint sifter-generate sifter \
+docker run --rm -v $(pwd)/data:/app/data --entrypoint rhyme-generate rhyme \
   --output-dir /app/data --prose-pools-dir /app/data/prose_pools --incidents-per-class 50
 
 # Test your model (tasks 2+3, ~$2 for 200 queries)
 docker run --rm -v $(pwd)/data:/app/data \
-  -e ANTHROPIC_API_KEY=sk-... -e SIFTER_MODEL=claude-haiku-4-5-20251001 \
-  --entrypoint sifter-run sifter \
+  -e ANTHROPIC_API_KEY=sk-... -e RHYME_MODEL=claude-haiku-4-5-20251001 \
+  --entrypoint rhyme-run rhyme \
   --corpus /app/data/corpus.json --queries /app/data/query_payloads.json \
   --output-dir /app/data/results --tasks 2,3 \
   --adapter "python /app/examples/anthropic_adapter.py"
 
 # Score
-docker run --rm -v $(pwd)/data:/app/data --entrypoint sifter-score sifter \
+docker run --rm -v $(pwd)/data:/app/data --entrypoint rhyme-score rhyme \
   --corpus /app/data/corpus.json --queries /app/data/queries.json \
   --results /app/data/results/custom_task2_results.json
 ```
@@ -88,9 +88,9 @@ Task 2 is the recommended starting point — it's 30x cheaper than Task 1 and pr
 Select tasks with `--tasks`:
 
 ```sh
-sifter-run --tasks 2,3 --adapter "..."   # Recommended (~$2)
-sifter-run --tasks 1,2,3 --adapter "..."  # Full evaluation (~$50)
-sifter-run --tasks 3 --adapter "..."      # Just remediation (~$0.10)
+rhyme-run --tasks 2,3 --adapter "..."   # Recommended (~$2)
+rhyme-run --tasks 1,2,3 --adapter "..."  # Full evaluation (~$50)
+rhyme-run --tasks 3 --adapter "..."      # Just remediation (~$0.10)
 ```
 
 The CLI shows estimated token counts before any API calls are made.
@@ -162,7 +162,7 @@ A fingerprint schema encodes a theory of what discriminates proximal causes. Gen
 
 The biggest risk for any synthetic benchmark: models learn to detect the generator's writing style rather than reasoning about the incident content. If a classifier can predict cause class from *style features alone* (sentence length, punctuation patterns, formatting — not vocabulary), the corpus has a leak.
 
-Sifter runs an adversarial probe on every corpus version:
+Rhyme runs an adversarial probe on every corpus version:
 
 1. Strip all content from incident text (replace every word with `W`, numbers with `N`, punctuation with `P`)
 2. Train a logistic regression classifier on character n-grams and numeric features
@@ -203,13 +203,13 @@ Report `token_usage` for efficiency metrics:
 | [`gemini_adapter.py`](examples/gemini_adapter.py) | Google Gemini (AI Studio) | `GEMINI_API_KEY` |
 | [`bedrock_adapter.py`](examples/bedrock_adapter.py) | AWS Bedrock (all models) | AWS credentials + `AWS_REGION` |
 
-All adapters use `SIFTER_MODEL` env var to select the model.
+All adapters use `RHYME_MODEL` env var to select the model.
 
 ### Python adapter
 
 ```python
-from sifter_bench.harness import Adapter
-from sifter_bench.models import IncidentPayload, RankedMatch
+from rhyme_bench.harness import Adapter
+from rhyme_bench.models import IncidentPayload, RankedMatch
 
 class MyModel(Adapter):
     def retrieve(self, query: IncidentPayload, corpus: list[IncidentPayload], k: int = 10):
@@ -223,7 +223,7 @@ Use OpenRouter (one API key for all providers) to sweep multiple models:
 ```sh
 export OPENROUTER_API_KEY=sk-or-...
 docker run --rm -v $(pwd)/data:/app/data -e OPENROUTER_API_KEY \
-  --entrypoint python sifter \
+  --entrypoint python rhyme \
   scripts/benchmark_models.py --data-dir /app/data --tasks 2,3
 ```
 
@@ -260,7 +260,7 @@ These limitations are fundamental, not bugs to be fixed:
 
 ## Design rationale
 
-The full design document is in [`sifter-v1-spec.md`](sifter-v1-spec.md), including:
+The full design document is in [`rhyme-v1-spec.md`](rhyme-v1-spec.md), including:
 
 - 7 failure modes pressure-tested during design
 - Why "proximal cause" and not "root cause"

@@ -1,11 +1,11 @@
 """Tests for human-label scoring."""
 
-from sifter_web.models import (
+from rhyme_web.models import (
     IncidentPair,
     LabelingSession,
     PairLabel,
 )
-from sifter_web.scorer_human import score_against_humans
+from rhyme_web.scorer_human import score_against_humans
 
 
 def _make_session(pairs_and_labels):

@@ -1,11 +1,11 @@
 """Tests for query set construction and remediation questions."""
 
-from sifter_bench.queries import (
+from rhyme_bench.queries import (
     build_query_set,
     build_private_slice,
     build_remediation_questions,
 )
-from sifter_bench.taxonomy import CauseClass, ConfusabilityTier
+from rhyme_bench.taxonomy import CauseClass, ConfusabilityTier
 
 
 def test_query_set_size(small_corpus):

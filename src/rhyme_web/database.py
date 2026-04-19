@@ -4,7 +4,7 @@ SQLAlchemy database models for the web labeling tool.
 Supports PostgreSQL (production) and SQLite (local development).
 Set DATABASE_URL env var to configure:
   - PostgreSQL: postgresql://user:pass@host:5432/dbname
-  - SQLite:     sqlite:///data/web/sifter.db  (default)
+  - SQLite:     sqlite:///data/web/rhyme.db  (default)
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-DEFAULT_DATABASE_URL = "sqlite:///data/web/sifter.db"
+DEFAULT_DATABASE_URL = "sqlite:///data/web/rhyme.db"
 
 
 def get_database_url() -> str:

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AWS Bedrock adapter for IncidentCorr-Bench.
+AWS Bedrock adapter for Rhyme.
 
 Uses the Bedrock Converse API for a unified interface across all Bedrock
 models (Claude, Llama, Mistral, Titan, etc.).
@@ -8,12 +8,12 @@ models (Claude, Llama, Mistral, Titan, etc.).
 Requires: boto3, AWS credentials configured (env vars, ~/.aws/credentials, or IAM role).
 
 Usage:
-  export AWS_REGION=us-east-1 SIFTER_MODEL=anthropic.claude-3-haiku-20240307-v1:0
-  sifter-run --adapter "python examples/bedrock_adapter.py" ...
+  export AWS_REGION=us-east-1 RHYME_MODEL=anthropic.claude-3-haiku-20240307-v1:0
+  rhyme-run --adapter "python examples/bedrock_adapter.py" ...
 
   # Or with explicit credentials:
   export AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... AWS_REGION=us-east-1
-  sifter-run --adapter "python examples/bedrock_adapter.py" ...
+  rhyme-run --adapter "python examples/bedrock_adapter.py" ...
 """
 
 import json
@@ -22,7 +22,7 @@ import sys
 
 import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__))); from parse_utils import extract_json_array, extract_letter, normalize_matches
 
-MODEL = os.environ.get("SIFTER_MODEL", "anthropic.claude-3-haiku-20240307-v1:0")
+MODEL = os.environ.get("RHYME_MODEL", "anthropic.claude-3-haiku-20240307-v1:0")
 REGION = os.environ.get("AWS_REGION", "us-east-1")
 
 # Lazy-loaded boto3 client

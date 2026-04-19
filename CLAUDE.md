@@ -1,4 +1,4 @@
-# Sifter
+# Rhyme
 
 A benchmark for evaluating LLM-based correlation of microservice incidents, with explicit treatment of the red-herring problem.
 
@@ -9,7 +9,7 @@ Two products:
 ## Architecture
 
 ```
-src/sifter_bench/          # Product 1: Synthetic benchmark
+src/rhyme_bench/          # Product 1: Synthetic benchmark
   taxonomy.py                    # 20 cause classes, 8 families, remediation vocabulary, confusable pairs
   models.py                      # Pydantic models: Incident, Corpus, QuerySet, Fingerprint, TokenUsage, etc.
   archetypes.py                  # Per-class archetype templates (alerts, logs, summaries, fingerprint shapes)
@@ -21,15 +21,15 @@ src/sifter_bench/          # Product 1: Synthetic benchmark
   scorer.py                      # All metrics: retrieval@k, precision@k with lift, confusion matrix, ECE, efficiency
   baselines.py                   # Shipped baselines: Random, BM25, TF-IDF
   style_probe.py                 # Adversarial style probe (spec §10 FM1)
-  cli.py                         # CLI: sifter-generate, sifter-run, sifter-score, sifter-probe
+  cli.py                         # CLI: rhyme-generate, rhyme-run, rhyme-score, rhyme-probe
 
-src/sifter_web/            # Product 2: Web labeling tool
+src/rhyme_web/            # Product 2: Web labeling tool
   database.py                    # SQLAlchemy models (PostgreSQL + SQLite fallback)
   models.py                      # Pydantic models for import, pairs, labels, scoring
   pair_sampler.py                # Confidence-stratified pair sampling
   scorer_human.py                # Score model predictions vs human labels
   app.py                         # Flask routes: import, label, dashboard, API, health
-  cli.py                         # CLI: sifter-web
+  cli.py                         # CLI: rhyme-web
   templates/                     # HTML templates (Jinja2)
 
 data/
@@ -56,39 +56,39 @@ Everything runs in Docker. Never install dependencies on the host.
 
 ```sh
 # Build
-docker build -t sifter .
+docker build -t rhyme .
 
 # Generate corpus (1000 incidents, 50 per class, with LLM prose pools)
-docker run --rm -v $(pwd)/data:/app/data --entrypoint sifter-generate sifter \
+docker run --rm -v $(pwd)/data:/app/data --entrypoint rhyme-generate rhyme \
   --output-dir /app/data --prose-pools-dir /app/data/prose_pools --incidents-per-class 50
 
 # Run shipped baselines (Tasks 1, 2, 3)
-docker run --rm -v $(pwd)/data:/app/data --entrypoint sifter-run sifter \
+docker run --rm -v $(pwd)/data:/app/data --entrypoint rhyme-run rhyme \
   --corpus /app/data/corpus.json --queries /app/data/query_payloads.json \
   --output-dir /app/data/results
 
 # Run a custom model (tasks 2+3 only, saves cost)
 docker run --rm -v $(pwd)/data:/app/data \
-  -e ANTHROPIC_API_KEY=sk-... -e SIFTER_MODEL=claude-haiku-4-5-20251001 \
-  --entrypoint sifter-run sifter \
+  -e ANTHROPIC_API_KEY=sk-... -e RHYME_MODEL=claude-haiku-4-5-20251001 \
+  --entrypoint rhyme-run rhyme \
   --corpus /app/data/corpus.json --queries /app/data/query_payloads.json \
   --output-dir /app/data/results --tasks 2,3 \
   --adapter "python /app/examples/anthropic_adapter.py"
 
 # Score results
-docker run --rm -v $(pwd)/data:/app/data --entrypoint sifter-score sifter \
+docker run --rm -v $(pwd)/data:/app/data --entrypoint rhyme-score rhyme \
   --corpus /app/data/corpus.json --queries /app/data/queries.json \
   --results /app/data/results/bm25_results.json
 
 # Score with remediation
-docker run --rm -v $(pwd)/data:/app/data --entrypoint sifter-score sifter \
+docker run --rm -v $(pwd)/data:/app/data --entrypoint rhyme-score rhyme \
   --corpus /app/data/corpus.json --queries /app/data/queries.json \
   --results /app/data/results/random_results.json \
   --remediation-results /app/data/results/random_remediation_results.json \
   --remediation-questions /app/data/remediation_questions.json
 
 # Run adversarial style probe
-docker run --rm -v $(pwd)/data:/app/data --entrypoint sifter-probe sifter \
+docker run --rm -v $(pwd)/data:/app/data --entrypoint rhyme-probe rhyme \
   --corpus /app/data/corpus.json
 
 # --- Product 2: Web labeling tool ---
@@ -125,7 +125,7 @@ Write a program that reads JSON-lines from stdin and writes JSON-lines to stdout
 
 Token usage is optional. Pre-built adapters in `examples/`: `anthropic_adapter.py`, `openai_compat_adapter.py`, `gemini_adapter.py`, `bedrock_adapter.py`.
 
-Run with: `sifter-run --tasks 2,3 --adapter "python my_model.py"`
+Run with: `rhyme-run --tasks 2,3 --adapter "python my_model.py"`
 
 ### Option B: Python adapter
 Subclass `Adapter` from `harness.py` and implement `retrieve()`. Optionally implement `remediate()`. Return `RetrieveOutput` to include token usage.
@@ -139,7 +139,7 @@ No LLM-judge in headline metrics. All core metrics (retrieval@k, precision@k, co
 Models receive `IncidentPayload` only — never `IncidentLabels` or `Fingerprint`. This is the circularity problem from spec §3.2.
 
 ### Corpus realism — adversarial style probe is mandatory
-Run `sifter-probe` on every corpus version. The probe trains a classifier on style features (content-stripped char n-grams, sentence length) to detect cause-class leakage. The primary gate is on summary prose (stripped char n-grams ≤ random + 20pp). Full-text scores remain elevated due to inherent log format differences — this is expected.
+Run `rhyme-probe` on every corpus version. The probe trains a classifier on style features (content-stripped char n-grams, sentence length) to detect cause-class leakage. The primary gate is on summary prose (stripped char n-grams ≤ random + 20pp). Full-text scores remain elevated due to inherent log format differences — this is expected.
 
 ### Taxonomy changes invalidate all scores
 Changing a cause class changes ground truth. Validate against real postmortems before modifying. Major version bump required.

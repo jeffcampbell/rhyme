@@ -5,8 +5,8 @@ import os
 
 import pytest
 
-from sifter_web.app import create_app
-from sifter_web.models import parse_incidents
+from rhyme_web.app import create_app
+from rhyme_web.models import parse_incidents
 
 
 # ---------------------------------------------------------------------------

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from sifter_web.models import (
+from rhyme_web.models import (
     OrgCorpus,
     OrgIncident,
     LabelingSession,
