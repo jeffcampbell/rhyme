@@ -26,7 +26,7 @@ Rhyme measures whether a model can tell the difference.
 
 *Precision@10: fraction of top-10 matches sharing the same proximal cause. ECE: calibration error (lower = more trustworthy confidence scores). Correct fix: chose the right remediation from 5 options. Would worsen: chose a remediation that would make things worse.*
 
-**Key findings:** All tested LLMs achieve comparable retrieval precision to BM25 keyword matching (~0.80), but dramatically outperform it on remediation (72-96% correct vs 16% random). GPT-4.1 nano has the best calibration at the lowest token cost. Claude Opus 4 has the highest remediation accuracy (96%). DeepSeek V3 is competitive on retrieval but weaker on remediation (72% correct, 4% harmful).
+**Key findings:** Consistent with the standard RAG two-stage pattern, BM25 keyword retrieval matches LLM retrieval precision (~0.80) for incident correlation — confirming that expensive full-corpus LLM retrieval doesn't add value at the retrieval stage. The real value of LLMs is in reasoning: remediation accuracy jumps from 16% (random) to 72-96% when models evaluate candidates. GPT-4.1 nano has the best calibration at the lowest token cost. Claude Opus 4 has the highest remediation accuracy (96%). DeepSeek V3 is competitive on retrieval but weaker on remediation (72% correct, 4% harmful).
 
 ## Quick start
 
