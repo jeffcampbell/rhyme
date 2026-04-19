@@ -5,6 +5,10 @@ data/query_payloads.json
 data/query_payloads_test*.json
 data/remediation_questions.json
 data/results*/
+data/bench_*/
+data/benchmark_results.json
+data/models_*.json
+*.tar.gz
 
 # Private slice — never publish
 data/queries_private.json
@@ -25,3 +29,4 @@ build/
 .vscode/
 .idea/
 .DS_Store
+CLAUDE.md

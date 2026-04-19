@@ -206,7 +206,7 @@ No clean answer. Make a real decision, don't punt.
 
 **The failure.** Benchmarks that aren't championed by a major lab, hosted with a public leaderboard, or connected to an existing community tend to die regardless of quality.
 
-**Mitigation (not primarily technical).** Partnerships (Anthropic, observability vendors, SRE conferences). Public leaderboard hosting. Visible first-runs from known labs. 
+**Mitigation (not primarily technical).** Partnerships (Anthropic, observability vendors, SRE conferences). Public leaderboard hosting. Visible first-runs from known labs.
 
 ---
 
