@@ -192,6 +192,20 @@ class CorrelationScore(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0)
 
 
+class PairScore(BaseModel):
+    """A single pair's model score, keyed by pair_id."""
+
+    pair_id: str
+    confidence: float = Field(ge=0.0, le=1.0)
+
+
+class ModelScoreUpload(BaseModel):
+    """Payload for POST /api/scores/<session_id>."""
+
+    model_name: str
+    scores: list[PairScore]
+
+
 class HumanVsModelReport(BaseModel):
     """Results of comparing model predictions to human labels."""
 

@@ -54,7 +54,7 @@ docker run --rm -v $(pwd)/data:/app/data --entrypoint rhyme-score rhyme \
 ## Two products
 
 1. **Synthetic benchmark** (CLI) — evaluates models against a labeled synthetic corpus with deterministic scoring. Compare models, prompts, and approaches.
-2. **Web labeling tool** — evaluates models against your organization's real incidents with human SRE labels. Confirms a model works on your specific incident patterns.
+2. **Web labeling tool** — evaluates models against your organization's real incidents with human SRE labels. Compare multiple models side-by-side to find which one best matches your team's judgment.
 
 ### Evaluate against your own incidents
 
@@ -63,7 +63,7 @@ docker compose up -d          # start web + postgres
 # visit http://localhost:8080
 ```
 
-Import incidents as JSON, label pairs side-by-side ("Would knowing about Incident A help respond to Incident B?"), review model performance vs human labels on the dashboard. The tool highlights red herrings — cases where the model is confident but your SREs disagree.
+Import incidents as JSON, label pairs side-by-side ("Would knowing about Incident A help respond to Incident B?"), then evaluate multiple models with `rhyme-eval`. The dashboard compares each model's scores against your SREs' labels and highlights red herrings — cases where the model is confident but your team disagrees.
 
 ---
 
@@ -231,12 +231,43 @@ docker run --rm -v $(pwd)/data:/app/data -e OPENROUTER_API_KEY \
 
 ## Web labeling tool details
 
+![Rhyme Web UI](img/rhyme_ui.png)
+
 ### How it works
 
 1. **Import** incidents as JSON — minimum fields: `id`, `summary`, `timestamp`. Optional: `severity`, `service`, `url` (link to your incident tracker)
 2. **Pairs are sampled** across the model's confidence spectrum (high/medium/low/random) to calibrate both true positives and false positives
 3. **SREs label** pairs: "Would knowing about Incident A help you respond to Incident B?" — Yes / No / Maybe
-4. **Dashboard** shows precision/recall at multiple thresholds, calibration curves, inter-annotator agreement, and red herring detection
+4. **Evaluate models** against your labeled pairs — run any adapter from the CLI and scores upload automatically
+5. **Dashboard** compares multiple models side-by-side against human labels: precision/recall/F1 at thresholds, calibration, and red herring detection
+
+![Rhyme Dashboard](img/rhyme_dashboard_ui.png)
+
+### Comparing models against human labels
+
+Once you have labeled pairs, evaluate any model from the CLI:
+
+```sh
+# Evaluate Claude against your labeled session
+docker run --rm -v $(pwd)/data:/app/data \
+  -e ANTHROPIC_API_KEY -e RHYME_MODEL=claude-haiku-4-5-20251001 \
+  --entrypoint rhyme-eval rhyme \
+  --session <session-id> \
+  --server http://host.docker.internal:8080 \
+  --adapter "python /app/examples/anthropic_adapter.py" \
+  --model-name "claude-haiku-3.5"
+
+# Evaluate GPT-4o mini
+docker run --rm -v $(pwd)/data:/app/data \
+  -e OPENAI_API_KEY -e RHYME_MODEL=gpt-4o-mini \
+  --entrypoint rhyme-eval rhyme \
+  --session <session-id> \
+  --server http://host.docker.internal:8080 \
+  --adapter "python /app/examples/openai_compat_adapter.py" \
+  --model-name "gpt-4o-mini"
+```
+
+Each model you evaluate appears in the dashboard's comparison table, showing which model most closely matches your SREs' judgment. The dashboard highlights the best model by F1 score and flags red herrings — cases where the model is confident but your team disagrees.
 
 ### Deployment
 

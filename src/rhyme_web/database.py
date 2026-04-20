@@ -88,6 +88,23 @@ class DBLabel(db.Model):
     labeled_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
 
+class DBModelScore(db.Model):
+    """A model's correlation score for an incident pair."""
+
+    __tablename__ = "model_scores"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    session_id = db.Column(db.String(32), db.ForeignKey("sessions.id"), nullable=False, index=True)
+    model_name = db.Column(db.String(255), nullable=False)
+    pair_id = db.Column(db.String(32), db.ForeignKey("pairs.pair_id"), nullable=False, index=True)
+    confidence = db.Column(db.Float, nullable=False)
+    uploaded_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    __table_args__ = (
+        db.UniqueConstraint("session_id", "model_name", "pair_id", name="uq_model_score"),
+    )
+
+
 def init_db(app):
     """Initialize database with the Flask app."""
     database_url = get_database_url()

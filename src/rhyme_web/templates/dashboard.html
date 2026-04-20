@@ -20,6 +20,42 @@
     <p>{{ labeled }} of {{ total }} pairs labeled ({{ (100 * labeled // total) if total else 0 }}%)</p>
 </div>
 
+{# --- Model comparison section --- #}
+{% if model_reports %}
+<div class="card">
+    <h3>Model Comparison vs Human Labels</h3>
+    {% if best_model %}
+    <p style="margin-bottom: 12px;" class="meta">Best model by F1@0.50: <strong>{{ best_model }}</strong></p>
+    {% endif %}
+    <table>
+        <thead>
+            <tr>
+                <th>Model</th>
+                <th>P@0.50</th><th>R@0.50</th><th>F1@0.50</th>
+                <th>P@0.70</th><th>R@0.70</th><th>F1@0.70</th>
+                <th>Red Herrings</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for name, r in model_reports.items() %}
+            <tr{% if name == best_model %} style="background: #e8f5e9;"{% endif %}>
+                <td><strong>{{ name }}</strong></td>
+                <td>{{ "%.1f"|format(r.precision_at_50 * 100) }}%</td>
+                <td>{{ "%.1f"|format(r.recall_at_50 * 100) }}%</td>
+                <td><strong>{{ "%.1f"|format(r.f1_at_50 * 100) }}%</strong></td>
+                <td>{{ "%.1f"|format(r.precision_at_70 * 100) }}%</td>
+                <td>{{ "%.1f"|format(r.recall_at_70 * 100) }}%</td>
+                <td><strong>{{ "%.1f"|format(r.f1_at_70 * 100) }}%</strong></td>
+                <td style="color: {% if r.high_conf_disagreements > 5 %}#e63946{% else %}#333{% endif %};">
+                    {{ r.high_conf_disagreements }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
 {% if report %}
 <div class="grid-2">
     <div class="card">
@@ -36,7 +72,7 @@
     </div>
 
     <div class="card">
-        <h3>Red Herring Detection</h3>
+        <h3>Red Herring Detection{% if best_model %} ({{ best_model }}){% endif %}</h3>
         <table>
             <tr>
                 <td>Model confident, humans disagree</td>
@@ -55,7 +91,7 @@
     </div>
 </div>
 
-{% if report.precision_at_50 is not none %}
+{% if report.precision_at_50 is not none and not model_reports %}
 <div class="card">
     <h3>Model Performance vs Human Labels</h3>
     <table>
@@ -88,7 +124,7 @@
 
 {% if report.calibration_buckets %}
 <div class="card">
-    <h3>Calibration (Model Confidence vs Human Agreement)</h3>
+    <h3>Calibration{% if best_model %} ({{ best_model }}){% endif %}</h3>
     <table>
         <thead>
             <tr><th>Confidence Range</th><th>Mean Confidence</th><th>Human Agree Rate</th><th>Count</th><th>Gap</th></tr>
@@ -116,5 +152,30 @@
     <p>No labels yet. <a href="/session/{{ session_id }}">Start labeling</a> to see results.</p>
 </div>
 {% endif %}
+
+{# --- Evaluate models section --- #}
+<div class="card">
+    <h3>Evaluate a Model</h3>
+    <p style="margin-bottom: 12px;">Run a model against this session's incidents, then upload the scores to compare against human labels.</p>
+    <pre style="background: #1a1a2e; color: #e0e0e0; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 13px; line-height: 1.6;">
+<span style="color: #888;"># Run a model and upload scores (replace adapter + env vars for your model)</span>
+docker run --rm -v $(pwd)/data:/app/data \
+  -e ANTHROPIC_API_KEY \
+  --entrypoint rhyme-eval rhyme \
+  --session {{ session_id }} \
+  --server http://host.docker.internal:8080 \
+  --adapter "python /app/examples/anthropic_adapter.py" \
+  --model-name "claude-haiku-3.5"
+
+<span style="color: #888;"># Or with OpenAI-compatible providers</span>
+docker run --rm -v $(pwd)/data:/app/data \
+  -e OPENAI_API_KEY -e RHYME_MODEL=gpt-4o-mini \
+  --entrypoint rhyme-eval rhyme \
+  --session {{ session_id }} \
+  --server http://host.docker.internal:8080 \
+  --adapter "python /app/examples/openai_compat_adapter.py" \
+  --model-name "gpt-4o-mini"</pre>
+    <p class="meta" style="margin-top: 8px;">Each model you evaluate will appear in the comparison table above.</p>
+</div>
 
 {% endblock %}

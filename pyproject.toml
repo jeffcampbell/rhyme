@@ -35,6 +35,7 @@ rhyme-generate = "rhyme_bench.cli:generate"
 rhyme-run = "rhyme_bench.cli:run"
 rhyme-score = "rhyme_bench.cli:score"
 rhyme-probe = "rhyme_bench.cli:probe"
+rhyme-eval = "rhyme_bench.cli:eval_web"
 rhyme-web = "rhyme_web.cli:main"
 
 [tool.ruff]

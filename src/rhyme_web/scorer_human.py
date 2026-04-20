@@ -21,6 +21,36 @@ def _f1(precision: float, recall: float) -> float:
 def score_against_humans(session: LabelingSession) -> HumanVsModelReport:
     """Score model predictions against human labels from a labeling session.
 
+    Uses model_confidence from the session pairs (import-time scores).
+    """
+    pair_conf = {
+        p.pair_id: p.model_confidence if p.model_confidence is not None else 0.5
+        for p in session.pairs
+    }
+    return _score_with_confidences(session, pair_conf)
+
+
+def score_model_against_humans(
+    session: LabelingSession,
+    model_confidences: dict[str, float],
+) -> HumanVsModelReport:
+    """Score a named model's confidences against human labels.
+
+    Args:
+        session: The labeling session with human labels.
+        model_confidences: Mapping of pair_id -> model confidence score.
+    """
+    # Fill in 0.5 for any pairs not scored by this model
+    pair_conf = {p.pair_id: model_confidences.get(p.pair_id, 0.5) for p in session.pairs}
+    return _score_with_confidences(session, pair_conf)
+
+
+def _score_with_confidences(
+    session: LabelingSession,
+    pair_conf: dict[str, float],
+) -> HumanVsModelReport:
+    """Core scoring logic given a pair_id -> confidence mapping.
+
     Human judgment mapping:
       'yes'   = incidents are correlated (positive)
       'no'    = not correlated (negative)
@@ -41,18 +71,12 @@ def score_against_humans(session: LabelingSession) -> HumanVsModelReport:
     for pair_id, judgments in pair_labels.items():
         yes_count = judgments.count("yes")
         no_count = judgments.count("no")
-        maybe_count = judgments.count("maybe")
         if yes_count > no_count:
             resolved[pair_id] = "yes"
         elif no_count > yes_count:
             resolved[pair_id] = "no"
         else:
             resolved[pair_id] = "maybe"
-
-    # Build pair -> model confidence lookup
-    pair_conf: dict[str, float] = {}
-    for pair in session.pairs:
-        pair_conf[pair.pair_id] = pair.model_confidence if pair.model_confidence is not None else 0.5
 
     # Compute metrics at different thresholds
     def _pr_at_threshold(threshold: float) -> tuple[float, float]:

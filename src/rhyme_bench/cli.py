@@ -300,3 +300,117 @@ def probe():
     corpus = Corpus.load(Path(args.corpus))
     results = run_style_probe(corpus, cv_folds=args.folds)
     print_probe_report(results)
+
+
+def eval_web():
+    """Evaluate a model against a web labeling session's incidents."""
+    parser = argparse.ArgumentParser(
+        description="Evaluate a model against a Rhyme web session and upload scores"
+    )
+    parser.add_argument("--session", required=True, help="Web session ID")
+    parser.add_argument(
+        "--server", default="http://localhost:8080",
+        help="Rhyme web server URL (default: http://localhost:8080)",
+    )
+    parser.add_argument("--adapter", required=True, help="Adapter command (e.g. 'python adapter.py')")
+    parser.add_argument(
+        "--model-name", default=None,
+        help="Model name for display (defaults to RHYME_MODEL env var or adapter command)",
+    )
+    args = parser.parse_args()
+
+    import os
+    import shlex
+    import urllib.request
+    from collections import defaultdict
+
+    from .models import IncidentPayload, TopologyFragment
+    from .subprocess_adapter import SubprocessAdapter
+
+    server = args.server.rstrip("/")
+    session_id = args.session
+    model_name = args.model_name or os.environ.get("RHYME_MODEL") or args.adapter
+
+    # Fetch session data
+    print(f"Fetching session {session_id} from {server}...")
+    try:
+        resp = urllib.request.urlopen(f"{server}/api/export/{session_id}")
+        data = json.loads(resp.read())
+    except Exception as e:
+        print(f"Error fetching session: {e}")
+        raise SystemExit(1)
+
+    session_data = data["session"]
+    incidents_raw = data.get("incidents", [])
+    pairs = session_data["pairs"]
+
+    if not incidents_raw:
+        print("Error: No incidents in session export.")
+        raise SystemExit(1)
+
+    print(f"  {len(incidents_raw)} incidents, {len(pairs)} pairs")
+
+    # Build IncidentPayload objects from web incidents
+    incidents = {}
+    for inc in incidents_raw:
+        incidents[inc["id"]] = IncidentPayload(
+            incident_id=inc["id"],
+            summary=inc.get("summary", ""),
+            incident_start=inc.get("timestamp", ""),
+            alerts=[],
+            log_lines=[],
+            topology=TopologyFragment(nodes=[], edges=[]),
+        )
+
+    # Group pairs by incident_a to minimize adapter calls
+    pairs_by_a = defaultdict(list)
+    for pair in pairs:
+        pairs_by_a[pair["incident_a_id"]].append(pair)
+
+    # Start adapter
+    print(f"Starting adapter: {args.adapter}")
+    adapter = SubprocessAdapter(shlex.split(args.adapter))
+
+    # Run adapter for each unique query incident
+    all_scores = []
+    query_count = len(pairs_by_a)
+    for i, (a_id, a_pairs) in enumerate(pairs_by_a.items(), 1):
+        query = incidents.get(a_id)
+        if not query:
+            continue
+
+        # Build corpus of all other incidents
+        corpus_payloads = [inc for iid, inc in incidents.items() if iid != a_id]
+
+        print(f"  Query {i}/{query_count}: {a_id} ({len(a_pairs)} pairs)", end="\r")
+        result = adapter.retrieve(query, corpus_payloads, k=len(corpus_payloads))
+
+        # Extract confidence for each target incident
+        matches = result.matches if hasattr(result, "matches") else result
+        conf_map = {m.incident_id: m.confidence for m in matches}
+
+        for pair in a_pairs:
+            all_scores.append({
+                "pair_id": pair["pair_id"],
+                "confidence": conf_map.get(pair["incident_b_id"], 0.0),
+            })
+
+    adapter.close()
+    print(f"\n  Scored {len(all_scores)} pairs")
+
+    # Upload scores
+    payload = json.dumps({"model_name": model_name, "scores": all_scores}).encode()
+    req = urllib.request.Request(
+        f"{server}/api/scores/{session_id}",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        resp = urllib.request.urlopen(req)
+        result = json.loads(resp.read())
+        print(f"  Uploaded {result['saved']} scores as '{model_name}'")
+        print(f"\n  View results: {server}/dashboard/{session_id}")
+    except Exception as e:
+        print(f"Error uploading scores: {e}")
+        raise SystemExit(1)

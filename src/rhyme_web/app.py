@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash
 
-from .database import db, init_db, DBSession, DBIncident, DBPair, DBLabel
+from .database import db, init_db, DBSession, DBIncident, DBPair, DBLabel, DBModelScore
 from .models import (
     OrgCorpus,
     OrgIncident,
@@ -32,7 +32,7 @@ from .models import (
     ImportResult,
 )
 from .pair_sampler import sample_pairs
-from .scorer_human import score_against_humans
+from .scorer_human import score_against_humans, score_model_against_humans
 
 logger = logging.getLogger("rhyme_web")
 
@@ -278,11 +278,32 @@ def create_app(data_dir: str | None = None, verbose: bool = False) -> Flask:
         labeled_count = db.session.query(db.func.count(db.func.distinct(DBLabel.pair_id))).filter(DBLabel.session_id == session_id).scalar()
         total = db_session.pair_count
 
+        model_reports = {}
         report = None
+        best_model = None
+
         if labeled_count > 0:
-            # Build LabelingSession from DB for the scorer
             ls = _build_labeling_session(session_id)
-            report = score_against_humans(ls)
+
+            # Score each uploaded model
+            model_names = [
+                r[0] for r in db.session.query(DBModelScore.model_name)
+                .filter_by(session_id=session_id).distinct().all()
+            ]
+            for model_name in model_names:
+                scores = DBModelScore.query.filter_by(
+                    session_id=session_id, model_name=model_name
+                ).all()
+                conf_map = {s.pair_id: s.confidence for s in scores}
+                model_reports[model_name] = score_model_against_humans(ls, conf_map)
+
+            # Pick best model by F1 at 0.5
+            if model_reports:
+                best_model = max(model_reports, key=lambda m: model_reports[m].f1_at_50)
+                report = model_reports[best_model]
+            else:
+                # Fallback to import-time model_confidence if no models uploaded
+                report = score_against_humans(ls)
 
         return render_template(
             "dashboard.html",
@@ -291,6 +312,8 @@ def create_app(data_dir: str | None = None, verbose: bool = False) -> Flask:
             labeled=labeled_count,
             total=total,
             report=report,
+            model_reports=model_reports,
+            best_model=best_model,
         )
 
     # ------------------------------------------------------------------
@@ -311,10 +334,70 @@ def create_app(data_dir: str | None = None, verbose: bool = False) -> Flask:
             return jsonify({"error": "Session not found"}), 404
         labeled_count = len(ls.labels)
         report = score_against_humans(ls) if labeled_count > 0 else None
+        incidents = [
+            {"id": inc.incident_id, "summary": inc.summary, "timestamp": inc.timestamp,
+             "severity": inc.severity, "service": inc.service}
+            for inc in DBIncident.query.filter_by(session_id=session_id).all()
+        ]
         return jsonify({
             "session": ls.model_dump(),
+            "incidents": incidents,
             "report": report.model_dump() if report else None,
         })
+
+    @app.route("/api/scores/<session_id>", methods=["POST"])
+    def api_upload_scores(session_id: str):
+        """Upload model scores for a session's pairs."""
+        db_session_obj = db.session.get(DBSession, session_id)
+        if not db_session_obj:
+            return jsonify({"error": "Session not found"}), 404
+
+        data = request.get_json()
+        if not data or "model_name" not in data or "scores" not in data:
+            return jsonify({"error": "Must provide model_name and scores"}), 400
+
+        model_name = data["model_name"][:255]
+        scores = data["scores"]
+
+        # Validate pair_ids belong to this session
+        valid_pair_ids = {
+            p.pair_id for p in DBPair.query.filter_by(session_id=session_id).all()
+        }
+
+        # Delete existing scores for this model+session (upsert semantics)
+        DBModelScore.query.filter_by(
+            session_id=session_id, model_name=model_name
+        ).delete()
+
+        count = 0
+        for s in scores:
+            pair_id = s.get("pair_id", "")
+            if pair_id not in valid_pair_ids:
+                continue
+            try:
+                conf = max(0.0, min(1.0, float(s.get("confidence", 0.0))))
+            except (TypeError, ValueError):
+                continue
+            db.session.add(DBModelScore(
+                session_id=session_id,
+                model_name=model_name,
+                pair_id=pair_id,
+                confidence=conf,
+            ))
+            count += 1
+
+        db.session.commit()
+        logger.info(f"Uploaded {count} scores for model '{model_name}' in session {session_id}")
+        return jsonify({"saved": count, "model_name": model_name})
+
+    @app.route("/api/models/<session_id>")
+    def api_list_models(session_id: str):
+        """List models with uploaded scores for a session."""
+        rows = db.session.query(
+            DBModelScore.model_name,
+            db.func.count(DBModelScore.id),
+        ).filter_by(session_id=session_id).group_by(DBModelScore.model_name).all()
+        return jsonify({"models": [{"name": r[0], "score_count": r[1]} for r in rows]})
 
     def _build_labeling_session(session_id: str) -> LabelingSession | None:
         """Reconstruct a LabelingSession from the database for scoring."""
