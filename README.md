@@ -2,7 +2,7 @@
 
 # Rhyme
 
-**A benchmark for evaluating how well LLMs correlate microservice incidents by proximal cause — not just by symptoms.**
+**A benchmark for evaluating how well LLMs correlate incidents by proximal cause — not just by symptoms.**
 
 When an "AI SRE" tool surfaces a similar past incident, is it actually helpful — or is it a red herring? Incidents often share symptoms (same error codes, same affected services) while having completely different underlying causes. Surfacing the wrong one sends the on-call engineer down the wrong path.
 
