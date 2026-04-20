@@ -18,6 +18,7 @@ Rhyme measures whether a model can tell the difference.
 | DeepSeek V3 | 0.804 | 0.115 | 1,933 | 72% | 4% |
 | GPT-4o mini | 0.802 | 0.082 | 1,879 | 95% | 1% |
 | Claude Sonnet 4 | 0.802 | 0.091 | 2,186 | 94% | 0% |
+| GPT-4.1 | 0.799 | 0.150 | 1,877 | 93% | 0% |
 | Gemini 2.0 Flash | 0.789 | 0.132 | 2,243 | 89% | 0% |
 | Claude Haiku 3.5 | 0.784 | 0.106 | 2,186 | 94% | 0% |
 | Claude Opus 4 | 0.782 | 0.119 | 2,163 | **96%** | 0% |
