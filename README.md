@@ -6,7 +6,7 @@
 
 When an "AI SRE" tool surfaces a similar past incident, is it actually helpful — or is it a red herring? Incidents often share symptoms (same error codes, same affected services) while having completely different underlying causes. Surfacing the wrong one sends the on-call engineer down the wrong path.
 
-Rhyme measures whether a model can tell the difference.
+Rhyme measures whether a model can tell the difference. You can find the full paper [here](https://github.com/jeffcampbell/rhyme/blob/main/paper/Rhyme-Paper.pdf).
 
 ## Rhyme Scores
 
