@@ -25,9 +25,9 @@ Rhyme measures whether a model can tell the difference. You can find the full pa
 | GPT-5.6 Sol | 0.801 | 0.157 | 2,257 | **98%** | 0% |
 | GPT-4.1 | 0.799 | 0.150 | 1,877 | 93% | 0% |
 | Inkling | 0.799 | 0.147 | 9,204 | 94% | 0% |
+| Claude Fable 5 | 0.795 | 0.115 | 3,397 | 95% | 0% |
 | Gemma 4 31B IT | 0.792 | 0.160 | 2,318 | 94% | 0% |
 | Gemini 2.0 Flash | 0.789 | 0.132 | 2,243 | 89% | 0% |
-| Claude Fable 5 | 0.786 | 0.145 | 26,218† | **98%** | 0% |
 | Claude Haiku 3.5 | 0.784 | 0.106 | 2,186 | 94% | 0% |
 | Gemma 4 26B A4B IT (free)‡ | 0.784 | 0.106 | 2,308 | 95% | 0% |
 | Kimi K3 | 0.783 | 0.117 | 4,729 | **98%** | 0% |
@@ -38,11 +38,9 @@ Rhyme measures whether a model can tell the difference. You can find the full pa
 
 *Precision@10: fraction of top-10 matches sharing the same proximal cause. ECE: calibration error (lower = more trustworthy confidence scores). Correct fix: chose the right remediation from 5 options. Would worsen: chose a remediation that would make things worse.*
 
-*†Claude Fable 5 was run through the headless Claude Code CLI rather than the raw API used for every other row — its token count includes the CLI's own system prompt overhead (~22k tokens/call) and is not comparable to the other rows' figures. Precision, ECE, and remediation accuracy use the same prompts as all other rows and are directly comparable.*
-
 *‡Nemotron 3 Super 120B and Gemma 4 26B A4B IT were run on OpenRouter's free tier rather than a paid endpoint — free-tier serving can differ in quantization or routing from a paid deployment of the same model, so treat these two rows as directional. They're the only free-tier models in this table; several others were attempted and dropped after failing to complete a full run due to free-tier rate limits and provider errors.*
 
-**Key findings:** Consistent with the standard RAG two-stage pattern, BM25 keyword retrieval matches LLM retrieval precision (~0.80) for incident correlation — confirming that expensive full-corpus LLM retrieval doesn't add value at the retrieval stage. The real value of LLMs is in reasoning: remediation accuracy jumps from 16% (random) to 72-98% when models evaluate candidates. GPT-4.1 nano has the best calibration at the lowest token cost. Claude Fable 5, GPT-5.6 Sol, Claude Sonnet 5, and Kimi K3 tie for the highest remediation accuracy (98%), narrowly ahead of Claude Opus 4 (96%). DeepSeek V3 is competitive on retrieval but weaker on remediation (72% correct, 4% harmful). Inkling and Kimi K3 are notably token-hungry (9,204 and 4,729 tokens/query) without a precision or remediation edge over cheaper models — both spend the bulk of their budget on hidden reasoning tokens before answering. Nemotron 3 Super 120B (free) posts the second-best precision in the whole table, but with 1% would-worsen — the only nonzero harmful-fix rate among all the newer models tested this round.
+**Key findings:** Consistent with the standard RAG two-stage pattern, BM25 keyword retrieval matches LLM retrieval precision (~0.80) for incident correlation — confirming that expensive full-corpus LLM retrieval doesn't add value at the retrieval stage. The real value of LLMs is in reasoning: remediation accuracy jumps from 16% (random) to 72-98% when models evaluate candidates. GPT-4.1 nano has the best calibration at the lowest token cost. GPT-5.6 Sol, Claude Sonnet 5, and Kimi K3 tie for the highest remediation accuracy (98%), narrowly ahead of Claude Opus 4 (96%). DeepSeek V3 is competitive on retrieval but weaker on remediation (72% correct, 4% harmful). Inkling and Kimi K3 are notably token-hungry (9,204 and 4,729 tokens/query) without a precision or remediation edge over cheaper models — both spend the bulk of their budget on hidden reasoning tokens before answering. Nemotron 3 Super 120B (free) posts the second-best precision in the whole table, but with 1% would-worsen — the only nonzero harmful-fix rate among all the newer models tested this round.
 
 ## Quick start
 
