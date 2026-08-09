@@ -33,9 +33,19 @@ import os as _os, sys as _sys; _sys.path.insert(0, _os.path.dirname(_os.path.abs
 API_KEY = os.environ.get("OPENAI_API_KEY", "")
 BASE_URL = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
 MODEL = os.environ.get("RHYME_MODEL", "gpt-4o-mini")
+# Optional: append the model actually served per call to this JSONL file. Used
+# for analysing routers (e.g. openrouter/auto-beta) where the served model
+# differs per request. Not part of the scored output.
+MODEL_LOG = os.environ.get("RHYME_MODEL_LOG", "")
+
+# Output token budgets, overridable via env. Defaults are generous enough for
+# reasoning models (which spend hidden tokens before answering) so their JSON
+# array / letter answer isn't truncated away.
+RETRIEVE_MAX_TOKENS = int(os.environ.get("RHYME_RETRIEVE_MAX_TOKENS", "6000"))
+REMEDIATE_MAX_TOKENS = int(os.environ.get("RHYME_REMEDIATE_MAX_TOKENS", "2000"))
 
 
-def call_llm(prompt: str, max_tokens: int = 2000) -> tuple[str, dict]:
+def call_llm(prompt: str, max_tokens: int = 2000) -> tuple[str, dict, str]:
     body = json.dumps({
         "model": MODEL,
         "messages": [{"role": "user", "content": prompt}],
@@ -56,10 +66,30 @@ def call_llm(prompt: str, max_tokens: int = 2000) -> tuple[str, dict]:
 
     text = data["choices"][0]["message"]["content"]
     usage = data.get("usage", {})
+    # OpenRouter (and the auto router) echoes the model that actually served
+    # the request in the top-level "model" field; fall back to what we asked for.
+    resolved_model = data.get("model", MODEL)
     return text, {
         "input_tokens": usage.get("prompt_tokens", 0),
         "output_tokens": usage.get("completion_tokens", 0),
+    }, resolved_model
+
+
+def log_resolved_model(task: str, resolved_model: str, request: dict, usage: dict) -> None:
+    if not MODEL_LOG:
+        return
+    record = {
+        "task": task,
+        "requested_model": MODEL,
+        "resolved_model": resolved_model,
+        "query_id": (request.get("query") or {}).get("incident_id"),
+        "token_usage": usage,
     }
+    try:
+        with open(MODEL_LOG, "a") as f:
+            f.write(json.dumps(record) + "\n")
+    except Exception as e:
+        print(f"model-log error: {e}", file=sys.stderr)
 
 
 def handle_retrieve(request: dict) -> dict:
@@ -88,7 +118,8 @@ Return a JSON array of the top {k} matches ranked by proximal-cause similarity:
 Only return the JSON array, nothing else."""
 
     try:
-        text, usage = call_llm(prompt)
+        text, usage, resolved_model = call_llm(prompt, max_tokens=RETRIEVE_MAX_TOKENS)
+        log_resolved_model("retrieve", resolved_model, request, usage)
         matches = normalize_matches(extract_json_array(text), k)
         return {"ranked_matches": matches, "token_usage": usage}
     except Exception as e:
@@ -112,7 +143,8 @@ OPTIONS:
 Reply with ONLY the letter (A-E)."""
 
     try:
-        text, usage = call_llm(prompt, max_tokens=50)
+        text, usage, resolved_model = call_llm(prompt, max_tokens=REMEDIATE_MAX_TOKENS)
+        log_resolved_model("remediate", resolved_model, request, usage)
         return {"selected_label": extract_letter(text), "token_usage": usage}
     except Exception as e:
         print(f"Remediate error: {e}", file=sys.stderr)

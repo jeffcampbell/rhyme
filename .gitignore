@@ -30,3 +30,6 @@ build/
 .idea/
 .DS_Store
 CLAUDE.md
+
+# Secrets — API keys, never commit
+.env

@@ -21,6 +21,10 @@ from pathlib import Path
 
 # Default model list — covers major providers via OpenRouter
 DEFAULT_MODELS = [
+    # OpenRouter Auto Router — picks a model per request from OpenRouter's
+    # task rankings. The reported "model" stays "openrouter/auto-beta"; the
+    # actual model varies per query (see completion.model in each response).
+    {"name": "Auto Router", "model": "openrouter/auto-beta"},
     # OpenAI
     {"name": "GPT-4o", "model": "openai/gpt-4o"},
     {"name": "GPT-4o mini", "model": "openai/gpt-4o-mini"},
@@ -72,6 +76,12 @@ def run_model(model_config: dict, data_dir: str, tasks: str) -> dict | None:
         os.environ["OPENAI_BASE_URL"] = base_url
         adapter_script = "examples/openai_compat_adapter.py"
     os.environ["RHYME_MODEL"] = model_id
+
+    # Record the model actually served per query (useful for routers like
+    # openrouter/auto-beta). Start fresh each run so stale rows don't pile up.
+    model_log = output_dir / "resolved_models.jsonl"
+    model_log.unlink(missing_ok=True)
+    os.environ["RHYME_MODEL_LOG"] = str(model_log)
 
     # Find the project root (where examples/ lives)
     script_dir = Path(__file__).resolve().parent
