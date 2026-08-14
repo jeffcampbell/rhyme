@@ -33,3 +33,4 @@ CLAUDE.md
 
 # Secrets — API keys, never commit
 .env
+.bench_bridge/

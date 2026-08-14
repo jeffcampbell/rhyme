@@ -23,6 +23,7 @@ Rhyme measures whether a model can tell the difference. You can find the full pa
 | GPT-4o mini | 0.802 | 0.082 | 1,879 | 95% | 1% |
 | Claude Sonnet 4 | 0.802 | 0.091 | 2,186 | 94% | 0% |
 | GPT-5.6 Sol | 0.801 | 0.157 | 2,257 | **98%** | 0% |
+| Gemini 3.7 Flash | 0.799 | 0.112 | 3,518 | 96% | 0% |
 | GPT-4.1 | 0.799 | 0.150 | 1,877 | 93% | 0% |
 | Inkling | 0.799 | 0.147 | 9,204 | 94% | 0% |
 | Claude Fable 5 | 0.795 | 0.115 | 3,397 | 95% | 0% |
