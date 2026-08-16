@@ -29,7 +29,7 @@ Rhyme measures whether a model can tell the difference. You can find the full pa
 | Qwen3.8 27B* | 0.798 | 0.116 | 2,144 | 93% | 0% |
 | Claude Fable 5 | 0.795 | 0.115 | 3,397 | 95% | 0% |
 | Gemma 4 31B IT | 0.792 | 0.160 | 2,318 | 94% | 0% |
-| Bonsai 27B (local)† | 0.791 | 0.132 | 2,123 | 73% | 4% |
+| Bonsai 27B (local)† | 0.791 | 0.132 | 2,123 | 72% | 4% |
 | Gemini 2.0 Flash | 0.789 | 0.132 | 2,243 | 89% | 0% |
 | Claude Haiku 3.5 | 0.784 | 0.106 | 2,186 | 94% | 0% |
 | Gemma 4 26B A4B IT (free)‡ | 0.784 | 0.106 | 2,308 | 95% | 0% |
