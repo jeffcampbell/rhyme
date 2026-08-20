@@ -21,13 +21,16 @@ API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 MODEL = os.environ.get("RHYME_MODEL", "claude-haiku-4-5-20251001")
 
 
-def call_claude(prompt: str, max_tokens: int = 2000) -> tuple[str, dict]:
+def call_claude(prompt: str, max_tokens: int = 2000, system: str | None = None) -> tuple[str, dict]:
     """Call the Anthropic API and return (response_text, usage_dict)."""
-    body = json.dumps({
+    payload = {
         "model": MODEL,
         "max_tokens": max_tokens,
         "messages": [{"role": "user", "content": prompt}],
-    }).encode()
+    }
+    if system:
+        payload["system"] = system
+    body = json.dumps(payload).encode()
 
     req = urllib.request.Request(
         "https://api.anthropic.com/v1/messages",
@@ -77,7 +80,7 @@ confidence: 0.0 = definitely different proximal cause, 1.0 = definitely same pro
 Only return the JSON array, nothing else."""
 
     try:
-        text, usage = call_claude(prompt)
+        text, usage = call_claude(prompt, system=request.get("system_prompt"))
         matches = normalize_matches(extract_json_array(text), k)
         return {"ranked_matches": matches, "token_usage": usage}
     except Exception as e:
@@ -102,7 +105,7 @@ OPTIONS:
 Think carefully about what the proximal cause is, then reply with ONLY the letter (A, B, C, D, or E)."""
 
     try:
-        text, usage = call_claude(prompt, max_tokens=50)
+        text, usage = call_claude(prompt, max_tokens=50, system=request.get("system_prompt"))
         return {"selected_label": extract_letter(text), "token_usage": usage}
     except Exception as e:
         print(f"Remediate error: {e}", file=sys.stderr)

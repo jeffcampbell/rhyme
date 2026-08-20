@@ -21,14 +21,17 @@ API_KEY = os.environ.get("GEMINI_API_KEY", "")
 MODEL = os.environ.get("RHYME_MODEL", "gemini-2.0-flash")
 
 
-def call_gemini(prompt: str, max_tokens: int = 2000) -> tuple[str, dict]:
-    body = json.dumps({
+def call_gemini(prompt: str, max_tokens: int = 2000, system: str | None = None) -> tuple[str, dict]:
+    payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
             "maxOutputTokens": max_tokens,
             "temperature": 0,
         },
-    }).encode()
+    }
+    if system:
+        payload["systemInstruction"] = {"parts": [{"text": system}]}
+    body = json.dumps(payload).encode()
 
     url = (
         f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}"
@@ -68,7 +71,7 @@ Return a JSON array: [{{"incident_id": "INC-...", "confidence": 0.95}}, ...]
 Only the JSON array, nothing else."""
 
     try:
-        text, usage = call_gemini(prompt)
+        text, usage = call_gemini(prompt, system=request.get("system_prompt"))
         matches = normalize_matches(extract_json_array(text), k)
         return {"ranked_matches": matches, "token_usage": usage}
     except Exception as e:
@@ -92,7 +95,7 @@ OPTIONS:
 Reply with ONLY the letter (A-E)."""
 
     try:
-        text, usage = call_gemini(prompt, max_tokens=50)
+        text, usage = call_gemini(prompt, max_tokens=50, system=request.get("system_prompt"))
         return {"selected_label": extract_letter(text), "token_usage": usage}
     except Exception as e:
         print(f"Remediate error: {e}", file=sys.stderr)

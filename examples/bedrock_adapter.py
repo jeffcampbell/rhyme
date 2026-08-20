@@ -37,14 +37,17 @@ def _get_client():
     return _client
 
 
-def call_bedrock(prompt: str, max_tokens: int = 2000) -> tuple[str, dict]:
+def call_bedrock(prompt: str, max_tokens: int = 2000, system: str | None = None) -> tuple[str, dict]:
     client = _get_client()
 
-    response = client.converse(
-        modelId=MODEL,
-        messages=[{"role": "user", "content": [{"text": prompt}]}],
-        inferenceConfig={"maxTokens": max_tokens, "temperature": 0},
-    )
+    kwargs = {
+        "modelId": MODEL,
+        "messages": [{"role": "user", "content": [{"text": prompt}]}],
+        "inferenceConfig": {"maxTokens": max_tokens, "temperature": 0},
+    }
+    if system:
+        kwargs["system"] = [{"text": system}]
+    response = client.converse(**kwargs)
 
     text = response["output"]["message"]["content"][0]["text"]
     usage = response.get("usage", {})
@@ -75,7 +78,7 @@ Return a JSON array: [{{"incident_id": "INC-...", "confidence": 0.95}}, ...]
 Only the JSON array, nothing else."""
 
     try:
-        text, usage = call_bedrock(prompt)
+        text, usage = call_bedrock(prompt, system=request.get("system_prompt"))
         matches = normalize_matches(extract_json_array(text), k)
         return {"ranked_matches": matches, "token_usage": usage}
     except Exception as e:
@@ -99,7 +102,7 @@ OPTIONS:
 Reply with ONLY the letter (A-E)."""
 
     try:
-        text, usage = call_bedrock(prompt, max_tokens=50)
+        text, usage = call_bedrock(prompt, max_tokens=50, system=request.get("system_prompt"))
         return {"selected_label": extract_letter(text), "token_usage": usage}
     except Exception as e:
         print(f"Remediate error: {e}", file=sys.stderr)

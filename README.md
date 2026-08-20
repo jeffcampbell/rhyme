@@ -126,6 +126,8 @@ rhyme-run --tasks 3 --adapter "..."      # Just remediation (~$0.10)
 
 The CLI shows estimated token counts before any API calls are made.
 
+To benchmark a prompting strategy, add a system prompt with `--system-prompt` (or per-task `--system-prompt-retrieve` / `--system-prompt-remediate`, plus `-file` variants). See [Why we use a minimal prompt](#why-we-use-a-minimal-prompt).
+
 ### Scoring metrics
 
 All core metrics are deterministic — no LLM-judge in the scoring pipeline.
@@ -329,6 +331,10 @@ The shipped adapters use a deliberately simple prompt: *"Find the most similar i
 **Remediation (Task 3): better prompts help significantly — but that's the problem.** An expert prompt improved correct-fix rate from 72.5% to 88.8% on Haiku and eliminated all would-worsen answers. However, a benchmark that bakes in optimized prompts measures *model + our prompt engineering* rather than the model alone. The expert prompt teaches exactly the distinction (fixes-cause vs masks-symptom vs would-worsen) that the remediation questions test — it's tuned to the test. This compresses the gap between models: a 13pp difference between models under a bare prompt shrinks to 2pp under an expert prompt, hiding the signal the benchmark exists to measure.
 
 For benchmarking, a minimal prompt maximizes the distance between models of different capability levels. For production use, optimizing the prompt for your specific task is absolutely worthwhile — our results show it can dramatically improve remediation safety.
+
+**Reproduce it — or test your own prompt.** The minimal prompt stays the scored default, but you can supply a system prompt as an explicit experimental axis and measure its effect as a delta. `rhyme-run` accepts `--system-prompt` (and per-task `--system-prompt-retrieve` / `--system-prompt-remediate`, plus `-file` variants); the prompt is threaded to the adapter and mapped to the provider's native system channel. Because the two tasks respond so differently, keep them separate: a prompt on the retrieve task should barely move Precision@10, while one on the remediate task can move correct-fix and would-worsen substantially.
+
+A strong remediation prompt is a double-edged result. It can teach genuinely transferable diagnostic discipline (*separate the mechanism from the symptom; prefer a fix that removes the cause over one that suppresses the signal; reject a fix that would increase load, retries, or coupling*) — but it can also just encode the benchmark's own answer key. To tell a **generalizing** prompt from one **tuned to the test**: author it without ever naming the taxonomy's classes, confusable pairs, or the fixes-cause/masks-symptom/would-worsen vocabulary; then check whether its gains hold on the **private query slice**, transfer **across models**, and show up on the **hard confusable tier** — a real reasoning gain does, test-tuning tends not to. The would-worsen rate, always reported separately, is where a safety-oriented prompt earns its keep.
 
 ## Design rationale
 

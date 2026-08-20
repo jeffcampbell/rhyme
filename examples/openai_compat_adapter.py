@@ -45,10 +45,14 @@ RETRIEVE_MAX_TOKENS = int(os.environ.get("RHYME_RETRIEVE_MAX_TOKENS", "6000"))
 REMEDIATE_MAX_TOKENS = int(os.environ.get("RHYME_REMEDIATE_MAX_TOKENS", "2000"))
 
 
-def call_llm(prompt: str, max_tokens: int = 2000) -> tuple[str, dict, str]:
+def call_llm(prompt: str, max_tokens: int = 2000, system: str | None = None) -> tuple[str, dict, str]:
+    messages = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": prompt})
     body = json.dumps({
         "model": MODEL,
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": messages,
         "temperature": 0,
         "max_tokens": max_tokens,
     }).encode()
@@ -118,7 +122,9 @@ Return a JSON array of the top {k} matches ranked by proximal-cause similarity:
 Only return the JSON array, nothing else."""
 
     try:
-        text, usage, resolved_model = call_llm(prompt, max_tokens=RETRIEVE_MAX_TOKENS)
+        text, usage, resolved_model = call_llm(
+            prompt, max_tokens=RETRIEVE_MAX_TOKENS, system=request.get("system_prompt"),
+        )
         log_resolved_model("retrieve", resolved_model, request, usage)
         matches = normalize_matches(extract_json_array(text), k)
         return {"ranked_matches": matches, "token_usage": usage}
@@ -143,7 +149,9 @@ OPTIONS:
 Reply with ONLY the letter (A-E)."""
 
     try:
-        text, usage, resolved_model = call_llm(prompt, max_tokens=REMEDIATE_MAX_TOKENS)
+        text, usage, resolved_model = call_llm(
+            prompt, max_tokens=REMEDIATE_MAX_TOKENS, system=request.get("system_prompt"),
+        )
         log_resolved_model("remediate", resolved_model, request, usage)
         return {"selected_label": extract_letter(text), "token_usage": usage}
     except Exception as e:

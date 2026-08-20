@@ -15,6 +15,12 @@ Protocol:
 
   Token usage is optional in both directions.
   The subprocess stays alive for all queries (not restarted per query).
+
+  Optional field: when rhyme-run is given a --system-prompt (or a per-task
+  variant), the request carries a top-level "system_prompt": "<text>" string.
+  Adapters should map it to their provider's system channel; the field is
+  omitted entirely when no system prompt is configured, so adapters can rely
+  on request.get("system_prompt").
 """
 
 from __future__ import annotations
@@ -34,14 +40,27 @@ from .models import (
 class SubprocessAdapter(Adapter):
     """Adapter that delegates to an external process via JSON-lines on stdin/stdout."""
 
-    def __init__(self, command: list[str], timeout: float = 300):
+    def __init__(
+        self,
+        command: list[str],
+        timeout: float = 300,
+        system_prompt_retrieve: str | None = None,
+        system_prompt_remediate: str | None = None,
+    ):
         """
         Args:
             command: Command to run as subprocess (e.g., ["python", "my_model.py"]).
             timeout: Seconds to wait for each response.
+            system_prompt_retrieve: Optional system prompt threaded into every
+                retrieve request as the ``system_prompt`` field. Adapters map it
+                to the provider's system channel. None omits the field entirely,
+                preserving the default (no system prompt) behaviour.
+            system_prompt_remediate: Optional system prompt for remediate requests.
         """
         self._command = command
         self._timeout = timeout
+        self._system_prompt_retrieve = system_prompt_retrieve
+        self._system_prompt_remediate = system_prompt_remediate
         self._proc: subprocess.Popen | None = None
 
     def _ensure_started(self) -> subprocess.Popen:
@@ -85,6 +104,8 @@ class SubprocessAdapter(Adapter):
             "corpus": [p.model_dump() for p in corpus],
             "k": k,
         }
+        if self._system_prompt_retrieve:
+            request["system_prompt"] = self._system_prompt_retrieve
         response = self._send_receive(request)
 
         matches = [
@@ -118,6 +139,8 @@ class SubprocessAdapter(Adapter):
             "top_matches": [p.model_dump() for p in top_matches],
             "choices": [c.model_dump() for c in choices],
         }
+        if self._system_prompt_remediate:
+            request["system_prompt"] = self._system_prompt_remediate
         response = self._send_receive(request)
         return response.get("selected_label")
 

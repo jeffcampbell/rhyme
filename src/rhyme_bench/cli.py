@@ -132,7 +132,49 @@ examples:
         help="Output directory for results",
     )
     parser.add_argument("-k", type=int, default=10, help="Top-k for retrieval")
+    parser.add_argument(
+        "--system-prompt", type=str, default=None,
+        help="System prompt applied to both tasks. Threaded to the adapter via "
+             "the subprocess protocol's `system_prompt` field; example adapters "
+             "map it to the provider's system channel. Per-task flags override it. "
+             "Only affects custom adapters (--adapter), not baselines.",
+    )
+    parser.add_argument(
+        "--system-prompt-file", type=str, default=None,
+        help="Read the shared system prompt from a file (overrides --system-prompt).",
+    )
+    parser.add_argument(
+        "--system-prompt-retrieve", type=str, default=None,
+        help="System prompt for the retrieve task only (overrides --system-prompt).",
+    )
+    parser.add_argument(
+        "--system-prompt-retrieve-file", type=str, default=None,
+        help="Read the retrieve system prompt from a file.",
+    )
+    parser.add_argument(
+        "--system-prompt-remediate", type=str, default=None,
+        help="System prompt for the remediate task only (overrides --system-prompt).",
+    )
+    parser.add_argument(
+        "--system-prompt-remediate-file", type=str, default=None,
+        help="Read the remediate system prompt from a file.",
+    )
     args = parser.parse_args()
+
+    def _resolve_prompt(inline: str | None, file_path: str | None, fallback: str | None) -> str | None:
+        if file_path:
+            return Path(file_path).read_text()
+        if inline is not None:
+            return inline
+        return fallback
+
+    shared_system = _resolve_prompt(args.system_prompt, args.system_prompt_file, None)
+    system_prompt_retrieve = _resolve_prompt(
+        args.system_prompt_retrieve, args.system_prompt_retrieve_file, shared_system,
+    )
+    system_prompt_remediate = _resolve_prompt(
+        args.system_prompt_remediate, args.system_prompt_remediate_file, shared_system,
+    )
 
     from .baselines import BM25Baseline, RandomBaseline, TfidfBaseline
     from .harness import Adapter, run_retrieval, run_reasoning_only, run_remediation
@@ -154,7 +196,17 @@ examples:
         import shlex
         from .subprocess_adapter import SubprocessAdapter
         cmd = shlex.split(args.adapter)
-        baselines["custom"] = SubprocessAdapter(cmd)
+        baselines["custom"] = SubprocessAdapter(
+            cmd,
+            system_prompt_retrieve=system_prompt_retrieve,
+            system_prompt_remediate=system_prompt_remediate,
+        )
+        if system_prompt_retrieve or system_prompt_remediate:
+            print(
+                "System prompt active — "
+                f"retrieve: {'yes' if system_prompt_retrieve else 'no'}, "
+                f"remediate: {'yes' if system_prompt_remediate else 'no'}"
+            )
     else:
         if args.baseline in ("random", "all"):
             baselines["random"] = RandomBaseline()

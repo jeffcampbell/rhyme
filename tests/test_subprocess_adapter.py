@@ -84,3 +84,104 @@ def test_subprocess_handles_crash(bad_script, small_corpus):
     with pytest.raises(RuntimeError, match="Subprocess exited"):
         adapter.retrieve(small_corpus.payloads()[0], small_corpus.payloads()[:3], k=2)
     adapter.close()
+
+
+@pytest.fixture
+def spy_script(tmp_path):
+    """Adapter that echoes the `system_prompt` it received back to the caller.
+
+    Retrieve puts the seen value in each match's `reasoning`; remediate returns
+    it as the `selected_label`. Absence of the field is reported as the sentinel
+    "<MISSING>" so tests can distinguish an omitted field from an empty string.
+    """
+    script = tmp_path / "spy_adapter.py"
+    script.write_text(textwrap.dedent("""\
+        import json, sys
+        SENTINEL = "<MISSING>"
+        for line in sys.stdin:
+            line = line.strip()
+            if not line:
+                continue
+            req = json.loads(line)
+            seen = req.get("system_prompt", SENTINEL)
+            if req.get("task") == "retrieve":
+                corpus = req.get("corpus", [])
+                k = req.get("k", 10)
+                matches = [
+                    {"incident_id": c["incident_id"], "confidence": 0.5, "reasoning": seen}
+                    for c in corpus[:k]
+                ]
+                resp = {"ranked_matches": matches}
+            elif req.get("task") == "remediate":
+                resp = {"selected_label": seen}
+            else:
+                resp = {"error": "unknown"}
+            sys.stdout.write(json.dumps(resp) + "\\n")
+            sys.stdout.flush()
+    """))
+    return str(script)
+
+
+def _remediate(adapter, payload):
+    from rhyme_bench.models import RemediationChoice
+    return adapter.remediate(
+        payload, [], [RemediationChoice(label="A", text="Fix", grade="fixed")]
+    )
+
+
+def test_system_prompt_per_task_distinct(spy_script, small_corpus):
+    """Per-task prompts thread through independently to each task."""
+    adapter = SubprocessAdapter(
+        [sys.executable, spy_script],
+        system_prompt_retrieve="RET_SYS",
+        system_prompt_remediate="REM_SYS",
+    )
+    payloads = small_corpus.payloads()
+
+    result = adapter.retrieve(payloads[0], payloads[1:4], k=2)
+    assert result.matches[0].reasoning == "RET_SYS"
+
+    assert _remediate(adapter, payloads[0]) == "REM_SYS"
+    adapter.close()
+
+
+def test_system_prompt_omitted_when_unset(spy_script, small_corpus):
+    """With no system prompt configured, the field is omitted entirely.
+
+    This guarantees existing runs/results are unchanged by the feature.
+    """
+    adapter = SubprocessAdapter([sys.executable, spy_script])
+    payloads = small_corpus.payloads()
+
+    result = adapter.retrieve(payloads[0], payloads[1:4], k=2)
+    assert result.matches[0].reasoning == "<MISSING>"
+
+    assert _remediate(adapter, payloads[0]) == "<MISSING>"
+    adapter.close()
+
+
+def test_system_prompt_retrieve_only(spy_script, small_corpus):
+    """A retrieve-only prompt does not leak into the remediate task."""
+    adapter = SubprocessAdapter(
+        [sys.executable, spy_script],
+        system_prompt_retrieve="ONLY_RET",
+    )
+    payloads = small_corpus.payloads()
+
+    result = adapter.retrieve(payloads[0], payloads[1:4], k=2)
+    assert result.matches[0].reasoning == "ONLY_RET"
+
+    assert _remediate(adapter, payloads[0]) == "<MISSING>"
+    adapter.close()
+
+
+def test_system_prompt_empty_string_treated_as_unset(spy_script, small_corpus):
+    """An empty-string prompt is falsy and omitted, not sent as ''."""
+    adapter = SubprocessAdapter(
+        [sys.executable, spy_script],
+        system_prompt_retrieve="",
+    )
+    payloads = small_corpus.payloads()
+    result = adapter.retrieve(payloads[0], payloads[1:4], k=2)
+    assert result.matches[0].reasoning == "<MISSING>"
+    adapter.close()
