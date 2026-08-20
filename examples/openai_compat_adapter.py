@@ -21,6 +21,22 @@ Usage:
   # Together AI
   export OPENAI_BASE_URL=https://api.together.xyz/v1 OPENAI_API_KEY=... RHYME_MODEL=meta-llama/Llama-3-70b-chat-hf
   rhyme-run --adapter "python examples/openai_compat_adapter.py" ...
+
+  # OpenRouter, reasoning off + pinned provider (reproducible, matches a local
+  # reasoning-off config so hosted iteration transfers back to a local run):
+  export OPENAI_BASE_URL=https://openrouter.ai/api/v1 OPENAI_API_KEY=sk-or-...
+  export RHYME_MODEL=some/model RHYME_EXTRA_BODY='{"reasoning":{"enabled":false}}'
+  export RHYME_PROVIDER=DeepInfra RHYME_MODEL_LOG=/app/data/served_models.jsonl
+  rhyme-run --tasks 3 --adapter "python examples/openai_compat_adapter.py" ...
+
+Extra knobs:
+  RHYME_EXTRA_BODY  JSON object shallow-merged into every request body; its keys
+                    win over everything else (provider pin, defaults). Aborts at
+                    startup if not valid JSON, so a config field is never silently
+                    dropped.
+  RHYME_PROVIDER    Comma-separated OpenRouter provider preference order; builds
+                    the `provider` routing block with fallbacks off (set
+                    RHYME_PROVIDER_ALLOW_FALLBACKS=true to allow them).
 """
 
 import json
@@ -44,18 +60,50 @@ MODEL_LOG = os.environ.get("RHYME_MODEL_LOG", "")
 RETRIEVE_MAX_TOKENS = int(os.environ.get("RHYME_RETRIEVE_MAX_TOKENS", "6000"))
 REMEDIATE_MAX_TOKENS = int(os.environ.get("RHYME_REMEDIATE_MAX_TOKENS", "2000"))
 
+# Extra request-body fields merged into every /chat/completions call. A JSON
+# object string; its top-level keys are shallow-merged into the body and win
+# over everything set here (including the conveniences below). Use it to pass
+# provider-specific fields that aren't part of the OpenAI schema, e.g.:
+#   OpenRouter reasoning off:  RHYME_EXTRA_BODY='{"reasoning":{"enabled":false}}'
+#   vLLM/LM Studio thinking off: RHYME_EXTRA_BODY='{"reasoning_effort":"none"}'
+# A malformed value aborts at startup rather than silently sending the request
+# without the field — a silent drop would quietly change what config you tested.
+try:
+    EXTRA_BODY = json.loads(os.environ.get("RHYME_EXTRA_BODY", "") or "{}")
+except json.JSONDecodeError as e:
+    print(f"RHYME_EXTRA_BODY is not valid JSON: {e}", file=sys.stderr)
+    sys.exit(1)
+if not isinstance(EXTRA_BODY, dict):
+    print("RHYME_EXTRA_BODY must be a JSON object", file=sys.stderr)
+    sys.exit(1)
+
+# OpenRouter provider pin. RHYME_PROVIDER is a comma-separated preference order
+# (e.g. "DeepInfra,Together"); it builds the OpenRouter `provider` routing block
+# so you don't silently get a different backend (and quantization) per request.
+# Fallbacks are disabled by default for reproducibility — set
+# RHYME_PROVIDER_ALLOW_FALLBACKS=true to allow routing outside the pinned list.
+PROVIDERS = [p.strip() for p in os.environ.get("RHYME_PROVIDER", "").split(",") if p.strip()]
+ALLOW_FALLBACKS = os.environ.get("RHYME_PROVIDER_ALLOW_FALLBACKS", "false").lower() in (
+    "1", "true", "yes",
+)
+
 
 def call_llm(prompt: str, max_tokens: int = 2000, system: str | None = None) -> tuple[str, dict, str]:
     messages = []
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
-    body = json.dumps({
+    payload = {
         "model": MODEL,
         "messages": messages,
         "temperature": 0,
         "max_tokens": max_tokens,
-    }).encode()
+    }
+    # Provider pin (convenience) first, then RHYME_EXTRA_BODY wins over everything.
+    if PROVIDERS:
+        payload["provider"] = {"order": PROVIDERS, "allow_fallbacks": ALLOW_FALLBACKS}
+    payload.update(EXTRA_BODY)
+    body = json.dumps(payload).encode()
 
     req = urllib.request.Request(
         f"{BASE_URL}/chat/completions",
