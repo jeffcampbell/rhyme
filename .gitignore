@@ -13,6 +13,11 @@ data/models_*.json
 # Private slice — never publish
 data/queries_private.json
 data/query_payloads_private.json
+data/remediation_questions_private.json
+data/priv_run/
+
+# Candidate system prompts under evaluation (see --system-prompt)
+prompts/
 
 # Web labeling session data (contains org-specific incidents)
 data/web/
