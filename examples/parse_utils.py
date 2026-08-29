@@ -3,6 +3,36 @@
 import json
 import re
 
+_THINK_TAGS = ("think", "thinking", "reasoning")
+
+
+def strip_thinking(text: str) -> str:
+    """Remove chain-of-thought blocks from LLM output.
+
+    Handles matched pairs plus the two unpaired cases servers actually emit:
+    some (LM Studio) consume the opening tag and stream only the closer, and a
+    generation truncated by max_tokens can open a block that never closes.
+    An unpaired closer is the dangerous one -- the reasoning stays in the text
+    and downstream scanners pick an answer out of the model's deliberation.
+    """
+    for tag in _THINK_TAGS:
+        text = re.sub(rf'<{tag}>[\s\S]*?</{tag}>', '', text)
+
+    # Unpaired closer: everything up to the last one is reasoning.
+    for tag in _THINK_TAGS:
+        close = f'</{tag}>'
+        idx = text.rfind(close)
+        if idx != -1:
+            text = text[idx + len(close):]
+
+    # Unpaired opener: reasoning ran to the end without closing.
+    for tag in _THINK_TAGS:
+        idx = text.find(f'<{tag}>')
+        if idx != -1:
+            text = text[:idx]
+
+    return text.strip()
+
 
 def extract_json_array(text: str) -> list:
     """Robustly extract a JSON array from LLM output.
@@ -12,11 +42,11 @@ def extract_json_array(text: str) -> list:
     """
     text = text.strip()
 
-    # Strip thinking tags (DeepSeek, Qwen, Gemini thinking mode)
-    text = re.sub(r'<think>[\s\S]*?</think>', '', text)
-    text = re.sub(r'<thinking>[\s\S]*?</thinking>', '', text)
-    text = re.sub(r'<reasoning>[\s\S]*?</reasoning>', '', text)
-    text = text.strip()
+    # Strip thinking tags (DeepSeek, Qwen, Gemini thinking mode). Keep the
+    # original if stripping consumed everything -- an array buried in an
+    # unterminated reasoning block is still better than nothing.
+    stripped = strip_thinking(text)
+    text = stripped or text
 
     # Strip code fences
     if "```" in text:
@@ -78,11 +108,7 @@ def normalize_matches(raw_matches: list, k: int) -> list[dict]:
 
 def extract_letter(text: str) -> str:
     """Extract a single letter (A-E) from remediation response."""
-    # Strip thinking tags
-    text = re.sub(r'<think>[\s\S]*?</think>', '', text)
-    text = re.sub(r'<thinking>[\s\S]*?</thinking>', '', text)
-    text = re.sub(r'<reasoning>[\s\S]*?</reasoning>', '', text)
-    text = text.strip().upper()
+    text = strip_thinking(text).upper()
     for char in text:
         if char in "ABCDE":
             return char
