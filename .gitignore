@@ -39,3 +39,6 @@ CLAUDE.md
 # Secrets — API keys, never commit
 .env
 .bench_bridge/
+
+# Local agent-capability eval harness (not part of the benchmark)
+.agent_eval/
