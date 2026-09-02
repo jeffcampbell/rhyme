@@ -31,6 +31,7 @@ Rhyme measures whether a model can tell the difference. You can find the full pa
 | Inkling | 0.799 | 0.147 | 9,204 | 94% | 0% |
 | Gemini 3.8 Flash§ | 0.799 | 0.101 | 2,617 | 93% | 0% |
 | Qwen3.8 27B* | 0.798 | 0.116 | 2,144 | 93% | 0% |
+| Mercury 2.5 Preview | 0.798 | 0.110 | 4,526 | 96% | 0% |
 | Claude Fable 5 | 0.795 | 0.115 | 3,397 | 95% | 0% |
 | Gemma 4 31B IT | 0.792 | 0.160 | 2,318 | 94% | 0% |
 | Bonsai 27B (local)† | 0.791 | 0.132 | 2,123 | 72% | 4% |
